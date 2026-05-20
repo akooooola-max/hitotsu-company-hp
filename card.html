@@ -208,6 +208,70 @@
       color: #333;
       letter-spacing: 0.08em;
     }
+
+    /* ── Animations ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0; }
+    }
+
+    @keyframes typing {
+      from { width: 0; }
+      to   { width: 100%; }
+    }
+
+    @keyframes glowPulse {
+      0%, 100% { box-shadow: 0 32px 80px rgba(0,0,0,0.6); }
+      50%       { box-shadow: 0 32px 80px rgba(0,0,0,0.6), 0 0 40px rgba(217,119,87,0.08); }
+    }
+
+    .card {
+      animation: fadeUp 0.6s ease both, glowPulse 4s ease-in-out 1s infinite;
+    }
+
+    .terminal-bar { animation: fadeUp 0.5s ease 0.1s both; }
+    .card-header  { animation: fadeUp 0.5s ease 0.3s both; }
+
+    .prompt {
+      overflow: hidden;
+      white-space: nowrap;
+      width: 0;
+      animation: typing 0.4s steps(8) 0.6s forwards;
+    }
+
+    .cursor {
+      display: inline-block;
+      width: 2px;
+      height: 1.1em;
+      background: #D97757;
+      vertical-align: middle;
+      margin-left: 2px;
+      animation: blink 1s step-end infinite;
+    }
+
+    .card-name  { animation: fadeUp 0.5s ease 1.1s both; opacity: 0; }
+    .card-tag   { animation: fadeUp 0.5s ease 1.3s both; opacity: 0; }
+    .code-comment { animation: fadeUp 0.5s ease 1.5s both; opacity: 0; }
+
+    .link-item:nth-child(1) { animation: fadeUp 0.4s ease 1.7s both; opacity: 0; }
+    .link-item:nth-child(2) { animation: fadeUp 0.4s ease 1.85s both; opacity: 0; }
+    .link-item:nth-child(3) { animation: fadeUp 0.4s ease 2.0s both; opacity: 0; }
+    .link-item:nth-child(4) { animation: fadeUp 0.4s ease 2.15s both; opacity: 0; }
+
+    .qr-section  { animation: fadeUp 0.5s ease 2.3s both; opacity: 0; }
+    .card-footer { animation: fadeUp 0.5s ease 2.5s both; opacity: 0; }
+
+    .link-item {
+      transition: border-color 0.25s, background 0.25s, transform 0.2s;
+    }
+    .link-item:hover {
+      transform: translateX(5px);
+    }
   </style>
 </head>
 <body>
@@ -222,7 +286,7 @@
     </div>
 
     <div class="card-header">
-      <div class="prompt">$ whoami</div>
+      <div class="prompt">$ whoami<span class="cursor"></span></div>
       <div class="card-name">Hitot<span>su</span></div>
       <div class="card-tag">AI社員の制作・導入</div>
     </div>
