@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hitotsu | Digital Card</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Noto Sans JP', sans-serif;
+      background: #f5f0eb;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+    }
+
+    .card {
+      background: #fff;
+      width: 100%;
+      max-width: 380px;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+    }
+
+    .card-header {
+      background: linear-gradient(135deg, #D97757 0%, #e8946f 100%);
+      padding: 2.5rem 2rem 2rem;
+      text-align: center;
+      color: #fff;
+    }
+
+    .card-avatar {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.3);
+      margin: 0 auto 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Inter', sans-serif;
+      font-size: 1.8rem;
+      font-weight: 600;
+      color: #fff;
+    }
+
+    .card-name {
+      font-family: 'Inter', sans-serif;
+      font-size: 1.6rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.3rem;
+    }
+
+    .card-title {
+      font-size: 0.82rem;
+      font-weight: 300;
+      opacity: 0.9;
+      letter-spacing: 0.08em;
+    }
+
+    .card-body {
+      padding: 2rem;
+    }
+
+    .card-company {
+      text-align: center;
+      margin-bottom: 1.8rem;
+    }
+
+    .card-company-name {
+      font-family: 'Inter', sans-serif;
+      font-size: 1rem;
+      font-weight: 600;
+      color: #1a1a1a;
+      letter-spacing: 0.05em;
+    }
+
+    .card-company-desc {
+      font-size: 0.78rem;
+      color: #888;
+      margin-top: 0.3rem;
+    }
+
+    .divider {
+      height: 1px;
+      background: #f0ede8;
+      margin-bottom: 1.8rem;
+    }
+
+    .links {
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+      margin-bottom: 2rem;
+    }
+
+    .link-item {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 0.9rem 1.2rem;
+      border-radius: 12px;
+      background: #faf8f5;
+      text-decoration: none;
+      color: #1a1a1a;
+      transition: all 0.2s;
+    }
+
+    .link-item:hover {
+      background: #fdf0e8;
+      transform: translateX(4px);
+    }
+
+    .link-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: #D97757;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 0.8rem;
+      font-weight: 600;
+      font-family: 'Inter', sans-serif;
+      flex-shrink: 0;
+    }
+
+    .link-icon.instagram { background: linear-gradient(135deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); }
+    .link-icon.threads { background: #000; }
+    .link-icon.note { background: #41C9B4; }
+    .link-icon.web { background: #D97757; }
+
+    .link-text {
+      flex: 1;
+    }
+
+    .link-label {
+      font-size: 0.72rem;
+      color: #aaa;
+      font-weight: 300;
+    }
+
+    .link-value {
+      font-size: 0.88rem;
+      font-weight: 400;
+      color: #1a1a1a;
+    }
+
+    .qr-section {
+      text-align: center;
+      padding-top: 0.5rem;
+    }
+
+    .qr-label {
+      font-size: 0.72rem;
+      color: #aaa;
+      letter-spacing: 0.1em;
+      margin-bottom: 0.8rem;
+    }
+
+    .qr-section img {
+      width: 120px;
+      height: 120px;
+      border-radius: 8px;
+    }
+
+    .card-footer {
+      background: #faf8f5;
+      padding: 1rem;
+      text-align: center;
+      font-size: 0.72rem;
+      color: #bbb;
+      letter-spacing: 0.05em;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-avatar">H</div>
+      <div class="card-name">Hitotsu</div>
+      <div class="card-title">AI社員の制作・導入 / Hitotsu Company</div>
+    </div>
+
+    <div class="card-body">
+      <div class="card-company">
+        <div class="card-company-name">Hitotsu Company</div>
+        <div class="card-company-desc">あなたのビジネスに、AIで動く社員をつくります。</div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="links">
+        <a href="https://akooooola-max.github.io/hitotsu-company-hp/" target="_blank" class="link-item">
+          <div class="link-icon web">HP</div>
+          <div class="link-text">
+            <div class="link-label">Website</div>
+            <div class="link-value">Hitotsu Company HP</div>
+          </div>
+        </a>
+        <a href="https://note.com/hitotsu_ai" target="_blank" class="link-item">
+          <div class="link-icon note">n</div>
+          <div class="link-text">
+            <div class="link-label">note</div>
+            <div class="link-value">@hitotsu_ai</div>
+          </div>
+        </a>
+        <a href="https://www.instagram.com/hitotsu_ai/?hl=ja" target="_blank" class="link-item">
+          <div class="link-icon instagram">IG</div>
+          <div class="link-text">
+            <div class="link-label">Instagram</div>
+            <div class="link-value">@hitotsu_ai</div>
+          </div>
+        </a>
+        <a href="https://www.threads.com/@hitotsu_ai" target="_blank" class="link-item">
+          <div class="link-icon threads">Th</div>
+          <div class="link-text">
+            <div class="link-label">Threads</div>
+            <div class="link-value">@hitotsu_ai</div>
+          </div>
+        </a>
+      </div>
+
+      <div class="qr-section">
+        <div class="qr-label">WEBSITE QR CODE</div>
+        <img src="https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=https://akooooola-max.github.io/hitotsu-company-hp/&color=D97757&bgcolor=FFFFFF" alt="QR Code">
+      </div>
+    </div>
+
+    <div class="card-footer">Hitotsu Company &copy; 2026</div>
+  </div>
+
+</body>
+</html>
