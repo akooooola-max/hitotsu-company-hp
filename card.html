@@ -3,17 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Hitotsu | Digital Card</title>
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-  <meta http-equiv="Pragma" content="no-cache">
+  <title>Hitotsu | Digital Card</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600&family=Inter:wght@300;400;600&family=Noto+Sans+JP:wght@300;400&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      font-family: 'Noto Sans JP', sans-serif;
-      background: #f0ece6;
+      font-family: 'Inter', sans-serif;
+      background: #0e0e0e;
       min-height: 100vh;
       display: flex;
       align-items: center;
@@ -22,154 +21,223 @@
     }
 
     .card {
-      background: #fff;
       width: 100%;
       max-width: 360px;
-      border-radius: 24px;
+      background: #161616;
+      border-radius: 20px;
+      border: 1px solid #2a2a2a;
       overflow: hidden;
-      box-shadow: 0 24px 64px rgba(0,0,0,0.12);
+      box-shadow: 0 32px 80px rgba(0,0,0,0.6);
+    }
+
+    /* Terminal header bar */
+    .terminal-bar {
+      background: #1e1e1e;
+      border-bottom: 1px solid #2a2a2a;
+      padding: 0.7rem 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+    .dot.red    { background: #ff5f56; }
+    .dot.yellow { background: #ffbd2e; }
+    .dot.green  { background: #27c93f; }
+
+    .terminal-title {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.68rem;
+      color: #555;
+      margin-left: 0.5rem;
+      letter-spacing: 0.05em;
     }
 
     .card-header {
-      background: linear-gradient(135deg, #D97757 0%, #e8946f 100%);
-      padding: 2.8rem 2rem 2.2rem;
-      text-align: center;
-      color: #fff;
+      padding: 2.2rem 2rem 1.8rem;
+      border-bottom: 1px solid #222;
+    }
+
+    .prompt {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      color: #D97757;
+      margin-bottom: 0.6rem;
+      opacity: 0.8;
     }
 
     .card-name {
-      font-family: 'Inter', sans-serif;
-      font-size: 2rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 2.2rem;
       font-weight: 600;
-      letter-spacing: 0.08em;
-      margin-bottom: 0.4rem;
+      color: #f0f0f0;
+      letter-spacing: 0.04em;
+      line-height: 1;
+      margin-bottom: 0.8rem;
     }
 
-    .card-title {
-      font-size: 0.78rem;
-      font-weight: 300;
-      opacity: 0.85;
-      letter-spacing: 0.1em;
+    .card-name span { color: #D97757; }
+
+    .card-tag {
+      display: inline-block;
+      background: rgba(217, 119, 87, 0.12);
+      border: 1px solid rgba(217, 119, 87, 0.3);
+      color: #D97757;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.68rem;
+      padding: 0.25rem 0.7rem;
+      border-radius: 4px;
+      letter-spacing: 0.05em;
     }
 
     .card-body {
-      padding: 2rem 1.8rem;
+      padding: 1.8rem 2rem;
     }
 
-    .card-desc {
-      text-align: center;
-      font-size: 0.82rem;
-      color: #999;
-      margin-bottom: 1.8rem;
+    .code-comment {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.68rem;
+      color: #4a4a4a;
+      margin-bottom: 1.4rem;
       line-height: 1.8;
-    }
-
-    .divider {
-      height: 1px;
-      background: #f0ede8;
-      margin-bottom: 1.5rem;
     }
 
     .links {
       display: flex;
       flex-direction: column;
-      gap: 0.7rem;
+      gap: 0.6rem;
       margin-bottom: 2rem;
     }
 
     .link-item {
       display: flex;
       align-items: center;
-      gap: 1rem;
-      padding: 0.9rem 1.1rem;
-      border-radius: 14px;
-      background: #faf8f5;
+      gap: 0.9rem;
+      padding: 0.8rem 1rem;
+      border-radius: 10px;
+      background: #1e1e1e;
+      border: 1px solid #262626;
       text-decoration: none;
-      color: #1a1a1a;
       transition: all 0.2s;
     }
 
     .link-item:hover {
-      background: #fdf0e8;
-      transform: translateX(4px);
+      border-color: #D97757;
+      background: rgba(217, 119, 87, 0.06);
     }
 
     .link-icon {
-      width: 38px;
-      height: 38px;
-      border-radius: 10px;
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
       display: flex;
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
     }
 
-    .link-icon svg { width: 20px; height: 20px; }
+    .link-icon svg { width: 18px; height: 18px; }
 
-    .link-icon.web     { background: #D97757; }
-    .link-icon.note    { background: #41C9B4; }
-    .link-icon.instagram { background: linear-gradient(135deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); }
-    .link-icon.threads { background: #1a1a1a; }
+    .link-icon.web       { background: rgba(217,119,87,0.15); border: 1px solid rgba(217,119,87,0.3); }
+    .link-icon.note      { background: rgba(65,201,180,0.15); border: 1px solid rgba(65,201,180,0.3); }
+    .link-icon.instagram { background: rgba(220,39,67,0.12);  border: 1px solid rgba(220,39,67,0.25); }
+    .link-icon.threads   { background: rgba(255,255,255,0.05); border: 1px solid #333; }
 
     .link-text { flex: 1; }
 
     .link-label {
-      font-size: 0.68rem;
-      color: #bbb;
-      font-weight: 300;
-      letter-spacing: 0.06em;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.6rem;
+      color: #444;
+      letter-spacing: 0.1em;
     }
 
     .link-value {
-      font-size: 0.86rem;
+      font-size: 0.84rem;
       font-weight: 400;
-      color: #1a1a1a;
+      color: #ccc;
     }
+
+    .arrow {
+      font-family: 'JetBrains Mono', monospace;
+      color: #333;
+      font-size: 0.8rem;
+      transition: color 0.2s;
+    }
+    .link-item:hover .arrow { color: #D97757; }
 
     .qr-section {
       text-align: center;
+      padding-top: 0.5rem;
+      border-top: 1px solid #222;
+      padding-top: 1.5rem;
     }
 
     .qr-label {
-      font-size: 0.68rem;
-      color: #ccc;
-      letter-spacing: 0.15em;
-      margin-bottom: 0.8rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.6rem;
+      color: #333;
+      letter-spacing: 0.2em;
+      margin-bottom: 1rem;
     }
 
-    .qr-section img {
-      width: 110px;
-      height: 110px;
+    .qr-wrap {
+      display: inline-block;
+      padding: 10px;
+      background: #fff;
       border-radius: 10px;
     }
 
+    .qr-wrap img {
+      width: 100px;
+      height: 100px;
+      display: block;
+    }
+
     .card-footer {
-      background: #faf8f5;
-      padding: 1rem;
+      background: #111;
+      border-top: 1px solid #1e1e1e;
+      padding: 0.9rem;
       text-align: center;
-      font-size: 0.68rem;
-      color: #ccc;
-      letter-spacing: 0.05em;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.62rem;
+      color: #333;
+      letter-spacing: 0.08em;
     }
   </style>
 </head>
 <body>
 
   <div class="card">
+
+    <div class="terminal-bar">
+      <div class="dot red"></div>
+      <div class="dot yellow"></div>
+      <div class="dot green"></div>
+      <span class="terminal-title">hitotsu — claude code</span>
+    </div>
+
     <div class="card-header">
-      <div class="card-name">Hitotsu</div>
-      <div class="card-title">AI社員の制作・導入 / Hitotsu Company</div>
+      <div class="prompt">$ whoami</div>
+      <div class="card-name">Hitot<span>su</span></div>
+      <div class="card-tag">AI社員の制作・導入</div>
     </div>
 
     <div class="card-body">
-      <div class="card-desc">あなたのビジネスに、<br>AIで動く社員をつくります。</div>
-
-      <div class="divider"></div>
+      <div class="code-comment">
+        // あなたのビジネスに、<br>
+        // AIで動く社員をつくります。
+      </div>
 
       <div class="links">
+
         <a href="https://akooooola-max.github.io/hitotsu-company-hp/" target="_blank" class="link-item">
           <div class="link-icon web">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#D97757" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/>
               <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
             </svg>
@@ -178,11 +246,12 @@
             <div class="link-label">WEBSITE</div>
             <div class="link-value">Hitotsu Company</div>
           </div>
+          <span class="arrow">→</span>
         </a>
 
         <a href="https://note.com/hitotsu_ai" target="_blank" class="link-item">
           <div class="link-icon note">
-            <svg viewBox="0 0 24 24" fill="#fff">
+            <svg viewBox="0 0 24 24" fill="#41C9B4">
               <path d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2zm-7 14H7v-2h5v2zm5-4H7v-2h10v2zm0-4H7V7h10v2z"/>
             </svg>
           </div>
@@ -190,11 +259,12 @@
             <div class="link-label">NOTE</div>
             <div class="link-value">@hitotsu_ai</div>
           </div>
+          <span class="arrow">→</span>
         </a>
 
         <a href="https://www.instagram.com/hitotsu_ai/?hl=ja" target="_blank" class="link-item">
           <div class="link-icon instagram">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#dc2743" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
               <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
               <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
@@ -204,28 +274,33 @@
             <div class="link-label">INSTAGRAM</div>
             <div class="link-value">@hitotsu_ai</div>
           </div>
+          <span class="arrow">→</span>
         </a>
 
         <a href="https://www.threads.com/@hitotsu_ai" target="_blank" class="link-item">
           <div class="link-icon threads">
-            <svg viewBox="0 0 24 24" fill="#fff">
-              <path d="M12.186 24h-.007c-3.581-.024-6.334-1.205-8.184-3.509C2.35 18.44 1.5 15.586 1.471 12.01v-.017c.03-3.579.879-6.43 2.525-8.482C5.845 1.205 8.6.024 12.18 0h.014c2.746.02 5.043.725 6.826 2.098 1.677 1.29 2.858 3.13 3.509 5.467l-2.04.569c-1.104-3.96-3.898-5.984-8.304-6.015-2.91.022-5.11.936-6.54 2.717C4.307 6.504 3.616 8.914 3.589 12c.027 3.086.718 5.496 2.057 7.164 1.43 1.783 3.631 2.698 6.54 2.717 2.623-.02 4.358-.631 5.8-2.045 1.647-1.613 1.618-3.593 1.09-4.798-.31-.71-.873-1.3-1.634-1.75-.192 1.352-.622 2.446-1.284 3.272-.886 1.102-2.14 1.704-3.73 1.79-1.202.065-2.361-.218-3.259-.801-1.063-.689-1.685-1.74-1.752-2.964-.065-1.19.408-2.355 1.313-3.197.849-.79 2.096-1.281 3.554-1.357.descendants.54-.013 1.098.012 1.657h-.005c-.035-.007-.07-.014-.105-.02-.836-.13-1.707.006-2.44.384-.735.381-1.17.934-1.213 1.565-.045.65.307 1.279.964 1.712.567.375 1.313.558 2.152.53 1.054-.033 1.89-.449 2.486-1.238.523-.703.842-1.76.938-3.138-.654-.432-1.472-.655-2.44-.655h-.006zM19.5 12.01c-.01-.22-.024-.435-.04-.644-.283-3.24-2.316-5.17-5.4-5.17-1.5 0-2.852.515-3.8 1.45l-.001.001C9.33 8.535 8.83 9.605 8.83 10.826c0 1.226.498 2.297 1.429 3.086.948.803 2.285 1.231 3.872 1.231 1.52 0 2.79-.408 3.752-1.214.88-.74 1.454-1.785 1.617-3.047v.001z"/>
+            <svg viewBox="0 0 24 24" fill="#aaa">
+              <path d="M12.186 24h-.007c-3.581-.024-6.334-1.205-8.184-3.509C2.35 18.44 1.5 15.586 1.471 12.01v-.017c.03-3.579.879-6.43 2.525-8.482C5.845 1.205 8.6.024 12.18 0h.014c2.746.02 5.043.725 6.826 2.098 1.677 1.29 2.858 3.13 3.509 5.467l-2.04.569c-1.104-3.96-3.898-5.984-8.304-6.015-2.91.022-5.11.936-6.54 2.717C4.307 6.504 3.616 8.914 3.589 12c.027 3.086.718 5.496 2.057 7.164 1.43 1.783 3.631 2.698 6.54 2.717 2.623-.02 4.358-.631 5.8-2.045 1.647-1.613 1.618-3.593 1.09-4.798-.31-.71-.873-1.3-1.634-1.75-.192 1.352-.622 2.446-1.284 3.272-.886 1.102-2.14 1.704-3.73 1.79-1.202.065-2.361-.218-3.259-.801-1.063-.689-1.685-1.74-1.752-2.964-.065-1.19.408-2.355 1.313-3.197.849-.79 2.096-1.281 3.554-1.357.54-.013 1.098.012 1.657.075-.035-.007-.07-.014-.105-.02-.836-.13-1.707.006-2.44.384-.735.381-1.17.934-1.213 1.565-.045.65.307 1.279.964 1.712.567.375 1.313.558 2.152.53 1.054-.033 1.89-.449 2.486-1.238.523-.703.842-1.76.938-3.138-.654-.432-1.472-.655-2.44-.655h-.006z"/>
             </svg>
           </div>
           <div class="link-text">
             <div class="link-label">THREADS</div>
             <div class="link-value">@hitotsu_ai</div>
           </div>
+          <span class="arrow">→</span>
         </a>
+
       </div>
 
       <div class="qr-section">
         <div class="qr-label">SCAN TO VISIT</div>
-        <img src="https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=https://akooooola-max.github.io/hitotsu-company-hp/&color=D97757&bgcolor=FFFFFF" alt="QR Code">
+        <div class="qr-wrap">
+          <img src="https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=https://akooooola-max.github.io/hitotsu-company-hp/&color=D97757&bgcolor=FFFFFF" alt="QR Code">
+        </div>
       </div>
     </div>
 
-    <div class="card-footer">Hitotsu Company &copy; 2026</div>
+    <div class="card-footer">© 2026 Hitotsu Company</div>
   </div>
 
 </body>
