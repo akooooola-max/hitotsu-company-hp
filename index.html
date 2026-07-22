@@ -3,137 +3,323 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Hitotsu Company</title>
+  <title>Hitotsu Company | ひとりで、6つの会社を動かす。</title>
+  <meta name="description" content="屋号 Hitotsu Company。オーナー Hitotsu と54名のAIメンバーで、AIエージェント・Instagram運用支援・マーケティング制作・物販・出版・福祉支援の6事業を運営しています。">
+  <meta name="theme-color" content="#0e0e0e">
+  <meta property="og:title" content="Hitotsu Company | ひとりで、6つの会社を動かす。">
+  <meta property="og:description" content="オーナー1名と54名のAIメンバーで6事業を運営する、一人ホールディングス。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://akooooola-max.github.io/hitotsu-company-hp/">
   <link rel="stylesheet" href="style.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
-  <style>
-    /* ── Hero animations ── */
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(24px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to   { opacity: 1; }
-    }
-
-    .hero-sub   { animation: fadeUp 0.7s ease 0.2s both; }
-    .hero-title { animation: fadeUp 0.7s ease 0.5s both; }
-    .hero-desc  { animation: fadeUp 0.7s ease 0.8s both; }
-    .hero .btn  { animation: fadeUp 0.7s ease 1.1s both; }
-    .header     { animation: fadeIn 0.6s ease 0.1s both; }
-
-    /* ── Scroll-triggered ── */
-    .reveal {
-      opacity: 0;
-      transform: translateY(32px);
-      transition: opacity 0.7s ease, transform 0.7s ease;
-    }
-    .reveal.visible {
-      opacity: 1;
-      transform: translateY(0);
-    }
-    .reveal-delay-1 { transition-delay: 0.1s; }
-    .reveal-delay-2 { transition-delay: 0.25s; }
-    .reveal-delay-3 { transition-delay: 0.4s; }
-    .reveal-delay-4 { transition-delay: 0.55s; }
-  </style>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600;700&family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
 </head>
 <body>
 
-  <!-- Navigation -->
-  <header class="header">
-    <nav class="nav">
-      <div class="nav-logo">Hitotsu Company</div>
+  <!-- Nav -->
+  <nav class="nav">
+    <div class="nav-inner">
+      <a href="#top" class="nav-logo"><span class="dot-mark"></span>Hitotsu <em>Company</em></a>
       <ul class="nav-links">
         <li><a href="#about">会社概要</a></li>
-        <li><a href="#services">事業内容</a></li>
+        <li><a href="#business">事業</a></li>
+        <li><a href="#org">組織図</a></li>
+        <li><a href="#members">メンバー</a></li>
         <li><a href="#contact">お問い合わせ</a></li>
       </ul>
-    </nav>
-  </header>
+    </div>
+  </nav>
 
   <!-- Hero -->
-  <section class="hero">
-    <div class="hero-content">
-      <p class="hero-sub">ひとつひとつ、丁寧に。</p>
-      <h1 class="hero-title">Hitotsu Company</h1>
-      <p class="hero-desc">あなたのビジネスに、<br>AIで動く社員をつくります。</p>
-      <a href="#services" class="btn">事業内容を見る</a>
-    </div>
-  </section>
-
-  <!-- About -->
-  <section class="about" id="about">
-    <div class="container">
-      <div class="section-label reveal">ABOUT</div>
-      <h2 class="section-title reveal reveal-delay-1">会社概要</h2>
-      <div class="about-grid reveal reveal-delay-2">
-        <div class="about-item">
-          <span class="about-label">屋号</span>
-          <span class="about-value">Hitotsu Company</span>
-        </div>
-        <div class="about-item">
-          <span class="about-label">オーナー</span>
-          <span class="about-value">Hitotsu</span>
-        </div>
-        <div class="about-item">
-          <span class="about-label">事業内容</span>
-          <span class="about-value">AI社員の制作・導入</span>
-        </div>
+  <header class="hero" id="top">
+    <div class="wrap hero-inner">
+      <div class="terminal-bar">
+        <span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span>
+        <span class="terminal-title">hitotsu — claude code</span>
       </div>
-      <div class="about-message reveal reveal-delay-3">
-        <p>「ひとつ」の想いと行動が、仕事をもっとスマートにする。<br>私たちはあなたのビジネスに合ったAI社員を設計・制作し、<br>業務の自動化と生産性向上を実現します。</p>
+      <p class="hero-eyebrow">$ whoami<span class="cursor"></span></p>
+      <h1 class="hero-title">ひとりで、<span class="accent">6つの会社</span>を動かす。</h1>
+      <p class="hero-sub">屋号 Hitotsu Company。AIエージェント事業から放課後等デイサービス支援まで、6つの事業を、オーナー Hitotsu と54名のAIメンバーで運営しています。</p>
+      <div class="hero-cta">
+        <a href="#business" class="btn btn-primary">事業を見る</a>
+        <a href="#org" class="btn btn-ghost">組織図を見る</a>
+      </div>
+      <div class="stats">
+        <div class="stat"><b>6</b><span>事業 Divisions</span></div>
+        <div class="stat"><b>54</b><span>メンバー Agents</span></div>
+        <div class="stat"><b>1</b><span>オーナー Owner</span></div>
       </div>
     </div>
-  </section>
+  </header>
 
-  <!-- Services -->
-  <section class="services" id="services">
-    <div class="container">
-      <div class="section-label reveal">SERVICES</div>
-      <h2 class="section-title reveal reveal-delay-1">事業内容</h2>
-      <div class="services-grid">
+  <div class="page">
+    <div class="wrap">
 
-        <div class="service-card reveal reveal-delay-2">
-          <div class="service-num">01</div>
-          <div class="service-icon">&#9733;</div>
-          <h3 class="service-name">ai-company</h3>
-          <p class="service-category">AI社員の制作・導入</p>
-          <p class="service-desc">あなたのビジネスに最適なAI社員を設計・制作します。業務の自動化から顧客対応まで、AIがあなたの代わりに動き続ける仕組みをつくります。</p>
-          <ul class="service-features">
-            <li>AI社員の設計・カスタマイズ</li>
-            <li>業務フローの自動化</li>
-            <li>Claude Codeを活用した開発・制作</li>
-            <li>導入後のサポート・改善</li>
-          </ul>
-          <div class="service-links">
-            <a href="https://note.com/hitotsu_ai" target="_blank" class="btn btn-outline">note →</a>
-            <a href="https://www.instagram.com/hitotsu_ai/?hl=ja" target="_blank" class="btn btn-outline">Instagram →</a>
-            <a href="https://www.threads.com/@hitotsu_ai" target="_blank" class="btn btn-outline">Threads →</a>
+      <!-- About -->
+      <section class="section" id="about">
+        <div class="sec-label"><span class="n">01</span><h2>会社概要</h2><span class="rule"></span></div>
+        <div class="about-grid reveal">
+          <p class="about-lede">ひとりの意思決定を、AIメンバーが実行する。<br>Hitotsu Company は、オーナー <b>Hitotsu</b> が率いる<b>一人ホールディングス</b>です。各事業に専任のAIチームを置き、企画から制作・運用までを内製で回しています。</p>
+          <div class="facts">
+            <div class="fact"><div class="fk">屋号</div><div class="fv">Hitotsu Company</div></div>
+            <div class="fact"><div class="fk">代表 / オーナー</div><div class="fv">Hitotsu</div></div>
+            <div class="fact"><div class="fk">事業数</div><div class="fv">6 事業</div></div>
+            <div class="fact"><div class="fk">メンバー</div><div class="fv">54 名</div></div>
           </div>
         </div>
+      </section>
 
-      </div>
+      <!-- Business -->
+      <section class="section" id="business">
+        <div class="sec-label"><span class="n">02</span><h2>事業</h2><span class="rule"></span></div>
+        <p class="sec-lead">6つの事業が、それぞれ独立したAIチームで動いています。</p>
+        <div class="biz-grid">
+
+          <a href="#m-ai" class="biz-card reveal" style="--accent:#35B5C4">
+            <div class="b-num">事業①</div>
+            <div class="b-name">ai-company <span class="tag-new">NEW</span></div>
+            <div class="b-short">AIエージェント事業 ・ 7名</div>
+            <p class="b-desc">受託開発／教育・講座／自社運用の3本柱。他5事業の自動化も担う新設部門。</p>
+            <div class="b-more">メンバーを見る →</div>
+          </a>
+
+          <a href="#m-insta" class="biz-card reveal" style="--accent:#F06AA0">
+            <div class="b-num">事業②</div>
+            <div class="b-name">insta-company</div>
+            <div class="b-short">Instagram運用支援 ・ 9名</div>
+            <p class="b-desc">トレンド調査からリール制作・LP・LINE導線まで、集客の一気通貫を回す。</p>
+            <div class="b-more">メンバーを見る →</div>
+          </a>
+
+          <a href="#m-claude" class="biz-card reveal" style="--accent:#D97757">
+            <div class="b-num">事業③</div>
+            <div class="b-name">claude-company</div>
+            <div class="b-short">マーケ・制作支援 ・ 13名</div>
+            <p class="b-desc">マーケティング・コンテンツ制作・LP・SNS運用支援。最大所帯で戦略から制作・分析まで一括対応。</p>
+            <div class="b-more">メンバーを見る →</div>
+          </a>
+
+          <a href="#m-mark" class="biz-card reveal" style="--accent:#5B93E0">
+            <div class="b-num">事業④</div>
+            <div class="b-name">MARK</div>
+            <div class="b-short">物販・電脳せどり ・ 9名</div>
+            <p class="b-desc">店舗せどりで種を掴み、AIが電脳で横展開。仕入れの鉄則で利益を検証する。</p>
+            <div class="b-more">メンバーを見る →</div>
+          </a>
+
+          <a href="#m-book" class="biz-card reveal" style="--accent:#9B87E0">
+            <div class="b-num">事業⑤</div>
+            <div class="b-name">book-company</div>
+            <div class="b-short">Kindle出版・note発信 ・ 9名</div>
+            <p class="b-desc">1本の資産を note → Kindle → セミナーへ多重展開する出版社。</p>
+            <div class="b-more">メンバーを見る →</div>
+          </a>
+
+          <a href="#m-fukushi" class="biz-card reveal" style="--accent:#4FBF8B">
+            <div class="b-num">事業⑥</div>
+            <div class="b-name">fukushi-company</div>
+            <div class="b-short">放課後等デイ向けAI支援 ・ 7名</div>
+            <p class="b-desc">現場の書類・お知らせから運営企画・会計まで、AIで支援する部門（事業所運営は行いません）。</p>
+            <div class="b-more">メンバーを見る →</div>
+          </a>
+
+        </div>
+      </section>
+
+      <!-- Org chart -->
+      <section class="section" id="org">
+        <div class="sec-label"><span class="n">03</span><h2>組織図</h2><span class="rule"></span></div>
+        <p class="sec-lead">オーナー Hitotsu を頂点に、6事業が枝分かれします。</p>
+        <div class="tree reveal">
+          <div class="owner-node">
+            <div class="k">Owner</div>
+            <div class="name">Hitotsu Company</div>
+            <div class="who">代表 / オーナー &nbsp;—&nbsp; Hitotsu</div>
+          </div>
+          <div class="stem"></div>
+          <div class="branch-bar"></div>
+          <div class="divisions">
+            <div class="div-col"><div class="drop"></div>
+              <a href="#m-ai" class="div-node" style="--accent:#35B5C4">
+                <div class="num">事業①</div><div class="dn">ai</div>
+                <div class="dd">AIエージェント事業</div><span class="cnt">7名</span>
+              </a>
+            </div>
+            <div class="div-col"><div class="drop"></div>
+              <a href="#m-insta" class="div-node" style="--accent:#F06AA0">
+                <div class="num">事業②</div><div class="dn">insta</div>
+                <div class="dd">Instagram運用支援</div><span class="cnt">9名</span>
+              </a>
+            </div>
+            <div class="div-col"><div class="drop"></div>
+              <a href="#m-claude" class="div-node" style="--accent:#D97757">
+                <div class="num">事業③</div><div class="dn">claude</div>
+                <div class="dd">マーケ・制作支援</div><span class="cnt">13名</span>
+              </a>
+            </div>
+            <div class="div-col"><div class="drop"></div>
+              <a href="#m-mark" class="div-node" style="--accent:#5B93E0">
+                <div class="num">事業④</div><div class="dn">MARK</div>
+                <div class="dd">物販・電脳せどり</div><span class="cnt">9名</span>
+              </a>
+            </div>
+            <div class="div-col"><div class="drop"></div>
+              <a href="#m-book" class="div-node" style="--accent:#9B87E0">
+                <div class="num">事業⑤</div><div class="dn">book</div>
+                <div class="dd">Kindle出版・note発信</div><span class="cnt">9名</span>
+              </a>
+            </div>
+            <div class="div-col"><div class="drop"></div>
+              <a href="#m-fukushi" class="div-node" style="--accent:#4FBF8B">
+                <div class="num">事業⑥</div><div class="dn">fukushi</div>
+                <div class="dd">放課後等デイ向けAI支援</div><span class="cnt">7名</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Members -->
+      <section class="section" id="members">
+        <div class="sec-label"><span class="n">04</span><h2>メンバー</h2><span class="rule"></span></div>
+        <p class="sec-lead">全54名。それぞれに役割・判断基準を定義したAIメンバーです。</p>
+        <div class="cards">
+
+          <section class="card reveal" id="m-ai" style="--accent:#35B5C4">
+            <div class="card-head">
+              <div class="top"><span class="biz">事業①</span><span class="cname">ai-company</span><span class="tag-new">NEW</span></div>
+              <p class="desc">AIエージェント事業。受託開発／教育・講座／自社運用の3本柱。</p>
+            </div>
+            <div class="member-list">
+              <div class="member lead"><span class="badge">1</span><div><div class="role"><span class="en">leader</span></div><div class="task">司令塔。振り分けと進行・報告のまとめ</div></div></div>
+              <div class="member"><span class="badge">2</span><div><div class="role"><span class="en">architect</span></div><div class="task">要件定義・エージェント設計</div></div></div>
+              <div class="member"><span class="badge">3</span><div><div class="role"><span class="en">builder</span></div><div class="task">実装・構築・MCP連携</div></div></div>
+              <div class="member"><span class="badge">4</span><div><div class="role"><span class="en">prompt</span></div><div class="task">プロンプト設計・精度改善</div></div></div>
+              <div class="member"><span class="badge">5</span><div><div class="role"><span class="en">trainer</span></div><div class="task">教育・講座・教材作成</div></div></div>
+              <div class="member"><span class="badge">6</span><div><div class="role"><span class="en">sales</span></div><div class="task">受託営業・提案・進行管理</div></div></div>
+              <div class="member"><span class="badge">7</span><div><div class="role"><span class="en">ops</span></div><div class="task">他5事業の業務自動化・運用支援</div></div></div>
+            </div>
+          </section>
+
+          <section class="card reveal" id="m-insta" style="--accent:#F06AA0">
+            <div class="card-head">
+              <div class="top"><span class="biz">事業②</span><span class="cname">insta-company</span></div>
+              <p class="desc">Instagram運用支援。トレンド調査からリール制作・LP・LINE導線まで。</p>
+            </div>
+            <div class="member-list">
+              <div class="member lead"><span class="badge">0</span><div><div class="role"><span class="en">leader</span></div><div class="task">CEOの分身。全体統括と振り分け</div></div></div>
+              <div class="member"><span class="badge">1</span><div><div class="role"><span class="en">trend</span> トレンドリサーチャー</div><div class="task">トレンド・競合・ハッシュタグ調査</div></div></div>
+              <div class="member"><span class="badge">2</span><div><div class="role"><span class="en">writer</span> リール台本ライター</div><div class="task">フック→本編→CTAの台本作成</div></div></div>
+              <div class="member"><span class="badge">3</span><div><div class="role"><span class="en">editor</span> リール編集ディレクター</div><div class="task">動画編集ディレクション</div></div></div>
+              <div class="member"><span class="badge">4</span><div><div class="role"><span class="en">feed</span> フィード&amp;ストーリーズ</div><div class="task">フィード・ストーリーズ運用</div></div></div>
+              <div class="member"><span class="badge">5</span><div><div class="role"><span class="en">dm</span> DM対応マネージャー</div><div class="task">DM対応・見込み客フォロー</div></div></div>
+              <div class="member"><span class="badge">6</span><div><div class="role"><span class="en">lp</span> LPデザイナー</div><div class="task">ランディングページ制作</div></div></div>
+              <div class="member"><span class="badge">7</span><div><div class="role"><span class="en">line</span> LINE導線設計</div><div class="task">LINE導線・ステップ設計</div></div></div>
+              <div class="member"><span class="badge">8</span><div><div class="role"><span class="en">account</span></div><div class="task">アカウント運用管理</div></div></div>
+            </div>
+          </section>
+
+          <section class="card reveal" id="m-claude" style="--accent:#D97757">
+            <div class="card-head">
+              <div class="top"><span class="biz">事業③</span><span class="cname">claude-company</span></div>
+              <p class="desc">マーケティング・コンテンツ制作・LP・SNS運用支援。最大所帯の部門。</p>
+            </div>
+            <div class="member-list">
+              <div class="member lead"><span class="badge">1</span><div><div class="role"><span class="en">leader</span></div><div class="task">経営者の分身。全メンバー統括・戦略判断</div></div></div>
+              <div class="member"><span class="badge">2</span><div><div class="role"><span class="en">brunson</span></div><div class="task">マーケ施策の壁打ちパートナー・顧問</div></div></div>
+              <div class="member"><span class="badge">3</span><div><div class="role"><span class="en">designer</span></div><div class="task">デザイン制作</div></div></div>
+              <div class="member"><span class="badge">4</span><div><div class="role"><span class="en">lp</span></div><div class="task">LP制作</div></div></div>
+              <div class="member"><span class="badge">5</span><div><div class="role"><span class="en">video</span></div><div class="task">動画制作</div></div></div>
+              <div class="member"><span class="badge">6</span><div><div class="role"><span class="en">researcher</span></div><div class="task">Web＋SNS一次情報リサーチ</div></div></div>
+              <div class="member"><span class="badge">7</span><div><div class="role"><span class="en">writer</span></div><div class="task">ライティング</div></div></div>
+              <div class="member"><span class="badge">8</span><div><div class="role"><span class="en">analyst</span></div><div class="task">ボトルネック特定・改善インパクト順の提案</div></div></div>
+              <div class="member"><span class="badge">9</span><div><div class="role"><span class="en">product</span></div><div class="task">特典ページ・教材の型化された生産ライン</div></div></div>
+              <div class="member"><span class="badge">10</span><div><div class="role"><span class="en">sns</span></div><div class="task">Figmaテンプレ量産・文字数チェック</div></div></div>
+              <div class="member"><span class="badge">11</span><div><div class="role"><span class="en">voice</span></div><div class="task">ナレーション原稿＋音声制作</div></div></div>
+              <div class="member"><span class="badge">12</span><div><div class="role"><span class="en">reviewer</span></div><div class="task">レビュー・校正・品質チェック</div></div></div>
+              <div class="member"><span class="badge">13</span><div><div class="role"><span class="en">account</span></div><div class="task">アカウント管理</div></div></div>
+            </div>
+          </section>
+
+          <section class="card reveal" id="m-mark" style="--accent:#5B93E0">
+            <div class="card-head">
+              <div class="top"><span class="biz">事業④</span><span class="cname">MARK</span></div>
+              <p class="desc">物販・電脳せどり。リサーチから仕入れ判断・利益検証まで。</p>
+            </div>
+            <div class="member-list">
+              <div class="member lead"><span class="badge">1</span><div><div class="role"><span class="en">leader</span></div><div class="task">司令塔。仕入れ判断・タスク分解・報告集約</div></div></div>
+              <div class="member"><span class="badge">2</span><div><div class="role"><span class="en">seller</span></div><div class="task">セラーリサーチ（最重要）。他セラーから利益商品を抜く</div></div></div>
+              <div class="member"><span class="badge">3</span><div><div class="role"><span class="en">store</span></div><div class="task">店舗せどり起点。実店舗の利益商品を電脳の種に</div></div></div>
+              <div class="member"><span class="badge">4</span><div><div class="role"><span class="en">keyword</span></div><div class="task">アウトレット＋特価/限定KW検索</div></div></div>
+              <div class="member"><span class="badge">5</span><div><div class="role"><span class="en">source</span></div><div class="task">仕入れ元特定。Google検索で仕入先を割る</div></div></div>
+              <div class="member"><span class="badge">6</span><div><div class="role"><span class="en">repeat</span></div><div class="task">リピート商品ハンター</div></div></div>
+              <div class="member"><span class="badge">7</span><div><div class="role"><span class="en">expand</span></div><div class="task">新規サイト横展開（薄く横積み）</div></div></div>
+              <div class="member"><span class="badge">8</span><div><div class="role"><span class="en">profit</span></div><div class="task">利益計算・検証（手数料/送料/真贋リスク）</div></div></div>
+              <div class="member"><span class="badge">9</span><div><div class="role"><span class="en">watcher</span></div><div class="task">見張り役。脱線防止・アカウント保全</div></div></div>
+            </div>
+          </section>
+
+          <section class="card reveal" id="m-book" style="--accent:#9B87E0">
+            <div class="card-head">
+              <div class="top"><span class="biz">事業⑤</span><span class="cname">book-company</span></div>
+              <p class="desc">Kindle出版（KDP）× note発信。企画から販促・分析まで内製。</p>
+            </div>
+            <div class="member-list">
+              <div class="member lead"><span class="badge">1</span><div><div class="role"><span class="en">leader</span></div><div class="task">司令塔。企画判断・タスク分解・報告集約</div></div></div>
+              <div class="member"><span class="badge">2</span><div><div class="role"><span class="en">planner</span></div><div class="task">出版企画・テーマ設計</div></div></div>
+              <div class="member"><span class="badge">3</span><div><div class="role"><span class="en">writer</span></div><div class="task">原稿執筆</div></div></div>
+              <div class="member"><span class="badge">4</span><div><div class="role"><span class="en">editor</span></div><div class="task">編集・構成</div></div></div>
+              <div class="member"><span class="badge">5</span><div><div class="role"><span class="en">designer</span></div><div class="task">表紙・図版デザイン</div></div></div>
+              <div class="member"><span class="badge">6</span><div><div class="role"><span class="en">kdp</span></div><div class="task">KDP出版オペレーション（入稿・KW・価格・A+）</div></div></div>
+              <div class="member"><span class="badge">7</span><div><div class="role"><span class="en">note</span></div><div class="task">note発信・記事化</div></div></div>
+              <div class="member"><span class="badge">8</span><div><div class="role"><span class="en">marketer</span></div><div class="task">販促。レビュー導線・SNS拡散・無料キャンペーン</div></div></div>
+              <div class="member"><span class="badge">9</span><div><div class="role"><span class="en">analyst</span></div><div class="task">売上・DL・ランキング分析と改善提案</div></div></div>
+            </div>
+          </section>
+
+          <section class="card reveal" id="m-fukushi" style="--accent:#4FBF8B">
+            <div class="card-head">
+              <div class="top"><span class="biz">事業⑥</span><span class="cname">fukushi-company</span></div>
+              <p class="desc">放課後等デイサービス向けAIサポート。書類・企画・会計まわりを支援。</p>
+            </div>
+            <div class="member-list">
+              <div class="member lead"><span class="badge">1</span><div><div class="role"><span class="en">leader</span></div><div class="task">依頼を受けメンバーに振り、報告をまとめる</div></div></div>
+              <div class="member"><span class="badge">2</span><div><div class="role"><span class="en">writer</span></div><div class="task">文章・書類・お知らせ作成</div></div></div>
+              <div class="member"><span class="badge">3</span><div><div class="role"><span class="en">designer</span></div><div class="task">デザイン・ビジュアル制作</div></div></div>
+              <div class="member"><span class="badge">4</span><div><div class="role"><span class="en">planner</span></div><div class="task">運営企画・出席管理などの定常業務</div></div></div>
+              <div class="member"><span class="badge">5</span><div><div class="role"><span class="en">finance</span></div><div class="task">会計・数字まわりの管理</div></div></div>
+              <div class="member"><span class="badge">6</span><div><div class="role"><span class="en">counsel</span></div><div class="task">相談・対人／制度まわりの助言</div></div></div>
+              <div class="member"><span class="badge">7</span><div><div class="role"><span class="en">coach</span></div><div class="task">コーチング・人材育成</div></div></div>
+            </div>
+          </section>
+
+        </div>
+      </section>
+
+      <!-- Contact -->
+      <section class="section" id="contact">
+        <div class="sec-label"><span class="n">05</span><h2>お問い合わせ</h2><span class="rule"></span></div>
+        <p class="sec-lead">「うちの業務でも使えますか？」という段階からで大丈夫です。AI社員の制作・導入のご相談を受け付けています。</p>
+        <div class="hero-cta" style="justify-content:flex-start">
+          <a href="mailto:a.koooool.a@gmail.com" class="btn btn-primary">メールで相談する</a>
+          <a href="https://www.instagram.com/hitotsu_ai/?hl=ja" target="_blank" rel="noopener" class="btn btn-ghost">InstagramのDM</a>
+          <a href="card.html" class="btn btn-ghost">デジタル名刺</a>
+        </div>
+      </section>
+
     </div>
-  </section>
+  </div>
 
-  <!-- Contact -->
-  <section class="contact" id="contact">
-    <div class="container">
-      <div class="section-label reveal">CONTACT</div>
-      <h2 class="section-title reveal reveal-delay-1">お問い合わせ</h2>
-      <p class="contact-desc reveal reveal-delay-2">サービスに関するご質問・ご相談は、<br>お気軽にお問い合わせください。</p>
-      <a href="mailto:a.koooool.a@gmail.com" class="btn btn-outline">メールでお問い合わせ</a>
-    </div>
-  </section>
-
-  <!-- Footer -->
   <footer class="footer">
-    <div class="container">
-      <div class="footer-logo">Hitotsu Company</div>
-<p class="footer-copy">&copy; 2026 Hitotsu Company. All rights reserved.</p>
+    <div class="wrap">
+      <div class="footer-logo">Hitotsu <em>Company</em></div>
+      <div class="footer-sns">
+        <a href="https://note.com/hitotsu_ai" target="_blank" rel="noopener">note</a>
+        <a href="https://www.instagram.com/hitotsu_ai/?hl=ja" target="_blank" rel="noopener">Instagram</a>
+        <a href="https://www.threads.com/@hitotsu_ai" target="_blank" rel="noopener">Threads</a>
+        <a href="card.html">デジタル名刺</a>
+      </div>
+      <p class="footer-copy">&copy; 2026 Hitotsu Company</p>
     </div>
   </footer>
 
@@ -145,7 +331,7 @@
           observer.unobserve(e.target);
         }
       });
-    }, { threshold: 0.15 });
+    }, { threshold: 0.12 });
 
     document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
   </script>

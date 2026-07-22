@@ -106,6 +106,38 @@
       line-height: 1.8;
     }
 
+    .card-stats {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1.4rem;
+    }
+
+    .stat-box {
+      flex: 1;
+      background: #1a1a1a;
+      border: 1px solid #242424;
+      border-radius: 8px;
+      padding: 0.6rem 0.4rem;
+      text-align: center;
+    }
+
+    .stat-num {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #D97757;
+      line-height: 1.2;
+    }
+
+    .stat-num small { font-size: 0.65rem; }
+
+    .stat-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.55rem;
+      color: #4a4a4a;
+      letter-spacing: 0.1em;
+    }
+
     .links {
       display: flex;
       flex-direction: column;
@@ -257,6 +289,7 @@
     .card-name  { animation: fadeUp 0.5s ease 1.1s both; opacity: 0; }
     .card-tag   { animation: fadeUp 0.5s ease 1.3s both; opacity: 0; }
     .code-comment { animation: fadeUp 0.5s ease 1.5s both; opacity: 0; }
+    .card-stats   { animation: fadeUp 0.5s ease 1.6s both; opacity: 0; }
 
     .link-item:nth-child(1) { animation: fadeUp 0.4s ease 1.7s both; opacity: 0; }
     .link-item:nth-child(2) { animation: fadeUp 0.4s ease 1.85s both; opacity: 0; }
@@ -297,6 +330,21 @@
         // AIで動く社員をつくります。
       </div>
 
+      <div class="card-stats">
+        <div class="stat-box">
+          <div class="stat-num">6</div>
+          <div class="stat-label">BUSINESS</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-num">54</div>
+          <div class="stat-label">AI MEMBERS</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-num">24<small>h</small></div>
+          <div class="stat-label">RUNNING</div>
+        </div>
+      </div>
+
       <div class="links">
 
         <a href="https://akooooola-max.github.io/hitotsu-company-hp/" target="_blank" class="link-item">
@@ -308,7 +356,7 @@
           </div>
           <div class="link-text">
             <div class="link-label">WEBSITE</div>
-            <div class="link-value">ai-company</div>
+            <div class="link-value">hitotsu-company</div>
           </div>
           <span class="arrow">→</span>
         </a>
