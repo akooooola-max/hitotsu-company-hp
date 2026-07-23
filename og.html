@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Noto+Sans+JP:wght@500;700;900&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 1200px; height: 630px; }
+  body {
+    font-family: 'Noto Sans JP', sans-serif;
+    background: #0e0e0e;
+    color: #ededed;
+    position: relative;
+    overflow: hidden;
+  }
+  .grid {
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(#262626 1px, transparent 1px),
+      linear-gradient(90deg, #262626 1px, transparent 1px);
+    background-size: 54px 54px;
+    opacity: 0.3;
+    -webkit-mask-image: radial-gradient(80% 90% at 30% 40%, #000 0%, transparent 78%);
+    mask-image: radial-gradient(80% 90% at 30% 40%, #000 0%, transparent 78%);
+  }
+  .glow {
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(38% 55% at 12% 8%, rgba(217,119,87,0.28), transparent 70%),
+      radial-gradient(40% 60% at 92% 4%, rgba(53,181,196,0.16), transparent 70%),
+      radial-gradient(46% 62% at 78% 100%, rgba(155,135,224,0.14), transparent 72%);
+    filter: blur(8px);
+  }
+  .wrap {
+    position: relative; z-index: 2;
+    height: 100%;
+    display: flex; flex-direction: column;
+    justify-content: center;
+    padding: 0 74px;
+  }
+  .brand {
+    display: flex; align-items: center; gap: 14px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 26px; font-weight: 700; letter-spacing: 0.02em;
+    margin-bottom: 30px;
+  }
+  .brand .dot { width: 14px; height: 14px; border-radius: 50%; background: #D97757; box-shadow: 0 0 16px rgba(217,119,87,0.9); }
+  .brand em { font-style: normal; color: #D97757; }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 10px;
+    align-self: flex-start;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 18px; letter-spacing: 0.22em; color: #D97757;
+    background: rgba(217,119,87,0.09);
+    border: 1px solid rgba(217,119,87,0.28);
+    border-radius: 999px; padding: 8px 18px;
+    margin-bottom: 26px;
+  }
+  h1 {
+    font-size: 82px; font-weight: 900; line-height: 1.18;
+    letter-spacing: 0.01em;
+  }
+  h1 .ac { color: #D97757; text-shadow: 0 0 40px rgba(217,119,87,0.45); }
+  .sub {
+    margin-top: 28px;
+    font-size: 25px; color: #9a9a9a; font-weight: 500; line-height: 1.7;
+    max-width: 20em;
+  }
+  .stats {
+    display: flex; gap: 52px; margin-top: 40px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .stat b { font-size: 46px; font-weight: 700; color: #ededed; white-space: nowrap; }
+  .stat span { white-space: nowrap; }
+  .stat span { display: block; font-size: 16px; color: #5a5a5a; letter-spacing: 0.12em; margin-top: 4px; }
+  .stat b .u { display: inline; color: #D97757; margin: 0; font-size: 30px; }
+
+  /* terminal chip bottom-right */
+  .term {
+    position: absolute; right: 60px; bottom: 54px; z-index: 2;
+    width: 360px;
+    background: rgba(22,22,22,0.85);
+    border: 1px solid #262626; border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 30px 70px rgba(0,0,0,0.55);
+  }
+  .term-bar { display: flex; align-items: center; gap: 8px; padding: 12px 16px; background: #1a1a1a; border-bottom: 1px solid #262626; }
+  .term-bar i { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
+  .term-bar .r { background: #ff5f56; } .term-bar .y { background: #ffbd2e; } .term-bar .g { background: #27c93f; }
+  .term-bar span { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #5a5a5a; margin-left: 8px; }
+  .term-body { padding: 18px 18px; font-family: 'JetBrains Mono', monospace; font-size: 15px; line-height: 1.95; }
+  .term-body .p { color: #D97757; margin-right: 8px; }
+  .term-body .o { color: #9a9a9a; }
+  .term-body .ok { color: #27c93f; margin-right: 6px; }
+</style>
+</head>
+<body>
+  <div class="grid"></div>
+  <div class="glow"></div>
+
+  <div class="wrap">
+    <div class="brand"><span class="dot"></span>Hitotsu <em>Company</em></div>
+    <div class="eyebrow">&gt;_ AI AGENT HOLDINGS</div>
+    <h1>ひとりで、<span class="ac">6つの会社</span><br>を動かす。</h1>
+    <div class="stats">
+      <div class="stat"><b>6</b><span>DIVISIONS</span></div>
+      <div class="stat"><b>54</b><span>AI AGENTS</span></div>
+      <div class="stat"><b>24<span class="u">h</span></b><span>RUNNING</span></div>
+    </div>
+  </div>
+
+  <div class="term">
+    <div class="term-bar"><i class="r"></i><i class="y"></i><i class="g"></i><span>hitotsu — claude code</span></div>
+    <div class="term-body">
+      <div><span class="p">$</span>whoami</div>
+      <div class="o">Hitotsu Company</div>
+      <div><span class="p">$</span>agents --status</div>
+      <div class="o"><span class="ok">●</span>54 running — 24h</div>
+    </div>
+  </div>
+</body>
+</html>
