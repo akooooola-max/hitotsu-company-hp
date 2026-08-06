@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>福祉ツール制作 お申し込みフォーム｜hitotsu company</title>
+<style>
+  :root{ --navy:#123a5e; --teal:#1c8c8c; --accent:#e8834e; --bg:#f5f7fa; --line:#d9e0e8; --ink:#213040; }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,"Hiragino Kaku Gothic ProN",system-ui,sans-serif;line-height:1.7}
+  .wrap{max-width:640px;margin:0 auto;padding:20px 16px 64px}
+  header{background:linear-gradient(135deg,var(--navy),var(--teal));color:#fff;border-radius:16px;padding:24px 20px;margin-bottom:20px}
+  header h1{font-size:1.25rem;margin:0 0 6px}
+  header p{margin:0;font-size:.9rem;opacity:.92}
+  .card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px 16px;margin-bottom:14px}
+  label{display:block;font-weight:700;font-size:.98rem;margin-bottom:8px}
+  .req{color:var(--accent);font-size:.8rem;margin-left:6px}
+  .hint{font-weight:400;color:#5a6b7d;font-size:.82rem;margin:2px 0 10px}
+  input[type=text],textarea,select{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:9px;font-size:1rem;font-family:inherit;background:#fff}
+  textarea{min-height:84px;resize:vertical}
+  .radios{display:flex;flex-wrap:wrap;gap:8px}
+  .radios label{display:flex;align-items:center;gap:6px;font-weight:400;background:#f0f4f8;border:1px solid var(--line);border-radius:20px;padding:7px 14px;margin:0;cursor:pointer}
+  .radios input{accent-color:var(--teal)}
+  button{width:100%;background:var(--accent);color:#fff;border:0;border-radius:11px;padding:15px;font-size:1.05rem;font-weight:700;cursor:pointer;margin-top:4px}
+  button:active{transform:translateY(1px)}
+  .out{display:none;margin-top:18px}
+  .out.show{display:block}
+  .out textarea{min-height:220px;font-family:ui-monospace,Menlo,monospace;font-size:.82rem}
+  .copybtn{background:var(--navy)}
+  .done{background:#eaf6ef;border:1px solid #b7e0c6;color:#1c6b3f;border-radius:10px;padding:12px;font-size:.9rem;margin-top:10px}
+  footer{text-align:center;color:#8494a4;font-size:.78rem;margin-top:22px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>福祉ツール制作 お申し込み</h1>
+    <p>困りごとを教えてください。専用のWebツールを作って、URLでお届けします。</p>
+  </header>
+
+  <form id="f">
+    <div class="card">
+      <label>1. お名前・事業所名<span class="req">必須</span></label>
+      <div class="hint">例：ふるさとデイ 田中</div>
+      <input type="text" name="requester" required>
+    </div>
+
+    <div class="card">
+      <label>2. どんなツールが欲しいですか？<span class="req">必須</span></label>
+      <div class="hint">一番大事です。困りごと・やりたいことを自由に。例：毎朝の体温・体調を記録して職員みんなで見られるようにしたい</div>
+      <textarea name="purpose" required></textarea>
+    </div>
+
+    <div class="card">
+      <label>3. 管理したい項目<span class="req">必須</span></label>
+      <div class="hint">表やリストの「列」になる部分。例：利用者名、日付、体温、体調、気になること</div>
+      <textarea name="fields" required></textarea>
+    </div>
+
+    <div class="card">
+      <label>4. 主に誰が使いますか？</label>
+      <div class="radios">
+        <label><input type="radio" name="users" value="職員だけ" checked>職員だけ</label>
+        <label><input type="radio" name="users" value="職員＋保護者">職員＋保護者</label>
+        <label><input type="radio" name="users" value="利用者本人">利用者本人</label>
+        <label><input type="radio" name="users" value="その他">その他</label>
+      </div>
+    </div>
+
+    <div class="card">
+      <label>5. 主に使う端末</label>
+      <div class="radios">
+        <label><input type="radio" name="device" value="スマホ" checked>スマホ</label>
+        <label><input type="radio" name="device" value="PC">PC</label>
+        <label><input type="radio" name="device" value="両方">両方</label>
+      </div>
+    </div>
+
+    <div class="card">
+      <label>6. 複数人で共有しますか？</label>
+      <div class="hint">「はい」→ 合言葉ひとつで別の端末とデータが揃う仕組みを組み込みます</div>
+      <div class="radios">
+        <label><input type="radio" name="share" value="はい（みんなで共有したい）" checked>はい・共有したい</label>
+        <label><input type="radio" name="share" value="いいえ（自分の端末だけでよい）">いいえ・自分だけ</label>
+      </div>
+    </div>
+
+    <div class="card">
+      <label>7. 印刷は必要ですか？</label>
+      <div class="radios">
+        <label><input type="radio" name="print" value="必要" checked>必要</label>
+        <label><input type="radio" name="print" value="不要">不要</label>
+      </div>
+    </div>
+
+    <div class="card">
+      <label>8. 参考にしたいもの（任意）</label>
+      <div class="hint">URL・既存の紙様式の説明など</div>
+      <input type="text" name="reference">
+    </div>
+
+    <div class="card">
+      <label>9. 希望納期（任意）</label>
+      <input type="text" name="due" placeholder="例：今週中">
+    </div>
+
+    <div class="card">
+      <label>10. 完成URLの送り先<span class="req">必須</span></label>
+      <div class="hint">メールアドレス または LINE</div>
+      <input type="text" name="contact" required>
+    </div>
+
+    <button type="submit">内容を確認する</button>
+  </form>
+
+  <div class="out" id="out">
+    <div class="card">
+      <label>この内容で送信します（コピーして送ってください）</label>
+      <div class="hint">下のボタンでコピー → LINEかメールに貼り付けて送信。または「メールで送る」から。</div>
+      <textarea id="json" readonly></textarea>
+      <button class="copybtn" type="button" id="copy">内容をコピー</button>
+      <button type="button" id="mail" style="background:var(--teal)">メールで送る</button>
+      <div class="done" id="done" style="display:none">コピーしました。LINEかメールに貼って送ってください。</div>
+    </div>
+  </div>
+
+  <footer>hitotsu company｜福祉ツール自動工場<br>個人情報は最小限で。要配慮情報は記号化のうえ扱います。</footer>
+</div>
+
+<script>
+  const form = document.getElementById('f');
+  const out = document.getElementById('out');
+  const jsonEl = document.getElementById('json');
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    const fd = new FormData(form);
+    const obj = { id: 'req-' + Date.now() };
+    for (const [k,v] of fd.entries()) obj[k] = v;
+    // Claude Code の制作指示書が読む形（requests/*.json と同じキー）
+    jsonEl.value = JSON.stringify(obj, null, 2);
+    out.classList.add('show');
+    out.scrollIntoView({behavior:'smooth'});
+  });
+  document.getElementById('copy').addEventListener('click', async function(){
+    try { await navigator.clipboard.writeText(jsonEl.value); }
+    catch(_) { jsonEl.select(); document.execCommand('copy'); }
+    document.getElementById('done').style.display = 'block';
+  });
+  document.getElementById('mail').addEventListener('click', function(){
+    const fd = new FormData(form);
+    const to = 'a.koooool.a@gmail.com';
+    const subj = encodeURIComponent('福祉ツール制作の申し込み：' + (fd.get('requester')||''));
+    const body = encodeURIComponent(jsonEl.value);
+    location.href = `mailto:${to}?subject=${subj}&body=${body}`;
+  });
+</script>
+</body>
+</html>
