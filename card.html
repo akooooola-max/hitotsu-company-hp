@@ -309,6 +309,7 @@
     .link-item:nth-child(4) { animation: fadeUp 0.4s ease 2.15s both; opacity: 0; }
     .link-item:nth-child(5) { animation: fadeUp 0.4s ease 2.3s both; opacity: 0; }
     .link-item:nth-child(6) { animation: fadeUp 0.4s ease 2.45s both; opacity: 0; }
+    .link-item:nth-child(7) { animation: fadeUp 0.4s ease 2.6s both; opacity: 0; }
 
     .link-item.featured-order {
       border-color: rgba(217, 119, 87, 0.35);
@@ -330,6 +331,17 @@
       background: rgba(65, 201, 180, 0.1);
     }
     .link-item.featured:hover .arrow { color: #41C9B4; }
+
+    .link-item.featured-book {
+      border-color: rgba(240, 180, 41, 0.35);
+      background: rgba(240, 180, 41, 0.05);
+    }
+    .link-item.featured-book .link-label { color: #F0B429; }
+    .link-item.featured-book:hover {
+      border-color: #F0B429;
+      background: rgba(240, 180, 41, 0.1);
+    }
+    .link-item.featured-book:hover .arrow { color: #F0B429; }
 
     .qr-section  { animation: fadeUp 0.5s ease 2.3s both; opacity: 0; }
     .card-footer { animation: fadeUp 0.5s ease 2.5s both; opacity: 0; }
@@ -404,6 +416,20 @@
           <div class="link-text">
             <div class="link-label">ORDER — 福祉ツール制作</div>
             <div class="link-value">紙の作業を、専用ツールに（10問で注文）</div>
+          </div>
+          <span class="arrow">→</span>
+        </a>
+
+        <a href="https://www.amazon.co.jp/dp/B0HDMJ5VK3" target="_blank" class="link-item featured-book">
+          <div class="link-icon web">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#F0B429" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+              <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+            </svg>
+          </div>
+          <div class="link-text">
+            <div class="link-label">BOOK — Kindle新刊</div>
+            <div class="link-value">非エンジニアのClaude Code仕事術（500円）</div>
           </div>
           <span class="arrow">→</span>
         </a>
