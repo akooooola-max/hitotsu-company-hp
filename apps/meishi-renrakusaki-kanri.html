@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>社内名刺・連絡先管理</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic", sans-serif; background: #f5f7fa; color: #333; padding: 16px; line-height: 1.6; }
+.container { max-width: 720px; margin: 0 auto; }
+h1 { font-size: 1.4rem; margin-bottom: 4px; color: #2c3e50; }
+.subtitle { font-size: 0.85rem; color: #7f8c8d; margin-bottom: 16px; }
+.card { background: white; border-radius: 8px; padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+.search-box { display: flex; gap: 8px; margin-bottom: 12px; }
+input, textarea, select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 1rem; font-family: inherit; }
+textarea { resize: vertical; min-height: 60px; }
+button { background: #3498db; color: white; border: none; padding: 10px 16px; border-radius: 6px; font-size: 0.95rem; cursor: pointer; white-space: nowrap; }
+button:hover { background: #2980b9; }
+button.secondary { background: #95a5a6; }
+button.danger { background: #e74c3c; }
+button.small { padding: 6px 10px; font-size: 0.85rem; }
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+.form-grid > *:nth-child(-n+2) { grid-column: span 1; }
+.full { grid-column: 1 / -1 !important; }
+label { font-size: 0.8rem; color: #555; display: block; margin-bottom: 3px; font-weight: 500; }
+.contact { border-left: 3px solid #3498db; padding: 12px; background: white; margin-bottom: 8px; border-radius: 4px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+.contact-name { font-weight: bold; font-size: 1.05rem; color: #2c3e50; }
+.contact-meta { font-size: 0.85rem; color: #7f8c8d; margin: 2px 0; }
+.contact-info { font-size: 0.9rem; margin: 4px 0; }
+.contact-info a { color: #3498db; text-decoration: none; }
+.contact-memo { font-size: 0.85rem; background: #f8f9fa; padding: 6px 8px; border-radius: 4px; margin-top: 6px; color: #555; white-space: pre-wrap; }
+.contact-actions { display: flex; gap: 6px; margin-top: 8px; }
+.empty { text-align: center; color: #95a5a6; padding: 30px; }
+.count { font-size: 0.85rem; color: #7f8c8d; margin-bottom: 8px; }
+.toggle-form { display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
+.toggle-form h2 { font-size: 1rem; color: #2c3e50; }
+.form-body { margin-top: 12px; }
+.hidden { display: none; }
+.tag { display: inline-block; background: #ecf0f1; color: #555; padding: 2px 8px; border-radius: 10px; font-size: 0.75rem; margin-right: 4px; }
+@media (max-width: 500px) {
+  .form-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+<h1>📇 社内名刺・連絡先管理</h1>
+<p class="subtitle">ごちゃごちゃした人脈情報を、シンプルに整理・検索</p>
+
+<div class="card">
+<div class="toggle-form" onclick="toggleForm()">
+<h2 id="formTitle">➕ 新しい連絡先を追加</h2>
+<button class="small secondary" id="toggleBtn">開く</button>
+</div>
+<div class="form-body hidden" id="formBody">
+<div class="form-grid">
+<div><label>氏名 *</label><input type="text" id="name" placeholder="山田 太郎"></div>
+<div><label>ふりがな</label><input type="text" id="kana" placeholder="やまだ たろう"></div>
+<div><label>会社・所属</label><input type="text" id="company" placeholder="○○株式会社"></div>
+<div><label>部署・役職</label><input type="text" id="dept" placeholder="営業部 課長"></div>
+<div><label>メール</label><input type="email" id="email" placeholder="taro@example.com"></div>
+<div><label>電話</label><input type="tel" id="phone" placeholder="090-0000-0000"></div>
+<div class="full"><label>タグ (カンマ区切り)</label><input type="text" id="tags" placeholder="取引先, 展示会, 重要"></div>
+<div class="full"><label>メモ（出会った経緯・特徴など）</label><textarea id="memo" placeholder="2024年秋の展示会で名刺交換。新商品に関心あり。"></textarea></div>
+</div>
+<button onclick="saveContact()" id="saveBtn">保存する</button>
+<button onclick="cancelEdit()" class="secondary hidden" id="cancelBtn">キャンセル</button>
+</div>
+</div>
+
+<div class="search-box">
+<input type="text" id="search" placeholder="🔍 名前・会社・タグ・メモで検索" oninput="render()">
+</div>
+
+<div class="count" id="count"></div>
+<div id="list"></div>
+
+</div>
+
+<script>
+let contacts = JSON.parse(localStorage.getItem('contacts') || '[]');
+let editId = null;
+
+function save() { localStorage.setItem('contacts', JSON.stringify(contacts)); }
+
+function toggleForm() {
+  const body = document.getElementById('formBody');
+  const btn = document.getElementById('toggleBtn');
+  body.classList.toggle('hidden');
+  btn.textContent = body.classList.contains('hidden') ? '開く' : '閉じる';
+}
+
+function saveContact() {
+  const name = document.getElementById('name').value.trim();
+  if (!name) { alert('氏名を入力してください'); return; }
+  const data = {
+    id: editId || Date.now(),
+    name,
+    kana: document.getElementById('kana').value.trim(),
+    company: document.getElementById('company').value.trim(),
+    dept: document.getElementById('dept').value.trim(),
+    email: document.getElementById('email').value.trim(),
+    phone: document.getElementById('phone').value.trim(),
+    tags: document.getElementById('tags').value.split(',').map(t=>t.trim()).filter(t=>t),
+    memo: document.getElementById('memo').value.trim(),
+    updated: new Date().toISOString()
+  };
+  if (editId) {
+    contacts = contacts.map(c => c.id === editId ? data : c);
+  } else {
+    contacts.unshift(data);
+  }
+  save();
+  clearForm();
+  render();
+}
+
+function clearForm() {
+  ['name','kana','company','dept','email','phone','tags','memo'].forEach(id => document.getElementById(id).value = '');
+  editId = null;
+  document.getElementById('formTitle').textContent = '➕ 新しい連絡先を追加';
+  document.getElementById('saveBtn').textContent = '保存する';
+  document.getElementById('cancelBtn').classList.add('hidden');
+}
+
+function cancelEdit() { clearForm(); }
+
+function editContact(id) {
+  const c = contacts.find(x => x.id === id);
+  if (!c) return;
+  editId = id;
+  document.getElementById('name').value = c.name || '';
+  document.getElementById('kana').value = c.kana || '';
+  document.getElementById('company').value = c.company || '';
+  document.getElementById('dept').value = c.dept || '';
+  document.getElementById('email').value = c.email || '';
+  document.getElementById('phone').value = c.phone || '';
+  document.getElementById('tags').value = (c.tags || []).join(', ');
+  document.getElementById('memo').value = c.memo || '';
+  document.getElementById('formTitle').textContent = '✏️ 連絡先を編集';
+  document.getElementById('saveBtn').textContent = '更新する';
+  document.getElementById('cancelBtn').classList.remove('hidden');
+  const body = document.getElementById('formBody');
+  if (body.classList.contains('hidden')) toggleForm();
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+
+function deleteContact(id) {
+  if (!confirm('この連絡先を削除しますか？')) return;
+  contacts = contacts.filter(c => c.id !== id);
+  save();
+  render();
+}
+
+function escapeHtml(s) {
+  return (s || '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+
+function render() {
+  const q = document.getElementById('search').value.toLowerCase().trim();
+  const filtered = contacts.filter(c => {
+    if (!q) return true;
+    const hay = [c.name, c.kana, c.company, c.dept, c.email, c.phone, c.memo, (c.tags||[]).join(' ')].join(' ').toLowerCase();
+    return hay.includes(q);
+  });
+  document.getElementById('count').textContent = `登録: ${contacts.length}件 / 表示: ${filtered.length}件`;
+  const list = document.getElementById('list');
+  if (filtered.length === 0) {
+    list.innerHTML = '<div class="empty">' + (contacts.length === 0 ? '👆 上のフォームから最初の連絡先を追加しましょう' : '該当する連絡先がありません') + '</div>';
+    return;
+  }
+  list.innerHTML = filtered.map(c => `
+    <div class="contact">
+      <div class="contact-name">${escapeHtml(c.name)}${c.kana ? ` <span class="contact-meta">（${escapeHtml(c.kana)}）</span>` : ''}</div>
+      ${c.company || c.dept ? `<div class="contact-meta">${escapeHtml(c.company)}${c.company && c.dept ? ' / ' : ''}${escapeHtml(c.dept)}</div>` : ''}
+      ${c.email ? `<div class="contact-info">📧 <a href="mailto:${escapeHtml(c.email)}">${escapeHtml(c.email)}</a></div>` : ''}
+      ${c.phone ? `<div class="contact-info">📞 <a href="tel:${escapeHtml(c.phone)}">${escapeHtml(c.phone)}</a></div>` : ''}
+      ${(c.tags||[]).length ? `<div style="margin-top:6px">${c.tags.map(t=>`<span class="tag">${escapeHtml(t)}</span>`).join('')}</div>` : ''}
+      ${c.memo ? `<div class="contact-memo">${escapeHtml(c.memo)}</div>` : ''}
+      <div class="contact-actions">
+        <button class="small" onclick="editContact(${c.id})">編集</button>
+        <button class="small danger" onclick="deleteContact(${c.id})">削除</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+render();
+</script>
+<!-- hitotsu-cta -->
+<div style="max-width:720px;margin:32px auto 0;padding:20px;border-top:1px solid #ddd;
+  font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic',sans-serif;
+  font-size:14px;line-height:1.8;color:#444;background:transparent;">
+  <p style="margin:0 0 12px;">
+    この道具は、<strong>AI社員</strong>が毎朝のnote記事と一緒に自動で作ったものです。
+    作った人間の作業時間は0分です。
+  </p>
+  <p style="margin:0 0 16px;">
+    同じ仕組みを自分の仕事に置きたい方へ、<strong>AI社員チームの設計図（図解15枚＋テンプレ4本）</strong>を無料で配っています。
+  </p>
+  <p style="margin:0 0 8px;">
+    <a href="https://line.me/R/ti/p/@188jocyd" style="display:inline-block;background:#06c755;color:#fff;
+      text-decoration:none;padding:12px 20px;border-radius:8px;font-weight:bold;">
+      LINEで「AI社員」と送る → 設計図パックを受け取る
+    </a>
+  </p>
+  <p style="margin:12px 0 0;font-size:13px;color:#777;">
+    仕組みの全体像は<a href="https://note.com/hitotsu_ai/n/n493aa3b424cd" style="color:#0a7;">こちらのnote</a>で公開中／
+    hitotsu company
+  </p>
+</div>
+</body>
+</html>

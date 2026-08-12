@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>幹事のお助けツール - 贈り物&寄せ書きサポート</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: "Hiragino Sans", "Yu Gothic", "Meiryo", sans-serif;
+  background: #f5f7fa;
+  color: #333;
+  line-height: 1.6;
+  padding: 16px;
+}
+.container { max-width: 900px; margin: 0 auto; }
+header {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  padding: 20px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+header h1 { font-size: 1.4em; margin-bottom: 6px; }
+header p { font-size: 0.9em; opacity: 0.95; }
+.tabs { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+.tab {
+  flex: 1;
+  min-width: 120px;
+  padding: 12px;
+  background: white;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.95em;
+  font-weight: bold;
+  transition: all 0.2s;
+}
+.tab.active { background: #667eea; color: white; border-color: #667eea; }
+.panel {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  display: none;
+}
+.panel.active { display: block; }
+h2 { color: #667eea; margin-bottom: 12px; font-size: 1.15em; }
+.hint {
+  background: #fff9e6;
+  border-left: 4px solid #f5b301;
+  padding: 10px 12px;
+  margin-bottom: 16px;
+  font-size: 0.88em;
+  border-radius: 4px;
+}
+label { display: block; margin-top: 12px; margin-bottom: 4px; font-weight: bold; font-size: 0.9em; }
+input, select, textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 1em;
+  font-family: inherit;
+}
+textarea { resize: vertical; min-height: 80px; }
+button {
+  margin-top: 14px;
+  padding: 12px 20px;
+  background: #667eea;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 1em;
+  font-weight: bold;
+  cursor: pointer;
+  width: 100%;
+}
+button:hover { background: #5568d3; }
+button.secondary { background: #888; }
+button.secondary:hover { background: #666; }
+.result {
+  margin-top: 16px;
+  padding: 14px;
+  background: #f8f9fc;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+}
+table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.85em; }
+th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+th { background: #eef1f8; }
+.gift-item {
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 10px;
+}
+.gift-item h3 { color: #333; margin-bottom: 6px; font-size: 1em; }
+.gift-item .meta { font-size: 0.85em; color: #666; margin-bottom: 6px; }
+.gift-item .price { color: #d63384; font-weight: bold; }
+.message-box {
+  background: white;
+  padding: 12px;
+  margin-bottom: 10px;
+  border-left: 4px solid #667eea;
+  border-radius: 4px;
+  position: relative;
+}
+.message-box .copy-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  padding: 4px 10px;
+  font-size: 0.75em;
+  width: auto;
+  margin: 0;
+  background: #eee;
+  color: #333;
+}
+.checklist-item {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  margin-bottom: 6px;
+}
+.checklist-item input[type="checkbox"] { width: auto; margin-right: 10px; transform: scale(1.3); }
+.checklist-item.done { opacity: 0.5; text-decoration: line-through; }
+.checklist-item span { flex: 1; }
+.checklist-item button {
+  width: auto;
+  margin: 0;
+  padding: 4px 10px;
+  font-size: 0.8em;
+  background: #dc3545;
+}
+.two-col { display: flex; gap: 8px; }
+.two-col > * { flex: 1; }
+@media (max-width: 500px) {
+  .tab { min-width: 45%; font-size: 0.85em; padding: 10px 6px; }
+  header h1 { font-size: 1.15em; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>🎁 幹事のお助けツール</h1>
+    <p>歓送迎会の贈り物選びと寄せ書きをサクッと</p>
+  </header>
+
+  <div class="tabs">
+    <div class="tab active" data-tab="gift">🎁 贈り物選び</div>
+    <div class="tab" data-tab="message">✏️ 寄せ書き文例</div>
+    <div class="tab" data-tab="checklist">✅ 幹事チェック</div>
+  </div>
+
+  <!-- 贈り物パネル -->
+  <div class="panel active" id="panel-gift">
+    <h2>予算と相手情報からギフト候補を提案</h2>
+    <div class="hint">💡 予算と相手の情報を入れると、候補の比較表が出ます。相手の趣味などを一言添えると精度が上がります。</div>
+
+    <label>予算（円）</label>
+    <select id="budget">
+      <option value="1000">〜1,000円（プチギフト）</option>
+      <option value="3000" selected>〜3,000円</option>
+      <option value="5000">〜5,000円</option>
+      <option value="10000">〜10,000円</option>
+      <option value="20000">〜20,000円（連名）</option>
+    </select>
+
+    <div class="two-col">
+      <div>
+        <label>シーン</label>
+        <select id="scene">
+          <option value="送別">送別会</option>
+          <option value="歓迎">歓迎会</option>
+          <option value="退職">退職</option>
+          <option value="異動">異動</option>
+        </select>
+      </div>
+      <div>
+        <label>相手の性別</label>
+        <select id="gender">
+          <option value="女性">女性</option>
+          <option value="男性">男性</option>
+          <option value="問わない">問わない</option>
+        </select>
+      </div>
+    </div>
+
+    <label>相手の情報・好み（任意）</label>
+    <input type="text" id="hobby" placeholder="例：コーヒー好き、猫を飼っている、地方に異動">
+
+    <button onclick="suggestGifts()">ギフト候補を表示</button>
+
+    <div class="result" id="giftResult" style="display:none;"></div>
+  </div>
+
+  <!-- 寄せ書きパネル -->
+  <div class="panel" id="panel-message">
+    <h2>寄せ書きメッセージの文例集</h2>
+    <div class="hint">💡 関係性とシーンを選ぶと、そのまま使える文例が出ます。コピーして少し自分の言葉に書き換えるのがおすすめ。</div>
+
+    <div class="two-col">
+      <div>
+        <label>シーン</label>
+        <select id="msgScene">
+          <option value="送別">送別</option>
+          <option value="歓迎">歓迎</option>
+          <option value="退職">退職</option>
+        </select>
+      </div>
+      <div>
+        <label>関係性</label>
+        <select id="relation">
+          <option value="上司">上司へ</option>
+          <option value="同僚">同僚へ</option>
+          <option value="部下">部下・後輩へ</option>
+        </select>
+      </div>
+    </div>
+
+    <label>相手の名前（任意・文例に反映されます）</label>
+    <input type="text" id="targetName" placeholder="例：田中さん">
+
+    <button onclick="showMessages()">文例を表示</button>
+
+    <div class="result" id="messageResult" style="display:none;"></div>
+  </div>
+
+  <!-- チェックリストパネル -->
+  <div class="panel" id="panel-checklist">
+    <h2>幹事やることチェックリスト</h2>
+    <div class="hint">💡 進捗はブラウザに自動保存されます。追加・削除もできます。</div>
+
+    <div class="two-col">
+      <input type="text" id="newTask" placeholder="やることを追加">
+      <button onclick="addTask()" style="margin-top:0;">追加</button>
+    </div>
+
+    <div id="checklistArea" style="margin-top:16px;"></div>
+    <button class="secondary" onclick="resetChecklist()">初期リストに戻す</button>
+  </div>
+</div>
+
+<script>
+// タブ切り替え
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('panel-' + tab.dataset.tab).classList.add('active');
+  });
+});
+
+// ギフトデータ
+const giftDatabase = [
+  {name:"フラワーギフト（花束・アレンジメント）", min:2000, max:10000, gender:"女性", scene:"送別退職異動", tag:"", note:"見た目華やか。持ち帰りやすいアレンジがおすすめ", where:"花屋・オンライン"},
+  {name:"名入れボールペン", min:3000, max:15000, gender:"問わない", scene:"送別退職歓迎異動", tag:"", note:"実用的で長く使ってもらえる定番品", where:"文具店・オンライン"},
+  {name:"カタログギフト", min:3000, max:20000, gender:"問わない", scene:"送別退職異動", tag:"", note:"好みが分からない時の鉄板。無難だが失敗が少ない", where:"百貨店・オンライン"},
+  {name:"高級入浴剤・バスグッズセット", min:2000, max:8000, gender:"女性", scene:"送別退職異動歓迎", tag:"", note:"消え物で気を遣わせない。癒し系の定番", where:"ロフト・オンライン"},
+  {name:"スペシャルティコーヒーギフト", min:2000, max:8000, gender:"問わない", scene:"送別退職異動歓迎", tag:"コーヒー", note:"コーヒー好きに刺さる。消え物なので安心", where:"専門店・オンライン"},
+  {name:"日本茶・紅茶セット", min:1500, max:6000, gender:"問わない", scene:"送別退職異動", tag:"", note:"年配の方にも喜ばれる。上品な印象", where:"専門店・百貨店"},
+  {name:"ハンカチ・タオルセット", min:1000, max:5000, gender:"問わない", scene:"送別退職異動歓迎", tag:"", note:"実用性◎。ブランド物なら特別感も", where:"百貨店・オンライン"},
+  {name:"高級お菓子・スイーツ詰め合わせ", min:1500, max:8000, gender:"問わない", scene:"送別退職異動歓迎", tag:"", note:"家族と分けられるので好印象。消え物", where:"百貨店・オンライン"},
+  {name:"日本酒・ワイン", min:3000, max:15000, gender:"問わない", scene:"送別退職異動", tag:"お酒", note:"お酒好きに最適。銘柄選びは要注意", where:"酒屋・オンライン"},
+  {name:"マグカップ・タンブラー", min:2000, max:8000, gender:"問わない", scene:"歓迎送別異動", tag:"", note:"名入れやメッセージ入りにすると特別感UP", where:"雑貨店・オンライン"},
+  {name:"ボディケア・ハンドクリームセット", min:2000, max:6000, gender:"女性", scene:"送別退職異動歓迎", tag:"", note:"消え物で年齢問わず喜ばれる", where:"ロフト・オンライン"},
+  {name:"ご当地グルメ・お取り寄せセット", min:3000, max:10000, gender:"問わない", scene:"送別退職異動", tag:"地方", note:"異動先や出身地にちなむと会話も弾む", where:"オンライン"},
+  {name:"文具・レザー小物", min:3000, max:15000, gender:"問わない", scene:"歓迎送別退職異動", tag:"", note:"仕事で使えるビジネスギフトの定番", where:"文具店・百貨店"},
+  {name:"ミニ観葉植物", min:1500, max:5000, gender:"問わない", scene:"歓迎", tag:"", note:"デスクに置ける癒しアイテム。新任者に◎", where:"花屋・雑貨店"},
+  {name:"プチギフト詰め合わせ（お菓子）", min:500, max:1500, gender:"問わない", scene:"歓迎送別", tag:"", note:"大人数への配布に便利", where:"百貨店・オンライン"}
+];
+
+function suggestGifts() {
+  const budget = parseInt(document.getElementById('budget').value);
+  const scene = document.getElementById('scene').value;
+  const gender = document.getElementById('gender').value;
+  const hobby = document.getElementById('hobby').value;
+
+  let candidates = giftDatabase.filter(g => {
+    if (g.min > budget) return false;
+    if (!g.scene.includes(scene)) return false;
+    if (gender !== "問わない" && g.gender !== "問わない" && g.gender !== gender) return false;
+    return true;
+  });
+
+  // 趣味マッチをスコアリング
+  candidates.forEach(g => {
+    g.score = 0;
+    if (hobby) {
+      if (g.tag && hobby.includes(g.tag)) g.score += 10;
+      if (hobby.includes("コーヒー") && g.name.includes("コーヒー")) g.score += 10;
+      if (hobby.includes("お酒") && (g.name.includes("酒") || g.name.includes("ワイン"))) g.score += 10;
+      if (hobby.includes("花")) g.score += g.name.includes("フラワー") || g.name.includes("植物") ? 5 : 0;
+      if ((hobby.includes("地方") || hobby.includes("異動")) && g.name.includes("ご当地")) g.score += 10;
+    }
+    // 予算適合度
+    if (budget >= g.min && budget <= g.max) g.score += 3;
+  });
+
+  candidates.sort((a,b) => b.score - a.score);
+  candidates = candidates.slice(0, 6);
+
+  const div = document.getElementById('giftResult');
+  if (candidates.length === 0) {
+    div.innerHTML = '<p>条件に合う候補が見つかりませんでした。予算を見直してみてください。</p>';
+    div.style.display = 'block';
+    return;
+  }
+
+  let html = '<h3 style="margin-bottom:10px;">💡 おすすめギフト候補</h3>';
+  candidates.forEach((g, i) => {
+    const priceMax = Math.min(g.max, budget);
+    html += `<div class="gift-item">
+      <h3>${i+1}. ${g.name} ${g.score >= 10 ? '⭐ おすすめ' : ''}</h3>
+      <div class="meta">💰 <span class="price">${g.min.toLocaleString()}〜${priceMax.toLocaleString()}円</span> / 🛒 ${g.where}</div>
+      <div>${g.note}</div>
+    </div>`;
+  });
+  html += '<p style="margin-top:12px; font-size:0.85em; color:#666;">※価格は目安です。実際の商品は各店舗でご確認ください。</p>';
+  div.innerHTML = html;
+  div.style.display = 'block';
+}
+
+// メッセージ文例
+const messageTemplates = {
+  "送別-上司": [
+    "{name}、長い間本当にお世話になりました。優しくご指導いただいたこと、決して忘れません。新天地でのますますのご活躍を心よりお祈りしております。",
+    "{name}のもとで働けたことは、私にとって大きな財産です。教えていただいたことを胸に、これからも頑張ります。お身体に気をつけて、新しい環境でもご活躍ください。",
+    "いつも的確なアドバイスをいただき、ありがとうございました。{name}の背中を見て多くのことを学びました。またお会いできる日を楽しみにしています。"
+  ],
+  "送別-同僚": [
+    "{name}と一緒に働けて、本当に楽しかったです！離れてしまうのは寂しいですが、新しい場所でも{name}らしく輝いてくださいね。落ち着いたらぜひご飯行きましょう！",
+    "困った時にいつも助けてくれてありがとう。{name}がいたから乗り越えられたことがたくさんあります。新天地でのご活躍、心から応援しています！",
+    "一緒にランチしたり、悩みを聞いてもらったり…本当にお世話になりました。これからも変わらぬお付き合いをよろしくお願いします。お元気で！"
+  ],
+  "送別-部下": [
+    "{name}の成長を近くで見られて、とても嬉しく思っています。新しい場所でも{name}なら大丈夫。自信を持って進んでください。応援しています！",
+    "一緒に働けた時間は、私にとっても学びの多いものでした。{name}のこれからの活躍を楽しみにしています。困った時はいつでも連絡してくださいね。",
+    "いつも一生懸命な{name}の姿に、たくさん元気をもらいました。新天地でも自分らしく頑張ってください。心から応援しています。"
+  ],
+  "歓迎-上司": [
+    "{name}、ようこそチームへ！{name}のご経験から学ばせていただけること、とても楽しみにしております。どうぞよろしくお願いいたします。",
+    "お迎えできて大変嬉しく思います。分からないことばかりですが、色々とご指導いただけますと幸いです。よろしくお願いいたします。",
+    "{name}が来てくださって、チーム一同心強く感じています。一緒に働けることを楽しみにしております。よろしくお願いします。"
+  ],
+  "歓迎-同僚": [
+    "{name}、ようこそ！同じチームで働けることになって嬉しいです。分からないことがあれば何でも聞いてくださいね。これから仲良くしましょう！",
+    "はじめまして！{name}と一緒に働けるのを楽しみにしていました。ランチや飲み会にもぜひ誘ってください。よろしくお願いします！",
+    "新しい仲間が増えて嬉しいです。{name}のこれからのご活躍を楽しみにしています。困ったらいつでも声をかけてくださいね！"
+  ],
+  "歓迎-部下": [
+    "{name}、ようこそ！新しい環境で不安もあると思いますが、みんなでサポートしますので安心してください。一緒に頑張りましょう！",
+    "{name}を迎えられて嬉しいです。少しずつで大丈夫なので、焦らず慣れていってくださいね。困ったことがあればいつでも相談してください。",
+    "これから一緒に働けるのを楽しみにしています。{name}の新しい視点や発想に期待しています。よろしくお願いしますね！"
+  ],
+  "退職-上司": [
+    "長きにわたり本当にお疲れさまでした。{name}にご指導いただいたこと、生涯忘れません。これからは第二の人生、どうぞご自愛の上お過ごしください。",
+    "{name}のもとで学ばせていただいた日々は、私の宝物です。長い間、本当にありがとうございました。これからのお時間をどうぞ豊かにお過ごしください。",
+    "たくさんのことを教えていただき、感謝の気持ちでいっぱいです。お疲れさまでした。これからはご趣味の時間も大切にされてください。"
+  ],
+  "退職-同僚": [
+    "{name}、長い間お疲れさまでした！一緒に過ごした時間は本当に楽しかったです。これからは自分の時間を存分に楽しんでくださいね。またぜひ会いましょう！",
+    "たくさんの思い出をありがとう。{name}がいなくなるのは寂しいけど、これからの新しい人生を心から応援しています。お元気で！",
+    "同じ職場で働けて本当に良かったです。お疲れさまでした！今度はゆっくりお茶でもしましょうね。ご縁は続けていきたいです。"
+  ],
+  "退職-部下": [
+    "{name}、長い間お疲れさまでした。ここまで頑張ってこられた{name}を尊敬しています。これからの人生も、どうぞ自分らしく歩んでください。",
+    "一緒に働けて光栄でした。お疲れさまでした！新しい章のスタート、心から応援しています。時々は近況を聞かせてくださいね。",
+    "たくさん助けてもらいました。本当にありがとうございました。これからは自分のためにたっぷり時間を使ってください。お元気で！"
+  ]
+};
+
+function showMessages() {
+  const scene = document.getElementById('msgScene').value;
+  const relation = document.getElementById('relation').value;
+  const name = document.getElementById('targetName').value.trim() || (relation === "上司" ? "○○さん" : "○○さん");
+  const key = scene + "-" + relation;
+  const templates = messageTemplates[key] || [];
+
+  const div = document.getElementById('messageResult');
+  let html = '<h3 style="margin-bottom:10px;">✉️ 使える文例</h3>';
+  templates.forEach((t, i) => {
+    const msg = t.replace(/\{name\}/g, name);
+    html += `<div class="message-box">
+      <button class="copy-btn" onclick="copyMsg(this)">コピー</button>
+      <div style="padding-right:60px;">${msg}</div>
+    </div>`;
+  });
+  html += '<p style="margin-top:12px; font-size:0.85em; color:#666;">※そのまま使ってもOK。少し自分の言葉を足すとより気持ちが伝わります。</p>';
+  div.innerHTML = html;
+  div.style.display = 'block';
+}
+
+function copyMsg(btn) {
+  const text = btn.nextElementSibling.innerText;
+  navigator.clipboard.writeText(text).then(() => {
+    const original = btn.textContent;
+    btn.textContent = '✓完了';
+    setTimeout(() => btn.textContent = original, 1500);
+  }).catch(() => {
+    // fallback
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    btn.textContent = '✓完了';
+    setTimeout(() => btn.textContent = 'コピー', 1500);
+  });
+}
+
+// チェックリスト
+const defaultTasks = [
+  "参加者リスト作成・出欠確認",
+  "お店の候補選び・予約",
+  "予算の集計・集金方法決定",
+  "贈り物の選定・購入",
+  "寄せ書きの色紙用意・回覧",
+  "当日の進行・挨拶の段取り確認",
+  "会費の集金",
+  "当日の会計・精算",
+  "お礼のメール送付"
+];
+
+function loadChecklist() {
+  const saved = localStorage.getItem('kanjiChecklist');
+  return saved ? JSON.parse(saved) : defaultTasks.map(t => ({text: t, done: false}));
+}
+
+function saveChecklist(list) {
+  localStorage.setItem('kanjiChecklist', JSON.stringify(list));
+}
+
+function renderChecklist() {
+  const list = loadChecklist();
+  const area = document.getElementById('checklistArea');
+  area.innerHTML = '';
+  if (list.length === 0) {
+    area.innerHTML = '<p style="color:#666;">やることはありません。</p>';
+    return;
+  }
+  list.forEach((item, i) => {
+    const div = document.createElement('div');
+    div.className = 'checklist-item' + (item.done ? ' done' : '');
+    div.innerHTML = `
+      <input type="checkbox" ${item.done ? 'checked' : ''} onchange="toggleTask(${i})">
+      <span>${item.text}</span>
+      <button onclick="deleteTask(${i})">削除</button>
+    `;
+    area.appendChild(div);
+  });
+}
+
+function toggleTask(i) {
+  const list = loadChecklist();
+  list[i].done = !list[i].done;
+  saveChecklist(list);
+  renderChecklist();
+}
+
+function deleteTask(i) {
+  const list = loadChecklist();
+  list.splice(i, 1);
+  saveChecklist(list);
+  renderChecklist();
+}
+
+function addTask() {
+  const input = document.getElementById('newTask');
+  const text = input.value.trim();
+  if (!text) return;
+  const list = loadChecklist();
+  list.push({text, done: false});
+  saveChecklist(list);
+  input.value = '';
+  renderChecklist();
+}
+
+function resetChecklist() {
+  if (confirm('初期リストに戻しますか？現在の内容は消えます。')) {
+    localStorage.removeItem('kanjiChecklist');
+    renderChecklist();
+  }
+}
+
+document.getElementById('newTask').addEventListener('keypress', e => {
+  if (e.key === 'Enter') addTask();
+});
+
+renderChecklist();
+</script>
+<!-- hitotsu-cta -->
+<div style="max-width:720px;margin:32px auto 0;padding:20px;border-top:1px solid #ddd;
+  font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic',sans-serif;
+  font-size:14px;line-height:1.8;color:#444;background:transparent;">
+  <p style="margin:0 0 12px;">
+    この道具は、<strong>AI社員</strong>が毎朝のnote記事と一緒に自動で作ったものです。
+    作った人間の作業時間は0分です。
+  </p>
+  <p style="margin:0 0 16px;">
+    同じ仕組みを自分の仕事に置きたい方へ、<strong>AI社員チームの設計図（図解15枚＋テンプレ4本）</strong>を無料で配っています。
+  </p>
+  <p style="margin:0 0 8px;">
+    <a href="https://line.me/R/ti/p/@188jocyd" style="display:inline-block;background:#06c755;color:#fff;
+      text-decoration:none;padding:12px 20px;border-radius:8px;font-weight:bold;">
+      LINEで「AI社員」と送る → 設計図パックを受け取る
+    </a>
+  </p>
+  <p style="margin:12px 0 0;font-size:13px;color:#777;">
+    仕組みの全体像は<a href="https://note.com/hitotsu_ai/n/n493aa3b424cd" style="color:#0a7;">こちらのnote</a>で公開中／
+    hitotsu company
+  </p>
+</div>
+</body>
+</html>

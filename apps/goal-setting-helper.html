@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>目標設定モヤモヤ解消シート</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic", sans-serif;
+    background: #f5f7fa;
+    color: #333;
+    margin: 0;
+    padding: 16px;
+    line-height: 1.6;
+  }
+  .container { max-width: 800px; margin: 0 auto; }
+  h1 {
+    font-size: 1.4em;
+    text-align: center;
+    color: #2c5282;
+    margin-bottom: 4px;
+  }
+  .subtitle {
+    text-align: center;
+    font-size: 0.85em;
+    color: #666;
+    margin-bottom: 20px;
+  }
+  .tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-bottom: 16px;
+    border-bottom: 2px solid #cbd5e0;
+  }
+  .tab {
+    padding: 8px 12px;
+    background: #e2e8f0;
+    border: none;
+    border-radius: 6px 6px 0 0;
+    cursor: pointer;
+    font-size: 0.85em;
+    color: #4a5568;
+    flex: 1;
+    min-width: 100px;
+  }
+  .tab.active {
+    background: #2c5282;
+    color: white;
+    font-weight: bold;
+  }
+  .panel {
+    display: none;
+    background: white;
+    padding: 20px;
+    border-radius: 0 8px 8px 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  }
+  .panel.active { display: block; }
+  .panel h2 {
+    font-size: 1.1em;
+    color: #2c5282;
+    margin-top: 0;
+    border-left: 4px solid #4299e1;
+    padding-left: 10px;
+  }
+  .hint {
+    background: #ebf8ff;
+    padding: 10px 12px;
+    border-radius: 6px;
+    font-size: 0.85em;
+    color: #2c5282;
+    margin-bottom: 14px;
+  }
+  label {
+    display: block;
+    margin-top: 12px;
+    font-size: 0.9em;
+    font-weight: bold;
+    color: #4a5568;
+  }
+  textarea, input[type="text"] {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid #cbd5e0;
+    border-radius: 5px;
+    font-size: 0.95em;
+    font-family: inherit;
+    margin-top: 4px;
+    background: #fafafa;
+  }
+  textarea { resize: vertical; min-height: 70px; }
+  textarea:focus, input:focus {
+    outline: none;
+    border-color: #4299e1;
+    background: white;
+  }
+  .btn-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 16px;
+    flex-wrap: wrap;
+  }
+  button.action {
+    padding: 9px 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9em;
+    font-weight: bold;
+  }
+  .btn-primary { background: #2c5282; color: white; }
+  .btn-secondary { background: #e2e8f0; color: #4a5568; }
+  .btn-danger { background: #fed7d7; color: #822727; }
+  .output {
+    margin-top: 16px;
+    padding: 14px;
+    background: #f7fafc;
+    border: 1px dashed #a0aec0;
+    border-radius: 6px;
+    white-space: pre-wrap;
+    font-size: 0.9em;
+    display: none;
+  }
+  .output.show { display: block; }
+  .progress-row {
+    display: grid;
+    grid-template-columns: 1fr 80px 1fr;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 8px;
+    padding: 8px;
+    background: #f7fafc;
+    border-radius: 5px;
+  }
+  .progress-row input[type="text"] { margin-top: 0; }
+  .progress-row select {
+    padding: 6px;
+    border: 1px solid #cbd5e0;
+    border-radius: 4px;
+  }
+  .save-status {
+    font-size: 0.75em;
+    color: #48bb78;
+    text-align: right;
+    margin-top: 8px;
+    height: 14px;
+  }
+  @media (max-width: 600px) {
+    .tab { min-width: auto; font-size: 0.75em; padding: 6px 8px; }
+    .progress-row { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>📝 目標設定モヤモヤ解消シート</h1>
+  <div class="subtitle">言語化 → 指標 → 面談 → 進捗 → 振り返り まで一気通貫</div>
+
+  <div class="tabs">
+    <button class="tab active" data-tab="1">1.言語化</button>
+    <button class="tab" data-tab="2">2.指標</button>
+    <button class="tab" data-tab="3">3.面談メモ</button>
+    <button class="tab" data-tab="4">4.進捗</button>
+    <button class="tab" data-tab="5">5.振り返り</button>
+  </div>
+
+  <!-- Step 1: 言語化 -->
+  <div class="panel active" id="panel1">
+    <h2>ステップ1：目標案の言語化</h2>
+    <div class="hint">頭の中のモヤモヤを箇条書きで書き出してみましょう。キレイな文章でなくてOK。</div>
+
+    <label>今期やりたいこと・気になっていること（思いつくまま）</label>
+    <textarea id="brain-dump" placeholder="例：チームの資料共有が非効率で困っている&#10;例：後輩の育成に関わりたい&#10;例：Excelのスキルをもう一歩伸ばしたい"></textarea>
+
+    <label>会社・チームから期待されていること</label>
+    <textarea id="expectation" placeholder="例：業務効率化への貢献、若手のフォロー役"></textarea>
+
+    <label>自分の役割・立場</label>
+    <input type="text" id="role" placeholder="例：営業3年目・チームリーダー補佐">
+
+    <div class="btn-row">
+      <button class="action btn-primary" onclick="generateGoal()">▶ 目標文をまとめる</button>
+      <button class="action btn-secondary" onclick="copyText('goal-output')">📋 コピー</button>
+    </div>
+    <div class="output" id="goal-output"></div>
+    <div class="save-status" id="status1"></div>
+  </div>
+
+  <!-- Step 2: 指標 -->
+  <div class="panel" id="panel2">
+    <h2>ステップ2：達成指標の設定</h2>
+    <div class="hint">「数字にできない仕事」も、行動量や状態変化で指標化できます。</div>
+
+    <label>目標（ステップ1からコピーしてもOK）</label>
+    <textarea id="goal-for-kpi" placeholder="どの目標の指標を作りますか？"></textarea>
+
+    <div class="btn-row">
+      <button class="action btn-primary" onclick="generateKPI()">▶ 指標の候補を出す</button>
+      <button class="action btn-secondary" onclick="copyText('kpi-output')">📋 コピー</button>
+    </div>
+    <div class="output" id="kpi-output"></div>
+    <div class="save-status" id="status2"></div>
+  </div>
+
+  <!-- Step 3: 面談メモ -->
+  <div class="panel" id="panel3">
+    <h2>ステップ3：上司との面談メモ</h2>
+    <div class="hint">面談前にこれだけ整理すれば、話が空回りしません。</div>
+
+    <label>面談日</label>
+    <input type="text" id="meeting-date" placeholder="例：2025年4月15日 14:00〜">
+
+    <label>報告したいこと（進捗・成果）</label>
+    <textarea id="report" placeholder="例：〇〇の案件が想定より1週間早く進んだ"></textarea>
+
+    <label>相談したいこと（困りごと・判断を仰ぎたいこと）</label>
+    <textarea id="consult" placeholder="例：△△の優先度を下げてもよいか判断がほしい"></textarea>
+
+    <label>確認したいこと（会社方針・上司の期待）</label>
+    <textarea id="confirm" placeholder="例：来期の体制変更の影響について"></textarea>
+
+    <div class="btn-row">
+      <button class="action btn-primary" onclick="generateMeeting()">▶ 面談メモを整形</button>
+      <button class="action btn-secondary" onclick="copyText('meeting-output')">📋 コピー</button>
+    </div>
+    <div class="output" id="meeting-output"></div>
+    <div class="save-status" id="status3"></div>
+  </div>
+
+  <!-- Step 4: 進捗 -->
+  <div class="panel" id="panel4">
+    <h2>ステップ4：進捗確認シート</h2>
+    <div class="hint">目標ごとに現在の状態をチェック。月1回の見直しがおすすめ。</div>
+
+    <div id="progress-list"></div>
+
+    <div class="btn-row">
+      <button class="action btn-secondary" onclick="addProgressRow()">＋ 目標を追加</button>
+      <button class="action btn-primary" onclick="saveProgress()">💾 保存</button>
+    </div>
+    <div class="save-status" id="status4"></div>
+  </div>
+
+  <!-- Step 5: 振り返り -->
+  <div class="panel" id="panel5">
+    <h2>ステップ5：期末の振り返りレポート</h2>
+    <div class="hint">4つの質問に答えるだけで、レポートの骨格ができあがります。</div>
+
+    <label>Q1. 期初に立てた目標</label>
+    <textarea id="r-goal" placeholder="期の初めに立てた目標を書き出す"></textarea>
+
+    <label>Q2. 実際にやったこと・成果</label>
+    <textarea id="r-result" placeholder="具体的な行動と結果"></textarea>
+
+    <label>Q3. うまくいった点／うまくいかなかった点</label>
+    <textarea id="r-learn" placeholder="良かった点と課題を両方"></textarea>
+
+    <label>Q4. 次期に向けた改善・挑戦</label>
+    <textarea id="r-next" placeholder="次に活かしたいこと"></textarea>
+
+    <div class="btn-row">
+      <button class="action btn-primary" onclick="generateReview()">▶ 振り返りレポートを作成</button>
+      <button class="action btn-secondary" onclick="copyText('review-output')">📋 コピー</button>
+    </div>
+    <div class="output" id="review-output"></div>
+    <div class="save-status" id="status5"></div>
+  </div>
+
+  <div style="text-align:center; margin-top:20px;">
+    <button class="action btn-danger" onclick="clearAll()">全データを消去</button>
+  </div>
+</div>
+
+<script>
+  // タブ切替
+  document.querySelectorAll('.tab').forEach(t => {
+    t.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+      document.querySelectorAll('.panel').forEach(x => x.classList.remove('active'));
+      t.classList.add('active');
+      document.getElementById('panel' + t.dataset.tab).classList.add('active');
+    });
+  });
+
+  // localStorage自動保存対象
+  const fields = ['brain-dump','expectation','role','goal-for-kpi',
+                  'meeting-date','report','consult','confirm',
+                  'r-goal','r-result','r-learn','r-next'];
+
+  fields.forEach(id => {
+    const el = document.getElementById(id);
+    const saved = localStorage.getItem('gs_' + id);
+    if (saved) el.value = saved;
+    el.addEventListener('input', () => {
+      localStorage.setItem('gs_' + id, el.value);
+      const panel = el.closest('.panel');
+      if (panel) {
+        const num = panel.id.replace('panel','');
+        showStatus('status' + num, '自動保存しました');
+      }
+    });
+  });
+
+  function showStatus(id, msg) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.textContent = msg;
+    clearTimeout(el._t);
+    el._t = setTimeout(() => { el.textContent = ''; }, 1500);
+  }
+
+  function copyText(id) {
+    const el = document.getElementById(id);
+    if (!el.classList.contains('show')) { alert('先に「まとめる」ボタンを押してください'); return; }
+    navigator.clipboard.writeText(el.textContent).then(() => {
+      alert('コピーしました');
+    }).catch(() => {
+      const r = document.createRange();
+      r.selectNode(el);
+      window.getSelection().removeAllRanges();
+      window.getSelection().addRange(r);
+      document.execCommand('copy');
+      alert('コピーしました');
+    });
+  }
+
+  // ステップ1: 目標文生成
+  function generateGoal() {
+    const b = document.getElementById('brain-dump').value.trim();
+    const e = document.getElementById('expectation').value.trim();
+    const r = document.getElementById('role').value.trim();
+    if (!b) { alert('やりたいことを1つ以上入力してください'); return; }
+
+    const items = b.split('\n').filter(x => x.trim());
+    let out = '【目標案の言語化】\n';
+    if (r) out += '■ 役割：' + r + '\n';
+    if (e) out += '■ 期待されていること：' + e + '\n';
+    out += '\n■ 目標案（' + items.length + '件）：\n';
+    items.forEach((item, i) => {
+      const clean = item.replace(/^例：/, '').trim();
+      out += (i+1) + '. ' + clean + '\n';
+      out += '   → なぜやるか：（' + (e || '自分の成長・チーム貢献') + 'につながるため）\n';
+      out += '   → 期末までにどうなっていたいか：（達成後の状態を1文で）\n\n';
+    });
+    out += '💡 このメモを見ながら、優先度の高い1〜3件に絞ってみましょう。';
+
+    const outEl = document.getElementById('goal-output');
+    outEl.textContent = out;
+    outEl.classList.add('show');
+  }
+
+  // ステップ2: KPI候補
+  function generateKPI() {
+    const g = document.getElementById('goal-for-kpi').value.trim();
+    if (!g) { alert('目標を入力してください'); return; }
+
+    let out = '【達成指標の候補】\n目標：' + g + '\n\n';
+    out += '■ 数字で測る指標の例：\n';
+    out += '・回数：〇〇を月◯回実施する\n';
+    out += '・件数：担当案件を◯件以上こなす\n';
+    out += '・時間：△△にかかる時間を◯時間短縮する\n';
+    out += '・割合：〇〇率を◯％まで改善する\n\n';
+    out += '■ 数字にしにくい場合の指標の例：\n';
+    out += '・状態変化：「〇〇できていない状態」→「〇〇できる状態」になっている\n';
+    out += '・アウトプット：〇〇の資料/仕組みを完成させる\n';
+    out += '・フィードバック：上司/同僚から◯◯について肯定的な評価をもらう\n';
+    out += '・行動継続：◯◯を週◯回、◯ヶ月継続する\n\n';
+    out += '💡 「達成した／していない」が第三者にも判断できる書き方にするのがコツです。';
+
+    const outEl = document.getElementById('kpi-output');
+    outEl.textContent = out;
+    outEl.classList.add('show');
+  }
+
+  // ステップ3: 面談メモ
+  function generateMeeting() {
+    const d = document.getElementById('meeting-date').value.trim();
+    const rep = document.getElementById('report').value.trim();
+    const con = document.getElementById('consult').value.trim();
+    const conf = document.getElementById('confirm').value.trim();
+
+    if (!rep && !con && !conf) { alert('報告・相談・確認のいずれかを入力してください'); return; }
+
+    let out = '【上司との面談メモ】\n';
+    if (d) out += '日時：' + d + '\n';
+    out += '\n━━━━━━━━━━━━━━━━━━\n';
+    out += '■ 報告事項\n' + (rep || '（なし）') + '\n\n';
+    out += '■ 相談事項\n' + (con || '（なし）') + '\n\n';
+    out += '■ 確認したいこと\n' + (conf || '（なし）') + '\n';
+    out += '━━━━━━━━━━━━━━━━━━\n\n';
+    out += '■ 面談後に記入する欄：\n';
+    out += '・上司からのコメント：\n';
+    out += '・次回までのアクション：\n';
+    out += '・次回面談予定：';
+
+    const outEl = document.getElementById('meeting-output');
+    outEl.textContent = out;
+    outEl.classList.add('show');
+  }
+
+  // ステップ4: 進捗リスト
+  function renderProgress() {
+    const list = document.getElementById('progress-list');
+    const data = JSON.parse(localStorage.getItem('gs_progress') || '[]');
+    if (data.length === 0) {
+      data.push({goal:'', status:'未着手', note:''});
+    }
+    list.innerHTML = '';
+    data.forEach((row, i) => {
+      const div = document.createElement('div');
+      div.className = 'progress-row';
+      div.innerHTML =
+        '<input type="text" placeholder="目標" value="' + escapeHtml(row.goal) + '" data-i="' + i + '" data-k="goal">' +
+        '<select data-i="' + i + '" data-k="status">' +
+          ['未着手','進行中','順調','遅れ気味','完了'].map(s =>
+            '<option ' + (row.status===s?'selected':'') + '>' + s + '</option>'
+          ).join('') +
+        '</select>' +
+        '<input type="text" placeholder="メモ・次のアクション" value="' + escapeHtml(row.note) + '" data-i="' + i + '" data-k="note">';
+      list.appendChild(div);
+    });
+    list.querySelectorAll('input, select').forEach(el => {
+      el.addEventListener('input', () => {
+        const i = parseInt(el.dataset.i);
+        const k = el.dataset.k;
+        data[i][k] = el.value;
+        localStorage.setItem('gs_progress', JSON.stringify(data));
+        showStatus('status4', '自動保存しました');
+      });
+    });
+  }
+
+  function addProgressRow() {
+    const data = JSON.parse(localStorage.getItem('gs_progress') || '[]');
+    data.push({goal:'', status:'未着手', note:''});
+    localStorage.setItem('gs_progress', JSON.stringify(data));
+    renderProgress();
+  }
+
+  function saveProgress() {
+    showStatus('status4', '保存しました ✓');
+  }
+
+  function escapeHtml(s) {
+    return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  renderProgress();
+
+  // ステップ5: 振り返り
+  function generateReview() {
+    const g = document.getElementById('r-goal').value.trim();
+    const r = document.getElementById('r-result').value.trim();
+    const l = document.getElementById('r-learn').value.trim();
+    const n = document.getElementById('r-next').value.trim();
+
+    if (!g && !r && !l && !n) { alert('いずれかを入力してください'); return; }
+
+    let out = '【期末振り返りレポート】\n';
+    out += '作成日：' + new Date().toLocaleDateString('ja-JP') + '\n\n';
+    out += '━━━━━━━━━━━━━━━━━━\n';
+    out += '1. 期初に立てた目標\n' + (g || '（未入力）') + '\n\n';
+    out += '2. 実施した取り組み・成果\n' + (r || '（未入力）') + '\n\n';
+    out += '3. 良かった点／課題\n' + (l || '（未入力）') + '\n\n';
+    out += '4. 次期に向けて\n' + (n || '（未入力）') + '\n';
+    out += '━━━━━━━━━━━━━━━━━━\n\n';
+    out += '■ 総括（1〜2行）\n';
+    out += '今期は「' + (g.split('\n')[0] || '目標') + '」に取り組み、';
+    out += (r ? '具体的には上記の成果を得ました。' : '進めてきました。');
+    out += (l ? '得られた学びを踏まえ、' : '') + '次期はさらに前進していきます。';
+
+    const outEl = document.getElementById('review-output');
+    outEl.textContent = out;
+    outEl.classList.add('show');
+  }
+
+  function clearAll() {
+    if (!confirm('入力した全データを消去します。よろしいですか？')) return;
+    Object.keys(localStorage).filter(k => k.startsWith('gs_')).forEach(k => localStorage.removeItem(k));
+    location.reload();
+  }
+</script>
+<!-- hitotsu-cta -->
+<div style="max-width:720px;margin:32px auto 0;padding:20px;border-top:1px solid #ddd;
+  font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic',sans-serif;
+  font-size:14px;line-height:1.8;color:#444;background:transparent;">
+  <p style="margin:0 0 12px;">
+    この道具は、<strong>AI社員</strong>が毎朝のnote記事と一緒に自動で作ったものです。
+    作った人間の作業時間は0分です。
+  </p>
+  <p style="margin:0 0 16px;">
+    同じ仕組みを自分の仕事に置きたい方へ、<strong>AI社員チームの設計図（図解15枚＋テンプレ4本）</strong>を無料で配っています。
+  </p>
+  <p style="margin:0 0 8px;">
+    <a href="https://line.me/R/ti/p/@188jocyd" style="display:inline-block;background:#06c755;color:#fff;
+      text-decoration:none;padding:12px 20px;border-radius:8px;font-weight:bold;">
+      LINEで「AI社員」と送る → 設計図パックを受け取る
+    </a>
+  </p>
+  <p style="margin:12px 0 0;font-size:13px;color:#777;">
+    仕組みの全体像は<a href="https://note.com/hitotsu_ai/n/n493aa3b424cd" style="color:#0a7;">こちらのnote</a>で公開中／
+    hitotsu company
+  </p>
+</div>
+</body>
+</html>

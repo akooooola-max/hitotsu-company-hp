@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>社内アンケート かんたん作成・集計ツール</title>
+<style>
+* { box-sizing: border-box; }
+body {
+  font-family: -apple-system, "Hiragino Sans", "Yu Gothic", sans-serif;
+  background: #f5f7fa;
+  color: #333;
+  margin: 0;
+  padding: 0;
+  line-height: 1.6;
+}
+header {
+  background: linear-gradient(135deg, #4a90e2, #5aa8f0);
+  color: white;
+  padding: 20px;
+  text-align: center;
+}
+header h1 { margin: 0; font-size: 20px; }
+header p { margin: 5px 0 0; font-size: 13px; opacity: 0.9; }
+.tabs {
+  display: flex;
+  background: white;
+  border-bottom: 2px solid #e0e0e0;
+  overflow-x: auto;
+}
+.tab {
+  flex: 1;
+  min-width: 100px;
+  padding: 14px 10px;
+  text-align: center;
+  cursor: pointer;
+  font-size: 14px;
+  border-bottom: 3px solid transparent;
+  white-space: nowrap;
+}
+.tab.active {
+  color: #4a90e2;
+  border-bottom-color: #4a90e2;
+  font-weight: bold;
+}
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+}
+.panel { display: none; }
+.panel.active { display: block; }
+.card {
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 15px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+h2 { font-size: 17px; color: #4a90e2; margin-top: 0; }
+h3 { font-size: 15px; margin-top: 20px; }
+label { display: block; margin: 8px 0 4px; font-size: 14px; font-weight: bold; }
+input[type="text"], textarea, select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 14px;
+  font-family: inherit;
+}
+textarea { min-height: 60px; resize: vertical; }
+button {
+  background: #4a90e2;
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  margin: 5px 5px 5px 0;
+}
+button:hover { background: #3a7fd2; }
+button.secondary { background: #999; }
+button.danger { background: #e74c3c; }
+button.small { padding: 6px 12px; font-size: 12px; }
+.question-item {
+  background: #f9f9f9;
+  padding: 12px;
+  border-radius: 5px;
+  margin-bottom: 10px;
+  border-left: 4px solid #4a90e2;
+}
+.question-item .qhead {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.qtype { font-size: 12px; color: #666; background: #e0e8f5; padding: 2px 8px; border-radius: 3px; }
+.tip {
+  background: #fff8e1;
+  border-left: 4px solid #ffc107;
+  padding: 10px 12px;
+  font-size: 13px;
+  border-radius: 4px;
+  margin: 10px 0;
+}
+.answer-form label { font-weight: normal; }
+.radio-group label, .check-group label {
+  display: block;
+  padding: 6px 0;
+  cursor: pointer;
+  font-weight: normal;
+}
+.stat-row {
+  display: flex;
+  align-items: center;
+  margin: 5px 0;
+  font-size: 13px;
+}
+.stat-label { width: 30%; }
+.stat-bar {
+  flex: 1;
+  background: #eee;
+  border-radius: 3px;
+  height: 20px;
+  overflow: hidden;
+  margin: 0 8px;
+}
+.stat-fill {
+  background: #4a90e2;
+  height: 100%;
+  transition: width 0.3s;
+}
+.stat-count { width: 60px; text-align: right; font-size: 12px; }
+.free-text-list {
+  background: #f5f5f5;
+  padding: 10px;
+  border-radius: 4px;
+  max-height: 200px;
+  overflow-y: auto;
+  font-size: 13px;
+}
+.free-text-list div {
+  padding: 6px;
+  border-bottom: 1px dashed #ddd;
+}
+.template-btn {
+  background: #f0f4f9;
+  color: #4a90e2;
+  border: 1px solid #4a90e2;
+  margin: 3px;
+  display: inline-block;
+}
+.share-box {
+  background: #e8f5e9;
+  padding: 12px;
+  border-radius: 5px;
+  font-size: 13px;
+  word-break: break-all;
+  margin: 10px 0;
+}
+.empty {
+  text-align: center;
+  color: #999;
+  padding: 30px;
+  font-size: 14px;
+}
+.summary-num {
+  display: inline-block;
+  background: #4a90e2;
+  color: white;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+  margin-right: 10px;
+}
+</style>
+</head>
+<body>
+<header>
+  <h1>📋 社内アンケート かんたんツール</h1>
+  <p>質問づくり → 回答収集 → 集計レポートまで一気通貫</p>
+</header>
+
+<div class="tabs">
+  <div class="tab active" data-panel="design">①質問作成</div>
+  <div class="tab" data-panel="answer">②回答入力</div>
+  <div class="tab" data-panel="report">③集計レポート</div>
+</div>
+
+<div class="container">
+
+<!-- 質問作成 -->
+<div class="panel active" id="design">
+  <div class="card">
+    <h2>アンケート基本情報</h2>
+    <label>タイトル</label>
+    <input type="text" id="surveyTitle" placeholder="例：リモートワーク制度に関するアンケート">
+    <label>依頼文（回答者へのメッセージ）</label>
+    <textarea id="surveyIntro" placeholder="例：業務改善のため、5分ほどのご協力をお願いします。回答は匿名で集計されます。"></textarea>
+  </div>
+
+  <div class="card">
+    <h2>質問テンプレート（クリックで追加）</h2>
+    <div>
+      <button class="template-btn small" onclick="addTemplate('satisfaction')">満足度（5段階）</button>
+      <button class="template-btn small" onclick="addTemplate('frequency')">頻度（4段階）</button>
+      <button class="template-btn small" onclick="addTemplate('yesno')">はい/いいえ</button>
+      <button class="template-btn small" onclick="addTemplate('free')">自由記述</button>
+    </div>
+    <div class="tip">💡 誘導的にならないコツ：「〜だと思いませんか？」は避け、「〜についてどう感じますか？」など中立に。</div>
+  </div>
+
+  <div class="card">
+    <h2>質問リスト</h2>
+    <div id="questionList"></div>
+    <button onclick="addQuestion()">＋ 質問を追加</button>
+  </div>
+
+  <div class="card">
+    <h2>回答者への共有</h2>
+    <p style="font-size:13px;color:#666">このツールを社内で共有する場合は、HTMLファイルを共有フォルダに置くか、下記のようにメールで案内しましょう。</p>
+    <button onclick="copyMailTemplate()">📧 依頼メール文をコピー</button>
+    <div id="mailPreview" class="share-box" style="display:none"></div>
+  </div>
+</div>
+
+<!-- 回答入力 -->
+<div class="panel" id="answer">
+  <div class="card">
+    <h2 id="answerTitle">アンケート</h2>
+    <p id="answerIntro" style="font-size:14px;color:#555"></p>
+    <div id="answerForm" class="answer-form"></div>
+    <div id="answerActions" style="display:none">
+      <button onclick="submitAnswer()">✔ 回答を送信</button>
+      <button class="secondary" onclick="clearAnswerForm()">クリア</button>
+    </div>
+    <div id="answerEmpty" class="empty">先に「①質問作成」タブで質問を作成してください。</div>
+  </div>
+</div>
+
+<!-- レポート -->
+<div class="panel" id="report">
+  <div class="card">
+    <h2>集計サマリー</h2>
+    <div id="reportSummary">
+      <div class="empty">まだ回答がありません。</div>
+    </div>
+  </div>
+  <div class="card" id="reportDetail" style="display:none">
+    <h2>質問別の集計</h2>
+    <div id="reportBody"></div>
+    <button onclick="copyReport()">📋 レポート全文をコピー</button>
+    <button class="danger" onclick="clearResponses()">全回答を削除</button>
+  </div>
+</div>
+
+</div>
+
+<script>
+let survey = JSON.parse(localStorage.getItem('surveyData') || '{"title":"","intro":"","questions":[]}');
+let responses = JSON.parse(localStorage.getItem('surveyResponses') || '[]');
+
+function saveSurvey() {
+  survey.title = document.getElementById('surveyTitle').value;
+  survey.intro = document.getElementById('surveyIntro').value;
+  localStorage.setItem('surveyData', JSON.stringify(survey));
+}
+
+function saveResponses() {
+  localStorage.setItem('surveyResponses', JSON.stringify(responses));
+}
+
+function renderQuestions() {
+  const list = document.getElementById('questionList');
+  if (survey.questions.length === 0) {
+    list.innerHTML = '<div class="empty">まだ質問がありません。テンプレートまたは「＋質問を追加」からどうぞ。</div>';
+    return;
+  }
+  list.innerHTML = survey.questions.map((q, i) => `
+    <div class="question-item">
+      <div class="qhead">
+        <strong>Q${i+1}</strong>
+        <span class="qtype">${typeName(q.type)}</span>
+      </div>
+      <input type="text" value="${escapeHtml(q.text)}" placeholder="質問文" oninput="updateQ(${i},'text',this.value)">
+      ${q.type==='choice'||q.type==='multi' ? `
+        <label style="margin-top:8px">選択肢（1行に1つ）</label>
+        <textarea oninput="updateQ(${i},'options',this.value)">${escapeHtml((q.options||[]).join('\n'))}</textarea>
+      ` : ''}
+      <div style="margin-top:8px">
+        <select onchange="updateQ(${i},'type',this.value)">
+          <option value="choice" ${q.type==='choice'?'selected':''}>単一選択</option>
+          <option value="multi" ${q.type==='multi'?'selected':''}>複数選択</option>
+          <option value="free" ${q.type==='free'?'selected':''}>自由記述</option>
+        </select>
+        <button class="small secondary" onclick="moveQ(${i},-1)">↑</button>
+        <button class="small secondary" onclick="moveQ(${i},1)">↓</button>
+        <button class="small danger" onclick="delQ(${i})">削除</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function typeName(t) {
+  return {choice:'単一選択', multi:'複数選択', free:'自由記述'}[t] || t;
+}
+
+function escapeHtml(s) {
+  return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function updateQ(i, key, val) {
+  if (key === 'options') {
+    survey.questions[i].options = val.split('\n').map(s=>s.trim()).filter(s=>s);
+  } else {
+    survey.questions[i][key] = val;
+  }
+  saveSurvey();
+  if (key === 'type') renderQuestions();
+}
+
+function addQuestion() {
+  survey.questions.push({text:'', type:'choice', options:['選択肢1','選択肢2']});
+  saveSurvey();
+  renderQuestions();
+}
+
+function delQ(i) {
+  if (!confirm('この質問を削除しますか？')) return;
+  survey.questions.splice(i,1);
+  saveSurvey();
+  renderQuestions();
+}
+
+function moveQ(i, dir) {
+  const j = i + dir;
+  if (j < 0 || j >= survey.questions.length) return;
+  [survey.questions[i], survey.questions[j]] = [survey.questions[j], survey.questions[i]];
+  saveSurvey();
+  renderQuestions();
+}
+
+function addTemplate(kind) {
+  const templates = {
+    satisfaction: {text:'現在の制度についてどの程度満足していますか？', type:'choice', options:['とても満足','やや満足','どちらでもない','やや不満','とても不満']},
+    frequency: {text:'この制度を利用する頻度はどのくらいですか？', type:'choice', options:['毎日','週に数回','月に数回','ほとんどない']},
+    yesno: {text:'今後も継続を希望しますか？', type:'choice', options:['はい','いいえ']},
+    free: {text:'ご意見・ご要望があればお聞かせください', type:'free'}
+  };
+  survey.questions.push(JSON.parse(JSON.stringify(templates[kind])));
+  saveSurvey();
+  renderQuestions();
+}
+
+function copyMailTemplate() {
+  const title = survey.title || '社内アンケート';
+  const body = `件名：【ご協力のお願い】${title}
+
+お疲れさまです。
+
+このたび、${title}を実施いたします。
+${survey.intro || '業務改善のためご協力をお願いいたします。'}
+
+所要時間：約5分
+回答期限：〇月〇日（〇）まで
+
+回答方法：添付のアンケートツールを開き、「②回答入力」タブから回答してください。
+
+お忙しいところ恐縮ですが、ご協力のほどよろしくお願いいたします。`;
+  navigator.clipboard.writeText(body).then(() => {
+    const p = document.getElementById('mailPreview');
+    p.style.display = 'block';
+    p.textContent = body;
+    alert('メール文をコピーしました');
+  });
+}
+
+function renderAnswerForm() {
+  document.getElementById('answerTitle').textContent = survey.title || 'アンケート';
+  document.getElementById('answerIntro').textContent = survey.intro || '';
+  const form = document.getElementById('answerForm');
+  const empty = document.getElementById('answerEmpty');
+  const actions = document.getElementById('answerActions');
+  if (survey.questions.length === 0) {
+    form.innerHTML = '';
+    empty.style.display = 'block';
+    actions.style.display = 'none';
+    return;
+  }
+  empty.style.display = 'none';
+  actions.style.display = 'block';
+  form.innerHTML = survey.questions.map((q, i) => {
+    let inputHtml = '';
+    if (q.type === 'choice') {
+      inputHtml = '<div class="radio-group">' + (q.options||[]).map((o,j) =>
+        `<label><input type="radio" name="q${i}" value="${escapeHtml(o)}"> ${escapeHtml(o)}</label>`
+      ).join('') + '</div>';
+    } else if (q.type === 'multi') {
+      inputHtml = '<div class="check-group">' + (q.options||[]).map((o,j) =>
+        `<label><input type="checkbox" name="q${i}" value="${escapeHtml(o)}"> ${escapeHtml(o)}</label>`
+      ).join('') + '</div>';
+    } else {
+      inputHtml = `<textarea name="q${i}"></textarea>`;
+    }
+    return `<div class="question-item"><strong>Q${i+1}. ${escapeHtml(q.text||'(質問未入力)')}</strong>${inputHtml}</div>`;
+  }).join('');
+}
+
+function submitAnswer() {
+  const answer = {timestamp: new Date().toISOString(), values: []};
+  for (let i = 0; i < survey.questions.length; i++) {
+    const q = survey.questions[i];
+    if (q.type === 'choice') {
+      const el = document.querySelector(`input[name="q${i}"]:checked`);
+      answer.values.push(el ? el.value : '');
+    } else if (q.type === 'multi') {
+      const els = document.querySelectorAll(`input[name="q${i}"]:checked`);
+      answer.values.push(Array.from(els).map(e=>e.value));
+    } else {
+      const el = document.querySelector(`textarea[name="q${i}"]`);
+      answer.values.push(el ? el.value.trim() : '');
+    }
+  }
+  responses.push(answer);
+  saveResponses();
+  alert('回答を送信しました。ありがとうございました！');
+  clearAnswerForm();
+  renderReport();
+}
+
+function clearAnswerForm() {
+  renderAnswerForm();
+}
+
+function renderReport() {
+  const summary = document.getElementById('reportSummary');
+  const detail = document.getElementById('reportDetail');
+  const body = document.getElementById('reportBody');
+  if (responses.length === 0) {
+    summary.innerHTML = '<div class="empty">まだ回答がありません。</div>';
+    detail.style.display = 'none';
+    return;
+  }
+  summary.innerHTML = `
+    <div><span class="summary-num">${responses.length}件</span>の回答が集まっています</div>
+    <div style="font-size:13px;color:#666;margin-top:8px">最新回答：${new Date(responses[responses.length-1].timestamp).toLocaleString('ja-JP')}</div>
+  `;
+  detail.style.display = 'block';
+  body.innerHTML = survey.questions.map((q, i) => {
+    let content = '';
+    if (q.type === 'choice' || q.type === 'multi') {
+      const counts = {};
+      (q.options||[]).forEach(o => counts[o] = 0);
+      let total = 0;
+      responses.forEach(r => {
+        const v = r.values[i];
+        if (Array.isArray(v)) {
+          v.forEach(x => { if (x in counts) counts[x]++; total++; });
+        } else if (v) {
+          if (v in counts) counts[v]++;
+          total++;
+        }
+      });
+      content = Object.entries(counts).map(([opt, cnt]) => {
+        const pct = total > 0 ? Math.round(cnt/responses.length*100) : 0;
+        return `<div class="stat-row">
+          <div class="stat-label">${escapeHtml(opt)}</div>
+          <div class="stat-bar"><div class="stat-fill" style="width:${pct}%"></div></div>
+          <div class="stat-count">${cnt}件 (${pct}%)</div>
+        </div>`;
+      }).join('');
+    } else {
+      const texts = responses.map(r => r.values[i]).filter(v => v);
+      if (texts.length === 0) {
+        content = '<div style="color:#999;font-size:13px">回答なし</div>';
+      } else {
+        content = '<div class="free-text-list">' + texts.map(t => `<div>・${escapeHtml(t)}</div>`).join('') + '</div>';
+      }
+    }
+    return `<div class="question-item">
+      <strong>Q${i+1}. ${escapeHtml(q.text)}</strong>
+      <div style="margin-top:10px">${content}</div>
+    </div>`;
+  }).join('');
+}
+
+function copyReport() {
+  let txt = `【${survey.title||'アンケート'} 集計レポート】\n`;
+  txt += `回答数：${responses.length}件\n`;
+  txt += `作成日：${new Date().toLocaleDateString('ja-JP')}\n\n`;
+  survey.questions.forEach((q, i) => {
+    txt += `■ Q${i+1}. ${q.text}\n`;
+    if (q.type === 'choice' || q.type === 'multi') {
+      const counts = {};
+      (q.options||[]).forEach(o => counts[o] = 0);
+      responses.forEach(r => {
+        const v = r.values[i];
+        if (Array.isArray(v)) v.forEach(x => { if (x in counts) counts[x]++; });
+        else if (v && v in counts) counts[v]++;
+      });
+      Object.entries(counts).forEach(([opt, cnt]) => {
+        const pct = responses.length > 0 ? Math.round(cnt/responses.length*100) : 0;
+        txt += `  ${opt}：${cnt}件 (${pct}%)\n`;
+      });
+    } else {
+      const texts = responses.map(r => r.values[i]).filter(v => v);
+      texts.forEach(t => txt += `  ・${t}\n`);
+      if (texts.length === 0) txt += `  （回答なし）\n`;
+    }
+    txt += '\n';
+  });
+  navigator.clipboard.writeText(txt).then(() => alert('レポートをコピーしました。メールや資料に貼り付けてご利用ください。'));
+}
+
+function clearResponses() {
+  if (!confirm('本当にすべての回答を削除しますか？（この操作は取り消せません）')) return;
+  responses = [];
+  saveResponses();
+  renderReport();
+}
+
+// タブ切り替え
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById(tab.dataset.panel).classList.add('active');
+    if (tab.dataset.panel === 'answer') renderAnswerForm();
+    if (tab.dataset.panel === 'report') renderReport();
+  });
+});
+
+// 初期化
+document.getElementById('surveyTitle').value = survey.title;
+document.getElementById('surveyIntro').value = survey.intro;
+document.getElementById('surveyTitle').addEventListener('input', saveSurvey);
+document.getElementById('surveyIntro').addEventListener('input', saveSurvey);
+renderQuestions();
+</script>
+<!-- hitotsu-cta -->
+<div style="max-width:720px;margin:32px auto 0;padding:20px;border-top:1px solid #ddd;
+  font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic',sans-serif;
+  font-size:14px;line-height:1.8;color:#444;background:transparent;">
+  <p style="margin:0 0 12px;">
+    この道具は、<strong>AI社員</strong>が毎朝のnote記事と一緒に自動で作ったものです。
+    作った人間の作業時間は0分です。
+  </p>
+  <p style="margin:0 0 16px;">
+    同じ仕組みを自分の仕事に置きたい方へ、<strong>AI社員チームの設計図（図解15枚＋テンプレ4本）</strong>を無料で配っています。
+  </p>
+  <p style="margin:0 0 8px;">
+    <a href="https://line.me/R/ti/p/@188jocyd" style="display:inline-block;background:#06c755;color:#fff;
+      text-decoration:none;padding:12px 20px;border-radius:8px;font-weight:bold;">
+      LINEで「AI社員」と送る → 設計図パックを受け取る
+    </a>
+  </p>
+  <p style="margin:12px 0 0;font-size:13px;color:#777;">
+    仕組みの全体像は<a href="https://note.com/hitotsu_ai/n/n493aa3b424cd" style="color:#0a7;">こちらのnote</a>で公開中／
+    hitotsu company
+  </p>
+</div>
+</body>
+</html>
