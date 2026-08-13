@@ -57,10 +57,17 @@
   .cta .kicker { margin-bottom:.5rem; }
   .cta p { font-size:.92rem; color:#b6b6bf; margin-bottom:1.1rem; }
   .cta strong { color:#fff; }
-  .btn { display:inline-block; background:#06c755; color:#fff; text-decoration:none;
-    padding:.95rem 1.5rem; border-radius:11px; font-weight:700; font-size:.95rem;
-    transition:transform .15s; }
-  .btn:hover { transform:translateY(-2px); }
+  .ways { display:flex; flex-direction:column; gap:.7rem; }
+  .way { display:block; text-decoration:none; border-radius:12px; padding:1rem 1.1rem;
+    transition:transform .16s, filter .16s; }
+  .way:hover { transform:translateY(-2px); filter:brightness(1.08); }
+  .way-line { background:#06c755; color:#fff; }
+  .way-book { background:transparent; border:1px solid #f0b429; color:#f0b429; }
+  .wn { display:block; font-family:'JetBrains Mono',monospace; font-size:.63rem;
+    letter-spacing:.12em; opacity:.85; margin-bottom:.2rem; }
+  .wt { display:block; font-size:1rem; font-weight:700; margin-bottom:.25rem; }
+  .wd { display:block; font-size:.76rem; line-height:1.65; opacity:.85; }
+  .way-book .wd { color:#a1a1aa; }
   .fine { font-size:.76rem; color:#71717a; margin-top:1rem; }
   .fine a { color:#f0b429; }
   .back { display:inline-block; margin-top:2.2rem; font-family:'JetBrains Mono',monospace;
@@ -164,9 +171,22 @@
     <div class="cta">
       <div class="kicker">⚙ タネあかし</div>
       <p>この道具、ぜんぶ<strong>人間が手を動かしていません</strong>。毎朝、AI社員が記事を書いて、ついでに道具まで作って置いていきます。<br><br>
-        「うちの仕事でも動かせるかな」と思った方へ。<strong>その作り方（図解15枚＋テンプレ4本）</strong>を、まるごと無料でお渡ししています。</p>
-      <a class="btn" href="https://line.me/R/ti/p/@188jocyd">LINEで「AI社員」と送る →</a>
-      <p class="fine">仕組みの全体像は<a href="https://note.com/hitotsu_ai/n/n493aa3b424cd">こちらのnote</a>で公開中</p>
+        「うちの仕事でも動かせるかな」と思った方へ。<strong>作り方は、隠していません。</strong>受け取り方が2つあります。</p>
+
+      <div class="ways">
+        <a class="way way-line" href="https://line.me/R/ti/p/@188jocyd">
+          <span class="wn">① 無料でもらう</span>
+          <span class="wt">LINEで「AI社員」と送る</span>
+          <span class="wd">図解15枚＋コピペで使えるテンプレ4本。すぐ届きます</span>
+        </a>
+        <a class="way way-book" href="https://akooooola-max.github.io/hitotsu-company-hp/books.html">
+          <span class="wn">② じっくり読む</span>
+          <span class="wt">Kindleの本（500円〜）</span>
+          <span class="wd">面倒な業務を25分で片づける手順を22章。Unlimitedなら読み放題</span>
+        </a>
+      </div>
+
+      <p class="fine">仕組みの全体像は<a href="https://note.com/hitotsu_ai/n/n493aa3b424cd">こちらのnote</a>でも公開中</p>
     </div>
 
     <a class="back" href="../card.html">← Hitotsu Company</a>
