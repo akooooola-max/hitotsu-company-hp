@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>お中元・お歳暮 贈答記録簿</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: "Hiragino Sans", "Yu Gothic", "Meiryo", sans-serif;
+  background: #f5f1e8;
+  color: #333;
+  line-height: 1.6;
+  padding: 16px;
+}
+.container { max-width: 1000px; margin: 0 auto; }
+h1 {
+  font-size: 1.4rem;
+  color: #7a4a2a;
+  border-bottom: 3px solid #c89464;
+  padding-bottom: 8px;
+  margin-bottom: 16px;
+}
+h2 { font-size: 1.1rem; color: #7a4a2a; margin: 16px 0 8px; }
+.card {
+  background: #fff;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+}
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+@media (min-width: 600px) {
+  .form-row { grid-template-columns: repeat(6, 1fr); }
+  .form-row .full { grid-column: span 6; }
+}
+input, select, textarea, button {
+  font: inherit;
+  padding: 8px 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 100%;
+}
+textarea { resize: vertical; min-height: 60px; }
+button {
+  background: #c89464;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+}
+button:hover { background: #a67848; }
+button.small { padding: 4px 8px; font-size: 0.85rem; }
+button.danger { background: #b95555; }
+button.danger:hover { background: #953f3f; }
+button.sub { background: #7a8a7a; }
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+th, td {
+  border: 1px solid #ddd;
+  padding: 6px 8px;
+  text-align: left;
+  vertical-align: top;
+}
+th { background: #f0e6d6; color: #5a3a1a; }
+.tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+.tab {
+  padding: 8px 14px;
+  background: #e5d9c3;
+  color: #7a4a2a;
+  border-radius: 6px 6px 0 0;
+  cursor: pointer;
+  font-weight: bold;
+  border: none;
+  width: auto;
+}
+.tab.active { background: #c89464; color: #fff; }
+.summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.stat {
+  background: #faf6ee;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border-left: 4px solid #c89464;
+}
+.stat .label { font-size: 0.8rem; color: #888; }
+.stat .value { font-size: 1.1rem; font-weight: bold; color: #7a4a2a; }
+.noshi-box {
+  background: #fffdf5;
+  border: 1px dashed #c89464;
+  padding: 12px;
+  border-radius: 6px;
+  margin-top: 8px;
+  white-space: pre-wrap;
+  font-family: "Yu Mincho", serif;
+}
+.table-wrap { overflow-x: auto; }
+.hint { font-size: 0.85rem; color: #888; margin: 4px 0 8px; }
+.filter-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+.filter-row select, .filter-row input { width: auto; flex: 1; min-width: 120px; }
+.btn-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+.btn-row button { width: auto; }
+label { font-size: 0.85rem; color: #666; display: block; margin-bottom: 2px; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>🎁 お中元・お歳暮 贈答記録簿</h1>
+
+  <div class="tabs">
+    <button class="tab active" data-tab="list">贈答先リスト</button>
+    <button class="tab" data-tab="noshi">のし書き文例</button>
+  </div>
+
+  <div id="tab-list">
+    <div class="card">
+      <h2>➕ 新規登録 / 編集</h2>
+      <div class="form-row">
+        <div style="grid-column: span 2;">
+          <label>贈り先（会社名・氏名）</label>
+          <input id="f-name" type="text" placeholder="例：株式会社〇〇 山田様">
+        </div>
+        <div style="grid-column: span 2;">
+          <label>担当部署・役職</label>
+          <input id="f-title" type="text" placeholder="例：営業部 部長">
+        </div>
+        <div style="grid-column: span 2;">
+          <label>種別</label>
+          <select id="f-kind">
+            <option value="お中元">お中元</option>
+            <option value="お歳暮">お歳暮</option>
+          </select>
+        </div>
+        <div>
+          <label>年度</label>
+          <input id="f-year" type="number" value="">
+        </div>
+        <div style="grid-column: span 2;">
+          <label>贈答品</label>
+          <input id="f-item" type="text" placeholder="例：ビール詰め合わせ">
+        </div>
+        <div>
+          <label>金額(円)</label>
+          <input id="f-price" type="number" placeholder="5000">
+        </div>
+        <div style="grid-column: span 2;">
+          <label>発送日</label>
+          <input id="f-date" type="date">
+        </div>
+        <div class="full">
+          <label>備考（相手の好み・過去の反応など）</label>
+          <textarea id="f-note" placeholder="例：昨年は焼き菓子で好評。奥様は甘いもの好き。"></textarea>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button onclick="saveRecord()">💾 保存する</button>
+        <button class="sub" onclick="clearForm()">クリア</button>
+        <input type="hidden" id="f-id">
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>📋 記録一覧</h2>
+      <div class="summary" id="summary"></div>
+      <div class="filter-row">
+        <select id="filter-kind">
+          <option value="">種別すべて</option>
+          <option value="お中元">お中元</option>
+          <option value="お歳暮">お歳暮</option>
+        </select>
+        <select id="filter-year">
+          <option value="">年度すべて</option>
+        </select>
+        <input id="filter-text" type="text" placeholder="キーワード検索(会社名など)">
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>年度</th><th>種別</th><th>贈り先</th><th>役職</th><th>品物</th><th>金額</th><th>発送日</th><th>備考</th><th>操作</th>
+            </tr>
+          </thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+      <div class="btn-row">
+        <button class="sub" onclick="exportCSV()">📥 CSVエクスポート</button>
+        <button class="sub" onclick="copyLastYear()">📋 昨年分を今年にコピー</button>
+      </div>
+      <p class="hint">※データはこのブラウザ内に自動保存されます（localStorage）。他のPCとは共有されません。</p>
+    </div>
+  </div>
+
+  <div id="tab-noshi" style="display:none;">
+    <div class="card">
+      <h2>✍️ のし書き・送り状文例</h2>
+      <p class="hint">よく使う文例をまとめました。クリックでコピーできます。</p>
+
+      <h2>■ のし表書き</h2>
+      <div class="noshi-box" onclick="copyText(this)">御中元</div>
+      <div class="noshi-box" onclick="copyText(this)">御歳暮</div>
+      <div class="noshi-box" onclick="copyText(this)">暑中御見舞</div>
+      <div class="noshi-box" onclick="copyText(this)">残暑御見舞</div>
+      <div class="noshi-box" onclick="copyText(this)">寒中御見舞</div>
+
+      <h2>■ 送り状 文例（お中元・取引先向け）</h2>
+      <div class="noshi-box" onclick="copyText(this)">拝啓　盛夏の候、貴社ますますご清栄のこととお慶び申し上げます。平素は格別のお引き立てを賜り、厚く御礼申し上げます。
+つきましては、日頃の感謝の気持ちを込めまして、心ばかりの品をお送りいたしました。ご笑納いただければ幸いに存じます。
+時節柄、ご自愛のほどお祈り申し上げます。
+　　　　　　　　　　　　　　　　　　　　　　　　　敬具</div>
+
+      <h2>■ 送り状 文例（お歳暮・取引先向け）</h2>
+      <div class="noshi-box" onclick="copyText(this)">拝啓　師走の候、貴社ますますご発展のこととお慶び申し上げます。本年も格別のご厚情を賜り、誠にありがとうございました。
+つきましては、感謝の気持ちを込めて心ばかりの品をお送りいたしましたので、ご笑納いただきますようお願い申し上げます。
+来る年も変わらぬお付き合いのほど、よろしくお願い申し上げます。
+　　　　　　　　　　　　　　　　　　　　　　　　　敬具</div>
+
+      <h2>■ お礼状 文例（贈答品を頂いた際）</h2>
+      <div class="noshi-box" onclick="copyText(this)">拝啓　時下ますますご清祥のこととお慶び申し上げます。
+この度は、結構なお品をお送りいただき誠にありがとうございました。ご厚情に深く感謝申し上げます。
+略儀ながら書中をもちましてお礼申し上げます。
+　　　　　　　　　　　　　　　　　　　　　　　　　敬具</div>
+
+      <p class="hint" style="margin-top:12px;">💡 コツ：時候の挨拶（盛夏の候／師走の候など）と、日頃の感謝の一言を入れると失礼のない文面になります。</p>
+    </div>
+  </div>
+</div>
+
+<script>
+const STORAGE_KEY = 'ochugen_records_v1';
+let records = [];
+
+function load() {
+  try {
+    records = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+  } catch(e) { records = []; }
+}
+function save() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
+}
+
+function saveRecord() {
+  const name = document.getElementById('f-name').value.trim();
+  if (!name) { alert('贈り先を入力してください'); return; }
+  const id = document.getElementById('f-id').value;
+  const rec = {
+    id: id || Date.now().toString(),
+    name,
+    title: document.getElementById('f-title').value.trim(),
+    kind: document.getElementById('f-kind').value,
+    year: document.getElementById('f-year').value || new Date().getFullYear(),
+    item: document.getElementById('f-item').value.trim(),
+    price: document.getElementById('f-price').value || 0,
+    date: document.getElementById('f-date').value,
+    note: document.getElementById('f-note').value.trim()
+  };
+  if (id) {
+    const i = records.findIndex(r => r.id === id);
+    if (i >= 0) records[i] = rec;
+  } else {
+    records.push(rec);
+  }
+  save();
+  clearForm();
+  render();
+}
+
+function clearForm() {
+  document.getElementById('f-id').value = '';
+  document.getElementById('f-name').value = '';
+  document.getElementById('f-title').value = '';
+  document.getElementById('f-kind').value = 'お中元';
+  document.getElementById('f-year').value = new Date().getFullYear();
+  document.getElementById('f-item').value = '';
+  document.getElementById('f-price').value = '';
+  document.getElementById('f-date').value = '';
+  document.getElementById('f-note').value = '';
+}
+
+function editRecord(id) {
+  const r = records.find(x => x.id === id);
+  if (!r) return;
+  document.getElementById('f-id').value = r.id;
+  document.getElementById('f-name').value = r.name;
+  document.getElementById('f-title').value = r.title || '';
+  document.getElementById('f-kind').value = r.kind;
+  document.getElementById('f-year').value = r.year;
+  document.getElementById('f-item').value = r.item || '';
+  document.getElementById('f-price').value = r.price || '';
+  document.getElementById('f-date').value = r.date || '';
+  document.getElementById('f-note').value = r.note || '';
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function deleteRecord(id) {
+  if (!confirm('削除してよろしいですか？')) return;
+  records = records.filter(r => r.id !== id);
+  save();
+  render();
+}
+
+function render() {
+  const fk = document.getElementById('filter-kind').value;
+  const fy = document.getElementById('filter-year').value;
+  const ft = document.getElementById('filter-text').value.trim().toLowerCase();
+
+  const yearSel = document.getElementById('filter-year');
+  const years = [...new Set(records.map(r => r.year))].sort().reverse();
+  const cur = yearSel.value;
+  yearSel.innerHTML = '<option value="">年度すべて</option>' + years.map(y=>`<option value="${y}" ${y==cur?'selected':''}>${y}年</option>`).join('');
+
+  let filtered = records.filter(r => {
+    if (fk && r.kind !== fk) return false;
+    if (fy && String(r.year) !== String(fy)) return false;
+    if (ft) {
+      const hay = (r.name+r.title+r.item+r.note).toLowerCase();
+      if (!hay.includes(ft)) return false;
+    }
+    return true;
+  });
+
+  filtered.sort((a,b) => (b.year-a.year) || (a.name.localeCompare(b.name,'ja')));
+
+  const tbody = document.getElementById('tbody');
+  if (filtered.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;color:#999;">記録がありません</td></tr>';
+  } else {
+    tbody.innerHTML = filtered.map(r => `
+      <tr>
+        <td>${r.year}</td>
+        <td>${escape(r.kind)}</td>
+        <td>${escape(r.name)}</td>
+        <td>${escape(r.title||'')}</td>
+        <td>${escape(r.item||'')}</td>
+        <td>${r.price ? '¥'+Number(r.price).toLocaleString() : ''}</td>
+        <td>${r.date||''}</td>
+        <td style="max-width:200px;font-size:0.85rem;">${escape(r.note||'')}</td>
+        <td>
+          <button class="small sub" onclick="editRecord('${r.id}')">編集</button>
+          <button class="small danger" onclick="deleteRecord('${r.id}')">削除</button>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  // summary
+  const total = filtered.reduce((s,r) => s + Number(r.price||0), 0);
+  const count = filtered.length;
+  const uniq = new Set(filtered.map(r=>r.name)).size;
+  document.getElementById('summary').innerHTML = `
+    <div class="stat"><div class="label">件数</div><div class="value">${count} 件</div></div>
+    <div class="stat"><div class="label">合計金額</div><div class="value">¥${total.toLocaleString()}</div></div>
+    <div class="stat"><div class="label">贈り先(人数)</div><div class="value">${uniq} 件</div></div>
+    <div class="stat"><div class="label">平均単価</div><div class="value">¥${count?Math.round(total/count).toLocaleString():0}</div></div>
+  `;
+}
+
+function escape(s) {
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function exportCSV() {
+  if (records.length === 0) { alert('データがありません'); return; }
+  const header = ['年度','種別','贈り先','役職','品物','金額','発送日','備考'];
+  const rows = records.map(r => [r.year,r.kind,r.name,r.title||'',r.item||'',r.price||'',r.date||'',r.note||'']);
+  const csv = [header, ...rows].map(row =>
+    row.map(c => `"${String(c).replace(/"/g,'""')}"`).join(',')
+  ).join('\r\n');
+  const bom = '\uFEFF';
+  const blob = new Blob([bom+csv], {type:'text/csv'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `zoutou_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function copyLastYear() {
+  const thisYear = new Date().getFullYear();
+  const lastYear = thisYear - 1;
+  const targets = records.filter(r => String(r.year) === String(lastYear));
+  if (targets.length === 0) { alert(`${lastYear}年の記録がありません`); return; }
+  if (!confirm(`${lastYear}年の記録 ${targets.length}件を ${thisYear}年としてコピーしますか？（品物・発送日はクリアされます）`)) return;
+  targets.forEach(r => {
+    records.push({
+      ...r,
+      id: Date.now().toString()+Math.random().toString(36).slice(2,6),
+      year: thisYear,
+      item: '',
+      price: '',
+      date: ''
+    });
+  });
+  save();
+  render();
+  alert('コピーしました。品物・金額を今年用に更新してください。');
+}
+
+function copyText(el) {
+  const text = el.innerText;
+  navigator.clipboard.writeText(text).then(() => {
+    const orig = el.style.background;
+    el.style.background = '#d4edc9';
+    setTimeout(() => el.style.background = orig, 600);
+  }).catch(() => {
+    // fallback
+    const ta = document.createElement('textarea');
+    ta.value = text; document.body.appendChild(ta); ta.select();
+    document.execCommand('copy'); document.body.removeChild(ta);
+    alert('コピーしました');
+  });
+}
+
+// tabs
+document.querySelectorAll('.tab').forEach(t => {
+  t.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+    t.classList.add('active');
+    document.getElementById('tab-list').style.display = t.dataset.tab==='list' ? '' : 'none';
+    document.getElementById('tab-noshi').style.display = t.dataset.tab==='noshi' ? '' : 'none';
+  });
+});
+
+['filter-kind','filter-year','filter-text'].forEach(id => {
+  document.getElementById(id).addEventListener('input', render);
+  document.getElementById(id).addEventListener('change', render);
+});
+
+// init
+load();
+document.getElementById('f-year').value = new Date().getFullYear();
+render();
+</script>
+<!-- hitotsu-cta -->
+<div style="max-width:720px;margin:32px auto 0;padding:20px;border-top:1px solid #ddd;
+  font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic',sans-serif;
+  font-size:14px;line-height:1.8;color:#444;background:transparent;">
+  <p style="margin:0 0 12px;">
+    この道具は、<strong>AI社員</strong>が毎朝のnote記事と一緒に自動で作ったものです。
+    作った人間の作業時間は0分です。
+  </p>
+  <p style="margin:0 0 16px;">
+    同じ仕組みを自分の仕事に置きたい方へ、<strong>AI社員チームの設計図（図解15枚＋テンプレ4本）</strong>を無料で配っています。
+  </p>
+  <p style="margin:0 0 8px;">
+    <a href="https://line.me/R/ti/p/@188jocyd" style="display:inline-block;background:#06c755;color:#fff;
+      text-decoration:none;padding:12px 20px;border-radius:8px;font-weight:bold;">
+      LINEで「AI社員」と送る → 設計図パックを受け取る
+    </a>
+  </p>
+  <p style="margin:12px 0 0;font-size:13px;color:#777;">
+    仕組みの全体像は<a href="https://note.com/hitotsu_ai/n/n493aa3b424cd" style="color:#0a7;">こちらのnote</a>で公開中／
+    hitotsu company
+  </p>
+</div>
+</body>
+</html>
