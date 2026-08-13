@@ -4,90 +4,172 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AI社員がつくった道具箱｜hitotsu company</title>
-<meta name="description" content="毎朝のnote記事と一緒に、AI社員が自動で作った仕事道具。全部その場で使えます。">
+<meta name="description" content="夜のうちにAI社員が作って、朝には増えている仕事道具。登録なし・無料・開いたらすぐ使えます。">
+<meta name="theme-color" content="#0d0d0f">
+<meta property="og:title" content="AI社員がつくった道具箱">
+<meta property="og:description" content="夜のうちにAI社員が作って、朝には増えている仕事道具。登録なし・無料・開いたらすぐ使えます。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://akooooola-max.github.io/hitotsu-company-hp/apps/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
 <style>
-  * { box-sizing: border-box; }
-  body { font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic", sans-serif;
-    margin: 0; padding: 24px 16px 48px; background: #f5f5f7; color: #222; line-height: 1.7; }
-  .wrap { max-width: 720px; margin: 0 auto; }
-  h1 { font-size: 22px; margin: 0 0 8px; }
-  .lead { color: #555; font-size: 15px; margin: 0 0 4px; }
-  .count { color: #888; font-size: 13px; margin: 0 0 24px; }
-  .card { display: block; background: #fff; border-radius: 12px; padding: 16px 18px;
-    margin-bottom: 12px; text-decoration: none; color: inherit;
-    box-shadow: 0 1px 3px rgba(0,0,0,.08); transition: transform .15s, box-shadow .15s; }
-  .card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,.12); }
-  .date { display: block; font-size: 12px; color: #999; }
-  .title { display: block; font-size: 16px; font-weight: bold; margin: 2px 0 4px; }
-  .desc { display: block; font-size: 14px; color: #666; }
-  .cta { background: #fff; border-radius: 12px; padding: 20px; margin: 28px 0 0;
-    box-shadow: 0 1px 3px rgba(0,0,0,.08); }
-  .cta p { margin: 0 0 14px; font-size: 15px; }
-  .btn { display: inline-block; background: #06c755; color: #fff; text-decoration: none;
-    padding: 13px 22px; border-radius: 8px; font-weight: bold; }
-  .note { font-size: 13px; color: #777; margin: 14px 0 0; }
-  .note a { color: #0a7; }
+  *,*::before,*::after { box-sizing: border-box; margin:0; padding:0; }
+  body { font-family:'Noto Sans JP',-apple-system,BlinkMacSystemFont,sans-serif;
+    background:#0d0d0f; color:#e4e4e7; line-height:1.85;
+    padding:2.6rem 1rem 4rem; }
+  body::before { content:''; position:fixed; inset:0 0 auto 0; height:340px; pointer-events:none;
+    background:radial-gradient(ellipse 70% 100% at 50% 0%, rgba(240,180,41,.13), transparent 70%); }
+  .wrap { max-width:640px; margin:0 auto; position:relative; }
+
+  .kicker { font-family:'JetBrains Mono',monospace; font-size:.68rem; letter-spacing:.16em;
+    color:#f0b429; opacity:.9; margin-bottom:.7rem; }
+  h1 { font-size:1.85rem; line-height:1.35; color:#fff; margin-bottom:.9rem; letter-spacing:.01em; }
+  h1 .amp { color:#f0b429; }
+  .lead { font-size:.95rem; color:#a1a1aa; margin-bottom:1.5rem; }
+  .lead strong { color:#e4e4e7; }
+
+  .counter { display:flex; align-items:baseline; gap:.55rem; flex-wrap:wrap;
+    font-family:'JetBrains Mono',monospace; font-size:.75rem; color:#71717a;
+    border-top:1px solid #26262c; border-bottom:1px solid #26262c;
+    padding:.85rem 0; margin-bottom:1.8rem; }
+  .counter b { font-size:1.5rem; color:#f0b429; font-weight:600; line-height:1; }
+
+  .card { display:flex; gap:.95rem; align-items:flex-start;
+    background:#141418; border:1px solid #25252c; border-radius:14px;
+    padding:1.05rem 1.1rem; margin-bottom:.75rem;
+    text-decoration:none; color:inherit;
+    transition:border-color .18s, transform .18s, background .18s; }
+  .card:hover { border-color:#f0b429; transform:translateX(5px); background:#17171c; }
+  .ic { font-size:1.5rem; line-height:1.3; flex-shrink:0; }
+  .body { flex:1; min-width:0; }
+  .meta { display:block; font-family:'JetBrains Mono',monospace; font-size:.63rem;
+    letter-spacing:.1em; color:#6b6b75; margin-bottom:.25rem; }
+  .new { background:#f0b429; color:#0d0d0f; border-radius:3px; padding:.1rem .34rem;
+    font-size:.58rem; margin-left:.4rem; letter-spacing:.08em; }
+  .title { display:block; font-size:.98rem; font-weight:700; color:#fafafa;
+    line-height:1.5; margin-bottom:.3rem; }
+  .desc { display:block; font-size:.83rem; color:#9a9aa4; line-height:1.7; }
+  .arrow { font-family:'JetBrains Mono',monospace; color:#3f3f46; align-self:center; flex-shrink:0; }
+  .card:hover .arrow { color:#f0b429; }
+
+  .cta { background:#141418; border:1px solid #25252c; border-radius:16px;
+    padding:1.6rem 1.3rem; margin-top:2.2rem; }
+  .cta .kicker { margin-bottom:.5rem; }
+  .cta p { font-size:.92rem; color:#b6b6bf; margin-bottom:1.1rem; }
+  .cta strong { color:#fff; }
+  .btn { display:inline-block; background:#06c755; color:#fff; text-decoration:none;
+    padding:.95rem 1.5rem; border-radius:11px; font-weight:700; font-size:.95rem;
+    transition:transform .15s; }
+  .btn:hover { transform:translateY(-2px); }
+  .fine { font-size:.76rem; color:#71717a; margin-top:1rem; }
+  .fine a { color:#f0b429; }
+  .back { display:inline-block; margin-top:2.2rem; font-family:'JetBrains Mono',monospace;
+    font-size:.72rem; color:#52525b; text-decoration:none; }
+  .back:hover { color:#D97757; }
 </style>
 </head>
 <body>
   <div class="wrap">
-    <h1>AI社員がつくった道具箱</h1>
-    <p class="lead">毎朝のnote記事と一緒に、AI社員が自動で作った仕事道具です。<br>
-      インストール不要・登録不要。開いたその場で使えます。</p>
-    <p class="count">全9個／毎朝1つ増えます</p>
+    <div class="kicker">$ open toolbox/</div>
+    <h1>AI社員がつくった<span class="amp">道具箱</span></h1>
+    <p class="lead">夜のうちにAI社員が1つ作って、朝には増えています。<br>
+      <strong>登録なし・入力なし・無料。</strong>開いたら、もう使えます。</p>
+
+    <div class="counter">
+      <b>9</b><span>個の道具が入っています</span><span style="color:#f0b429;">／明日の朝、また1つ増えます</span>
+    </div>
 
       <a class="card" href="ochugen-oseibo-kanri.html">
-        <span class="date">2026-08-13</span>
-        <span class="title">お中元・お歳暮 贈答記録簿</span>
-        <span class="desc"></span>
+        <span class="ic">🎁</span>
+        <span class="body">
+          <span class="meta">今朝できたて <b class="new">NEW</b></span>
+          <span class="title">お中元・お歳暮 贈答記録簿</span>
+          <span class="desc">お中元とお歳暮。誰に何を贈ったか、来年の自分に引き継ぐ</span>
+        </span>
+        <span class="arrow">→</span>
       </a>
       <a class="card" href="kanji-25min-checklist.html">
-        <span class="date">2026-08-12</span>
-        <span class="title">幹事さん25分チェックリスト</span>
-        <span class="desc">忘年会の幹事。25分で会場・出欠・集金の段取りを終える</span>
+        <span class="ic">🍻</span>
+        <span class="body">
+          <span class="meta">昨日</span>
+          <span class="title">幹事さん25分チェックリスト</span>
+          <span class="desc">忘年会の幹事。会場・出欠・集金を25分で段取り終了</span>
+        </span>
+        <span class="arrow">→</span>
       </a>
       <a class="card" href="kanji-gift-helper.html">
-        <span class="date">2026-08-11</span>
-        <span class="title">幹事のお助けツール - 贈り物&寄せ書きサポート</span>
-        <span class="desc">送別会の幹事。贈り物選びと寄せ書きをまとめて片付ける</span>
+        <span class="ic">💐</span>
+        <span class="body">
+          <span class="meta">2日前</span>
+          <span class="title">幹事のお助けツール - 贈り物&寄せ書きサポート</span>
+          <span class="desc">送別会の幹事。贈り物選びと寄せ書きを、まとめて片付ける</span>
+        </span>
+        <span class="arrow">→</span>
       </a>
       <a class="card" href="kenshu-junbi-kit.html">
-        <span class="date">2026-08-10</span>
-        <span class="title">研修準備キット - 30分で片付ける</span>
-        <span class="desc">研修の準備。資料と進行を30分で組み上げる</span>
+        <span class="ic">📚</span>
+        <span class="body">
+          <span class="meta">3日前</span>
+          <span class="title">研修準備キット - 30分で片付ける</span>
+          <span class="desc">研修の準備。資料も進行も、30分で人前に立てる状態に</span>
+        </span>
+        <span class="arrow">→</span>
       </a>
       <a class="card" href="survey-builder.html">
-        <span class="date">2026-08-09</span>
-        <span class="title">社内アンケート かんたん作成・集計ツール</span>
-        <span class="desc">社内アンケート。質問設計から集計まで一気に作る</span>
+        <span class="ic">📊</span>
+        <span class="body">
+          <span class="meta">4日前</span>
+          <span class="title">社内アンケート かんたん作成・集計ツール</span>
+          <span class="desc">社内アンケート。何を聞くかで詰まらず、集計まで一直線</span>
+        </span>
+        <span class="arrow">→</span>
       </a>
       <a class="card" href="goal-setting-helper.html">
-        <span class="date">2026-08-07</span>
-        <span class="title">目標設定モヤモヤ解消シート</span>
-        <span class="desc">期初の目標設定。言葉にならない目標を、測れる形にする</span>
+        <span class="ic">🎯</span>
+        <span class="body">
+          <span class="meta">6日前</span>
+          <span class="title">目標設定モヤモヤ解消シート</span>
+          <span class="desc">「がんばります」で終わっていた目標を、測れる形に落とす</span>
+        </span>
+        <span class="arrow">→</span>
       </a>
       <a class="card" href="keicho-taio-set.html">
-        <span class="date">2026-08-06</span>
-        <span class="title">社内慶弔・お祝い対応セット</span>
-        <span class="desc">慶弔の連絡。相場とメッセージ文例を迷わず決める</span>
+        <span class="ic">🎗</span>
+        <span class="body">
+          <span class="meta">2026-08-06</span>
+          <span class="title">社内慶弔・お祝い対応セット</span>
+          <span class="desc">訃報の一報。相場もお悔やみの言葉も、迷わず決められる</span>
+        </span>
+        <span class="arrow">→</span>
       </a>
       <a class="card" href="meishi-renrakusaki-kanri.html">
-        <span class="date">2026-08-05</span>
-        <span class="title">社内名刺・連絡先管理</span>
-        <span class="desc">机に積んだ名刺を、探せる連絡先リストに変える</span>
+        <span class="ic">📇</span>
+        <span class="body">
+          <span class="meta">2026-08-05</span>
+          <span class="title">社内名刺・連絡先管理</span>
+          <span class="desc">机に積み上がった名刺の山を、探せる連絡先リストに変える</span>
+        </span>
+        <span class="arrow">→</span>
       </a>
       <a class="card" href="customer-visit-checklist.html">
-        <span class="date">2026-08-05</span>
-        <span class="title">来客対応・お茶出し準備チェック</span>
-        <span class="desc">急な来客。お茶出しと応接の準備を、抜けなく順番に片付ける</span>
+        <span class="ic">☕</span>
+        <span class="body">
+          <span class="meta">2026-08-05</span>
+          <span class="title">来客対応・お茶出し準備チェック</span>
+          <span class="desc">「あと10分で来客」から、お茶出しも応接も抜けなく間に合わせる</span>
+        </span>
+        <span class="arrow">→</span>
       </a>
 
     <div class="cta">
-      <p>この道具は全部、人間が手を動かさずにできています。<br>
-        同じ仕組みを自分の仕事に置きたい方へ、<strong>AI社員チームの設計図（図解15枚＋テンプレ4本）</strong>を無料で配っています。</p>
-      <p><a class="btn" href="https://line.me/R/ti/p/@188jocyd">LINEで「AI社員」と送る → 設計図パックを受け取る</a></p>
-      <p class="note">仕組みの全体像は<a href="https://note.com/hitotsu_ai/n/n493aa3b424cd">こちらのnote</a>で公開中／hitotsu company</p>
+      <div class="kicker">⚙ タネあかし</div>
+      <p>この道具、ぜんぶ<strong>人間が手を動かしていません</strong>。毎朝、AI社員が記事を書いて、ついでに道具まで作って置いていきます。<br><br>
+        「うちの仕事でも動かせるかな」と思った方へ。<strong>その作り方（図解15枚＋テンプレ4本）</strong>を、まるごと無料でお渡ししています。</p>
+      <a class="btn" href="https://line.me/R/ti/p/@188jocyd">LINEで「AI社員」と送る →</a>
+      <p class="fine">仕組みの全体像は<a href="https://note.com/hitotsu_ai/n/n493aa3b424cd">こちらのnote</a>で公開中</p>
     </div>
+
+    <a class="back" href="../card.html">← Hitotsu Company</a>
   </div>
 </body>
 </html>
