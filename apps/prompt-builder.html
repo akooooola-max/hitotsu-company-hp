@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI依頼文ビルダー｜貼るだけで使える</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "Hiragino Sans", "Yu Gothic UI", sans-serif;
+  background: #f4f6f9;
+  color: #222;
+  line-height: 1.6;
+  padding: 16px;
+}
+.container { max-width: 780px; margin: 0 auto; }
+header {
+  text-align: center;
+  padding: 20px 12px;
+  margin-bottom: 16px;
+}
+h1 { font-size: 22px; color: #1a4d8f; margin-bottom: 6px; }
+.subtitle { font-size: 13px; color: #666; }
+
+.tabs {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 12px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+.tab {
+  flex: 1;
+  min-width: 90px;
+  padding: 10px 8px;
+  background: #fff;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  text-align: center;
+  white-space: nowrap;
+  transition: all 0.15s;
+}
+.tab.active {
+  background: #1a4d8f;
+  color: #fff;
+  border-color: #1a4d8f;
+}
+.tab:hover:not(.active) { background: #eef3fa; }
+
+.card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  margin-bottom: 16px;
+}
+
+.field { margin-bottom: 14px; }
+label {
+  display: block;
+  font-weight: 600;
+  font-size: 14px;
+  margin-bottom: 6px;
+  color: #333;
+}
+.hint {
+  font-size: 12px;
+  color: #777;
+  margin-bottom: 6px;
+  font-weight: normal;
+}
+input[type="text"], textarea, select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1.5px solid #ccc;
+  border-radius: 8px;
+  font-size: 15px;
+  font-family: inherit;
+  background: #fafbfc;
+}
+input[type="text"]:focus, textarea:focus, select:focus {
+  outline: none;
+  border-color: #1a4d8f;
+  background: #fff;
+}
+textarea { resize: vertical; min-height: 80px; }
+
+.output-area {
+  background: #f8f9fb;
+  border: 1.5px dashed #b8c4d6;
+  border-radius: 8px;
+  padding: 14px;
+  margin-top: 12px;
+  font-size: 14px;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  min-height: 80px;
+  color: #222;
+}
+
+.btn-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+button {
+  padding: 11px 18px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: inherit;
+}
+.btn-primary { background: #1a4d8f; color: #fff; flex: 1; min-width: 120px; }
+.btn-primary:hover { background: #15407a; }
+.btn-secondary { background: #eef2f7; color: #333; }
+.btn-secondary:hover { background: #dde4ee; }
+.btn-success { background: #2a9d5f; color: #fff; }
+
+.copied { animation: flash 0.6s; }
+@keyframes flash {
+  0% { background: #d4edda; }
+  100% { background: #f8f9fb; }
+}
+
+.help-box {
+  background: #fff8e1;
+  border-left: 4px solid #f5a623;
+  padding: 12px 14px;
+  border-radius: 6px;
+  font-size: 13px;
+  margin-bottom: 16px;
+  color: #5a4700;
+}
+
+.trouble-item {
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  overflow: hidden;
+}
+.trouble-q {
+  padding: 12px 14px;
+  background: #f7f9fc;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.trouble-q:hover { background: #eef3fa; }
+.trouble-a {
+  padding: 0 14px;
+  max-height: 0;
+  overflow: hidden;
+  transition: all 0.25s;
+  font-size: 13px;
+}
+.trouble-a.open {
+  padding: 12px 14px;
+  max-height: 500px;
+  border-top: 1px solid #e0e0e0;
+}
+.trouble-a code {
+  display: block;
+  background: #f4f6f9;
+  padding: 8px 10px;
+  border-radius: 6px;
+  margin-top: 6px;
+  font-size: 12px;
+  color: #1a4d8f;
+  word-wrap: break-word;
+  white-space: pre-wrap;
+}
+.arrow { transition: transform 0.2s; }
+.trouble-item.open .arrow { transform: rotate(180deg); }
+
+@media (max-width: 500px) {
+  h1 { font-size: 19px; }
+  .card { padding: 16px; }
+  .tab { font-size: 12px; padding: 9px 6px; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>🤖 AI依頼文ビルダー</h1>
+    <p class="subtitle">項目を埋めるだけで、AIチャットに貼るだけの依頼文が完成します</p>
+  </header>
+
+  <div class="help-box">
+    💡 <strong>使い方：</strong>やりたいことのタブを選び、空欄を埋めて「依頼文を作る」を押します。出てきた文章をコピーして、AIチャット画面に貼り付けてください。
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" data-tab="mail">✉️ メール作成</div>
+    <div class="tab" data-tab="summary">📄 長文要約</div>
+    <div class="tab" data-tab="idea">💡 アイデア出し</div>
+    <div class="tab" data-tab="excel">📊 表計算の関数</div>
+    <div class="tab" data-tab="translate">🌐 翻訳・英文</div>
+    <div class="tab" data-tab="trouble">🔧 困ったとき</div>
+  </div>
+
+  <!-- メール -->
+  <div class="card tab-content" id="tab-mail">
+    <div class="field">
+      <label>誰に送るメールですか？</label>
+      <div class="hint">例：取引先、上司、社内の同僚、お客様</div>
+      <input type="text" id="mail-to" placeholder="取引先">
+    </div>
+    <div class="field">
+      <label>目的（何を伝えたい？）</label>
+      <div class="hint">例：納期遅れのお詫び、打ち合わせ日程の調整、資料送付のお願い</div>
+      <input type="text" id="mail-purpose" placeholder="納期遅れのお詫び">
+    </div>
+    <div class="field">
+      <label>入れたい情報・背景</label>
+      <div class="hint">箇条書きでOK。事実を伝えるほど精度が上がります</div>
+      <textarea id="mail-info" placeholder="・元の納期は10/15&#10;・新しい納期は10/22&#10;・遅れた理由は部品の入荷遅れ"></textarea>
+    </div>
+    <div class="field">
+      <label>雰囲気</label>
+      <select id="mail-tone">
+        <option>丁寧だが硬すぎない</option>
+        <option>フォーマル（かなり丁寧）</option>
+        <option>カジュアル（社内向け）</option>
+        <option>簡潔で短め</option>
+      </select>
+    </div>
+    <div class="btn-row">
+      <button class="btn-primary" onclick="buildMail()">依頼文を作る</button>
+      <button class="btn-secondary" onclick="clearFields('mail')">クリア</button>
+    </div>
+    <div class="output-area" id="mail-out">ここに依頼文が表示されます</div>
+    <div class="btn-row">
+      <button class="btn-success" onclick="copyText('mail-out', this)">📋 コピーする</button>
+    </div>
+  </div>
+
+  <!-- 要約 -->
+  <div class="card tab-content" id="tab-summary" style="display:none">
+    <div class="field">
+      <label>要約したい文章を貼り付けてください</label>
+      <div class="hint">議事録、記事、資料など何でもOK</div>
+      <textarea id="sum-text" rows="6" placeholder="ここに長い文章を貼り付ける"></textarea>
+    </div>
+    <div class="field">
+      <label>どのくらいの長さにまとめる？</label>
+      <select id="sum-len">
+        <option>3行でまとめて</option>
+        <option>箇条書きで5つのポイント</option>
+        <option>200文字程度</option>
+        <option>500文字程度で詳しめに</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>目的（任意）</label>
+      <div class="hint">例：上司への報告用、次の会議で使う、ブログのネタ探し</div>
+      <input type="text" id="sum-purpose" placeholder="上司への報告用">
+    </div>
+    <div class="btn-row">
+      <button class="btn-primary" onclick="buildSummary()">依頼文を作る</button>
+      <button class="btn-secondary" onclick="clearFields('sum')">クリア</button>
+    </div>
+    <div class="output-area" id="sum-out">ここに依頼文が表示されます</div>
+    <div class="btn-row">
+      <button class="btn-success" onclick="copyText('sum-out', this)">📋 コピーする</button>
+    </div>
+  </div>
+
+  <!-- アイデア -->
+  <div class="card tab-content" id="tab-idea" style="display:none">
+    <div class="field">
+      <label>何のアイデアが欲しい？</label>
+      <div class="hint">例：新商品のキャッチコピー、ブログのタイトル、イベントの企画名</div>
+      <input type="text" id="idea-what" placeholder="新商品のキャッチコピー">
+    </div>
+    <div class="field">
+      <label>対象・条件・背景</label>
+      <div class="hint">どんな商品か、誰向けか、盛り込みたい言葉など</div>
+      <textarea id="idea-cond" placeholder="・30代女性向け&#10;・時短家電&#10;・「疲れた日でも使える」感じ"></textarea>
+    </div>
+    <div class="field">
+      <label>いくつ欲しい？</label>
+      <select id="idea-num">
+        <option>5個</option>
+        <option>10個</option>
+        <option>20個</option>
+      </select>
+    </div>
+    <div class="btn-row">
+      <button class="btn-primary" onclick="buildIdea()">依頼文を作る</button>
+      <button class="btn-secondary" onclick="clearFields('idea')">クリア</button>
+    </div>
+    <div class="output-area" id="idea-out">ここに依頼文が表示されます</div>
+    <div class="btn-row">
+      <button class="btn-success" onclick="copyText('idea-out', this)">📋 コピーする</button>
+    </div>
+  </div>
+
+  <!-- Excel -->
+  <div class="card tab-content" id="tab-excel" style="display:none">
+    <div class="field">
+      <label>やりたいことを日本語で教えてください</label>
+      <div class="hint">例：A列の日付から曜日を出したい、B列の空欄を数えたい</div>
+      <textarea id="ex-what" placeholder="A列の日付から曜日を出したい"></textarea>
+    </div>
+    <div class="field">
+      <label>使っているソフト</label>
+      <select id="ex-app">
+        <option>Excel</option>
+        <option>Googleスプレッドシート</option>
+        <option>どちらでも使える式が欲しい</option>
+      </select>
+    </div>
+    <div class="btn-row">
+      <button class="btn-primary" onclick="buildExcel()">依頼文を作る</button>
+      <button class="btn-secondary" onclick="clearFields('ex')">クリア</button>
+    </div>
+    <div class="output-area" id="ex-out">ここに依頼文が表示されます</div>
+    <div class="btn-row">
+      <button class="btn-success" onclick="copyText('ex-out', this)">📋 コピーする</button>
+    </div>
+  </div>
+
+  <!-- 翻訳 -->
+  <div class="card tab-content" id="tab-translate" style="display:none">
+    <div class="field">
+      <label>やりたいこと</label>
+      <select id="tr-mode" onchange="toggleTrMode()">
+        <option value="ja2en">日本語 → 英語に翻訳</option>
+        <option value="en2ja">英語 → 日本語に翻訳</option>
+        <option value="check">英文をチェック・自然に直す</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>翻訳・チェックしたい文章</label>
+      <textarea id="tr-text" rows="4" placeholder="ここに文章を貼り付ける"></textarea>
+    </div>
+    <div class="field">
+      <label>雰囲気</label>
+      <select id="tr-tone">
+        <option>ビジネス向け（丁寧）</option>
+        <option>カジュアル</option>
+        <option>友達に話しかける感じ</option>
+        <option>できるだけシンプルに</option>
+      </select>
+    </div>
+    <div class="btn-row">
+      <button class="btn-primary" onclick="buildTranslate()">依頼文を作る</button>
+      <button class="btn-secondary" onclick="clearFields('tr')">クリア</button>
+    </div>
+    <div class="output-area" id="tr-out">ここに依頼文が表示されます</div>
+    <div class="btn-row">
+      <button class="btn-success" onclick="copyText('tr-out', this)">📋 コピーする</button>
+    </div>
+  </div>
+
+  <!-- 困ったとき -->
+  <div class="card tab-content" id="tab-trouble" style="display:none">
+    <p style="margin-bottom:14px; font-size:14px; color:#555;">AIの回答がしっくりこないときの直し方です。項目をタップして開いてください。</p>
+
+    <div class="trouble-item">
+      <div class="trouble-q" onclick="toggleTrouble(this)">回答がズレる・的外れ <span class="arrow">▼</span></div>
+      <div class="trouble-a">
+        情報不足が原因のことが多いです。次のように追加で伝えてみてください。
+        <code>今の回答は少しズレています。私が本当に知りたいのは〇〇です。前提として△△という状況です。もう一度お願いします。</code>
+      </div>
+    </div>
+
+    <div class="trouble-item">
+      <div class="trouble-q" onclick="toggleTrouble(this)">日本語が不自然・翻訳っぽい <span class="arrow">▼</span></div>
+      <div class="trouble-a">
+        「自然な日本語で」と明示するのが効きます。
+        <code>もっと自然な日本語に直してください。日本人が普段使う言い回しでお願いします。</code>
+      </div>
+    </div>
+
+    <div class="trouble-item">
+      <div class="trouble-q" onclick="toggleTrouble(this)">文章が長すぎる <span class="arrow">▼</span></div>
+      <div class="trouble-a">
+        文字数や行数を数字で指定するとコンパクトになります。
+        <code>今の半分の長さにまとめてください。200文字以内でお願いします。</code>
+      </div>
+    </div>
+
+    <div class="trouble-item">
+      <div class="trouble-q" onclick="toggleTrouble(this)">硬すぎる・丁寧すぎる <span class="arrow">▼</span></div>
+      <div class="trouble-a">
+        雰囲気を具体的に伝えます。
+        <code>もう少しカジュアルな言い方に直してください。同僚に話しかけるような雰囲気で。</code>
+      </div>
+    </div>
+
+    <div class="trouble-item">
+      <div class="trouble-q" onclick="toggleTrouble(this)">選択肢がなくて選べない <span class="arrow">▼</span></div>
+      <div class="trouble-a">
+        複数案を出してもらいましょう。
+        <code>案を3パターン出してください。それぞれ雰囲気を変えて（丁寧・カジュアル・簡潔など）お願いします。</code>
+      </div>
+    </div>
+
+    <div class="trouble-item">
+      <div class="trouble-q" onclick="toggleTrouble(this)">同じ答えばかり返ってくる <span class="arrow">▼</span></div>
+      <div class="trouble-a">
+        観点を指定して振り直します。
+        <code>今までと違う切り口で出し直してください。〇〇の観点や、△△の視点も入れてお願いします。</code>
+      </div>
+    </div>
+
+    <div class="trouble-item">
+      <div class="trouble-q" onclick="toggleTrouble(this)">難しくて理解できない <span class="arrow">▼</span></div>
+      <div class="trouble-a">
+        レベルを指定します。
+        <code>中学生でもわかるように、専門用語を使わずに説明してください。例え話も入れてくれると助かります。</code>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// タブ切り替え
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
+    document.getElementById('tab-' + tab.dataset.tab).style.display = 'block';
+  });
+});
+
+function val(id) { return document.getElementById(id).value.trim(); }
+
+function buildMail() {
+  const to = val('mail-to') || '（送り先を書いてください）';
+  const purpose = val('mail-purpose') || '（目的を書いてください）';
+  const info = val('mail-info') || '（背景情報を書いてください）';
+  const tone = val('mail-tone');
+  const text = `以下の条件でビジネスメールの下書きを作ってください。
+
+【宛先】${to}
+【目的】${purpose}
+【入れたい情報】
+${info}
+【雰囲気】${tone}
+
+件名も一緒に提案してください。長すぎず、要点が伝わる文章でお願いします。`;
+  document.getElementById('mail-out').textContent = text;
+  saveLocal();
+}
+
+function buildSummary() {
+  const text = val('sum-text') || '（ここに要約したい文章を入れてください）';
+  const len = val('sum-len');
+  const purpose = val('sum-purpose');
+  const purposeLine = purpose ? `\n【使う目的】${purpose}` : '';
+  const out = `以下の文章を「${len}」の形で要約してください。${purposeLine}
+
+要点だけを残して、重要でない部分は省いてください。専門用語が出てきた場合は、そのまま使って構いません。
+
+【対象の文章】
+${text}`;
+  document.getElementById('sum-out').textContent = out;
+  saveLocal();
+}
+
+function buildIdea() {
+  const what = val('idea-what') || '（何のアイデアが欲しいか書いてください）';
+  const cond = val('idea-cond') || '（条件や背景を書いてください）';
+  const num = val('idea-num');
+  const out = `${what}のアイデアを${num}出してください。
+
+【条件・背景】
+${cond}
+
+案ごとに簡単な狙い（なぜこの案か）も一言添えてください。
+似たようなものばかりにならないよう、切り口を変えてお願いします。`;
+  document.getElementById('idea-out').textContent = out;
+  saveLocal();
+}
+
+function buildExcel() {
+  const what = val('ex-what') || '（やりたいことを書いてください）';
+  const app = val('ex-app');
+  const out = `${app}で、次のことをしたいです。
+
+【やりたいこと】
+${what}
+
+そのままコピペで使える式を教えてください。
+式の意味も、初心者向けに簡単に説明してもらえると助かります。
+もし複数のやり方がある場合は、一番シンプルなものを最初に教えてください。`;
+  document.getElementById('ex-out').textContent = out;
+  saveLocal();
+}
+
+function toggleTrMode() {}
+
+function buildTranslate() {
+  const mode = document.getElementById('tr-mode').value;
+  const text = val('tr-text') || '（翻訳したい文章を入れてください）';
+  const tone = val('tr-tone');
+  let instruction = '';
+  if (mode === 'ja2en') instruction = '以下の日本語を英語に翻訳してください。';
+  else if (mode === 'en2ja') instruction = '以下の英語を日本語に翻訳してください。';
+  else instruction = '以下の英文をネイティブが見て自然になるように直してください。修正点も簡単に説明してください。';
+
+  const out = `${instruction}
+雰囲気は「${tone}」でお願いします。
+
+【対象の文章】
+${text}`;
+  document.getElementById('tr-out').textContent = out;
+  saveLocal();
+}
+
+function clearFields(prefix) {
+  document.querySelectorAll(`#tab-${prefix2tab(prefix)} input, #tab-${prefix2tab(prefix)} textarea`).forEach(el => el.value = '');
+  document.getElementById(prefix + '-out').textContent = 'ここに依頼文が表示されます';
+  saveLocal();
+}
+function prefix2tab(p) {
+  return {mail:'mail', sum:'summary', idea:'idea', ex:'excel', tr:'translate'}[p];
+}
+
+function copyText(id, btn) {
+  const text = document.getElementById(id).textContent;
+  if (!text || text === 'ここに依頼文が表示されます') {
+    alert('先に「依頼文を作る」を押してください');
+    return;
+  }
+  navigator.clipboard.writeText(text).then(() => {
+    const orig = btn.textContent;
+    btn.textContent = '✅ コピーしました！';
+    document.getElementById(id).classList.add('copied');
+    setTimeout(() => {
+      btn.textContent = orig;
+      document.getElementById(id).classList.remove('copied');
+    }, 1500);
+  }).catch(() => {
+    // フォールバック
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    btn.textContent = '✅ コピーしました！';
+    setTimeout(() => btn.textContent = '📋 コピーする', 1500);
+  });
+}
+
+function toggleTrouble(el) {
+  const item = el.parentElement;
+  const ans = item.querySelector('.trouble-a');
+  ans.classList.toggle('open');
+  item.classList.toggle('open');
+}
+
+// localStorage保存
+const inputIds = ['mail-to','mail-purpose','mail-info','mail-tone','sum-text','sum-len','sum-purpose','idea-what','idea-cond','idea-num','ex-what','ex-app','tr-text','tr-tone'];
+function saveLocal() {
+  const data = {};
+  inputIds.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) data[id] = el.value;
+  });
+  try { localStorage.setItem('promptBuilder', JSON.stringify(data)); } catch(e){}
+}
+function loadLocal() {
+  try {
+    const data = JSON.parse(localStorage.getItem('promptBuilder') || '{}');
+    inputIds.forEach(id => {
+      const el = document.getElementById(id);
+      if (el && data[id] !== undefined) el.value = data[id];
+    });
+  } catch(e){}
+}
+loadLocal();
+inputIds.forEach(id => {
+  const el = document.getElementById(id);
+  if (el) el.addEventListener('input', saveLocal);
+});
+</script>
+<!-- hitotsu-cta -->
+<div style="max-width:720px;margin:40px auto 0;padding:24px 20px;border-radius:14px;
+  background:#14141a;color:#c9c9d1;
+  font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic',sans-serif;
+  font-size:14px;line-height:1.9;">
+  <p style="margin:0 0 12px;color:#f0b429;font-weight:bold;font-size:13px;letter-spacing:.08em;">
+    ⚙ この道具のつくられ方
+  </p>
+  <p style="margin:0 0 14px;">
+    昨日の夜、AI社員が勝手に作りました。<br>
+    人間がキーボードを触った時間は、<strong style="color:#fff;">0分</strong>です。
+  </p>
+  <p style="margin:0 0 18px;">
+    「うちの仕事でもこれ、動かせないかな」と思った方へ。<br>
+    受け取り方は3つあります。
+  </p>
+  <p style="margin:0 0 12px;">
+    <a href="https://line.me/R/ti/p/@188jocyd" style="display:inline-block;background:#06c755;color:#fff;
+      text-decoration:none;padding:14px 22px;border-radius:10px;font-weight:bold;">
+      ① 無料でもらう ─ LINEで「AI社員」と送る →
+    </a>
+  </p>
+  <p style="margin:0 0 12px;">
+    <a href="https://akooooola-max.github.io/hitotsu-company-hp/books.html" style="display:inline-block;background:transparent;color:#f0b429;
+      border:1px solid #f0b429;text-decoration:none;padding:13px 22px;border-radius:10px;font-weight:bold;">
+      ② じっくり読む ─ Kindleの本（500円〜）→
+    </a>
+  </p>
+  <p style="margin:0 0 8px;">
+    <a href="https://coconala.com/services/4325740" style="display:inline-block;background:#f0b429;color:#0d0d0f;
+      text-decoration:none;padding:14px 22px;border-radius:10px;font-weight:bold;">
+      ③ つくってもらう ─ ココナラで相談する →
+    </a><br>
+    <span style="font-size:12.5px;color:#8b8b95;">
+      現場のやり方をうかがってから、あなた専用の1本を作ります（10,000円・お届けまで3日）
+    </span>
+  </p>
+  <p style="margin:14px 0 0;font-size:12.5px;color:#71717a;">
+    ほかの道具は<a href="./" style="color:#f0b429;">道具箱</a>に／
+    仕組みの全体像は<a href="https://note.com/hitotsu_ai/n/n493aa3b424cd" style="color:#f0b429;">こちらのnote</a>で公開中<br>
+    hitotsu company
+  </p>
+</div>
+</body>
+</html>
