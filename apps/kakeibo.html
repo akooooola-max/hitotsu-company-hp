@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>かんたん家計簿</title>
+<style>
+  :root {
+    --bg: #f4f5f7;
+    --card: #ffffff;
+    --text: #1f2430;
+    --text-sub: #8a8f9c;
+    --border: #ecedf1;
+    --income: #17a673;
+    --income-bg: #e7f8f2;
+    --expense: #e8534f;
+    --expense-bg: #fdecec;
+    --accent: #4c6ef5;
+    --accent-2: #7c5cff;
+    --shadow: 0 4px 16px rgba(30, 34, 48, 0.06);
+    --radius: 18px;
+  }
+
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Hiragino Kaku Gothic ProN",
+      "Yu Gothic", Meiryo, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    padding-bottom: 90px;
+    min-height: 100vh;
+  }
+
+  .app {
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 0 16px;
+  }
+
+  /* Header */
+  header {
+    padding: 20px 16px 8px;
+    max-width: 480px;
+    margin: 0 auto;
+  }
+
+  header h1 {
+    font-size: 18px;
+    font-weight: 700;
+    margin: 0 0 14px;
+    letter-spacing: 0.02em;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  header h1 .coin {
+    font-size: 20px;
+  }
+
+  .month-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--card);
+    border-radius: 14px;
+    padding: 6px 6px;
+    box-shadow: var(--shadow);
+  }
+
+  .month-nav button {
+    border: none;
+    background: transparent;
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    font-size: 18px;
+    color: var(--text-sub);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s;
+  }
+  .month-nav button:active { background: var(--bg); }
+
+  .month-label {
+    font-size: 16px;
+    font-weight: 700;
+  }
+
+  .month-label .yr {
+    font-size: 12px;
+    color: var(--text-sub);
+    font-weight: 500;
+    margin-right: 4px;
+  }
+
+  /* Balance card */
+  .balance-card {
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    border-radius: var(--radius);
+    padding: 24px 22px;
+    color: #fff;
+    margin-top: 16px;
+    box-shadow: 0 10px 24px rgba(76, 110, 245, 0.28);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .balance-card::after {
+    content: "";
+    position: absolute;
+    width: 180px;
+    height: 180px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 50%;
+    top: -80px;
+    right: -60px;
+  }
+
+  .balance-card .label {
+    font-size: 12px;
+    opacity: 0.85;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+  }
+
+  .balance-card .amount {
+    font-size: 34px;
+    font-weight: 800;
+    margin-top: 6px;
+    letter-spacing: 0.01em;
+    word-break: break-all;
+  }
+
+  .balance-card .amount .yen { font-size: 20px; font-weight: 600; margin-right: 2px; }
+
+  .sub-row {
+    display: flex;
+    gap: 10px;
+    margin-top: 18px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .sub-item {
+    flex: 1;
+    background: rgba(255,255,255,0.16);
+    border-radius: 12px;
+    padding: 10px 12px;
+    backdrop-filter: blur(4px);
+  }
+
+  .sub-item .s-label {
+    font-size: 11px;
+    opacity: 0.9;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .sub-item .s-amount {
+    font-size: 16px;
+    font-weight: 700;
+    margin-top: 2px;
+  }
+
+  .dot { width: 6px; height: 6px; border-radius: 50%; display: inline-block; }
+  .dot.in { background: #baf5e0; }
+  .dot.out { background: #ffd1cf; }
+
+  /* Transactions */
+  .section-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-sub);
+    margin: 26px 4px 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .day-group {
+    margin-bottom: 6px;
+  }
+
+  .day-header {
+    font-size: 12px;
+    color: var(--text-sub);
+    margin: 14px 4px 8px;
+    font-weight: 600;
+  }
+
+  .tx-list {
+    background: var(--card);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+
+  .tx-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+  }
+  .tx-item:last-child { border-bottom: none; }
+
+  .tx-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+
+  .tx-icon.income { background: var(--income-bg); }
+  .tx-icon.expense { background: var(--expense-bg); }
+
+  .tx-info { flex: 1; min-width: 0; }
+  .tx-cat { font-size: 14px; font-weight: 600; }
+  .tx-memo { font-size: 12px; color: var(--text-sub); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+  .tx-amount { font-size: 15px; font-weight: 700; flex-shrink: 0; }
+  .tx-amount.income { color: var(--income); }
+  .tx-amount.expense { color: var(--expense); }
+
+  .tx-delete {
+    background: none;
+    border: none;
+    color: #c9cdd6;
+    font-size: 18px;
+    padding: 4px 0 4px 6px;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 50px 20px;
+    color: var(--text-sub);
+  }
+  .empty-state .big { font-size: 40px; margin-bottom: 10px; }
+  .empty-state .msg { font-size: 14px; }
+
+  /* FAB */
+  .fab {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: min(448px, calc(100% - 32px));
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    color: #fff;
+    border: none;
+    border-radius: 16px;
+    padding: 15px;
+    font-size: 15px;
+    font-weight: 700;
+    box-shadow: 0 10px 24px rgba(76, 110, 245, 0.35);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    z-index: 50;
+  }
+  .fab:active { transform: translateX(-50%) scale(0.98); }
+
+  /* Modal */
+  .modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(20, 22, 30, 0.45);
+    display: none;
+    align-items: flex-end;
+    justify-content: center;
+    z-index: 100;
+  }
+  .modal-backdrop.open { display: flex; }
+
+  .modal {
+    background: var(--card);
+    width: 100%;
+    max-width: 480px;
+    border-radius: 22px 22px 0 0;
+    padding: 20px 20px calc(20px + env(safe-area-inset-bottom));
+    max-height: 88vh;
+    overflow-y: auto;
+    animation: slideUp 0.22s ease-out;
+  }
+
+  @keyframes slideUp {
+    from { transform: translateY(30px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+
+  .modal-handle {
+    width: 40px;
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    margin: 0 auto 14px;
+  }
+
+  .modal h2 {
+    font-size: 17px;
+    margin: 0 0 18px;
+  }
+
+  .type-toggle {
+    display: flex;
+    background: var(--bg);
+    border-radius: 12px;
+    padding: 4px;
+    margin-bottom: 16px;
+  }
+
+  .type-toggle button {
+    flex: 1;
+    border: none;
+    background: transparent;
+    padding: 10px;
+    border-radius: 9px;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-sub);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .type-toggle button.active.expense { background: var(--expense); color: #fff; }
+  .type-toggle button.active.income { background: var(--income); color: #fff; }
+
+  .field { margin-bottom: 14px; }
+  .field label {
+    display: block;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-sub);
+    margin-bottom: 6px;
+  }
+
+  .amount-input-wrap {
+    display: flex;
+    align-items: center;
+    background: var(--bg);
+    border-radius: 12px;
+    padding: 0 14px;
+    border: 2px solid transparent;
+  }
+  .amount-input-wrap:focus-within { border-color: var(--accent); background: #fff; }
+  .amount-input-wrap .yen-sign { font-size: 18px; font-weight: 700; color: var(--text-sub); }
+
+  input[type=number], input[type=text], input[type=date], select {
+    width: 100%;
+    border: none;
+    background: transparent;
+    padding: 13px 0;
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--text);
+    outline: none;
+    font-family: inherit;
+  }
+
+  input[type=text], input[type=date], select {
+    background: var(--bg);
+    border-radius: 12px;
+    padding: 12px 14px;
+    font-size: 15px;
+    font-weight: 500;
+    border: 2px solid transparent;
+  }
+  input[type=text]:focus, input[type=date]:focus, select:focus {
+    border-color: var(--accent);
+    background: #fff;
+  }
+
+  .cat-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+  }
+
+  .cat-btn {
+    border: 2px solid var(--border);
+    background: var(--card);
+    border-radius: 12px;
+    padding: 10px 4px;
+    text-align: center;
+    cursor: pointer;
+    font-size: 11px;
+    color: var(--text-sub);
+    font-weight: 600;
+  }
+  .cat-btn .ic { font-size: 20px; display: block; margin-bottom: 4px; }
+  .cat-btn.active { border-color: var(--accent); background: #eef1ff; color: var(--accent); }
+
+  .modal-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+  }
+
+  .btn {
+    flex: 1;
+    border: none;
+    border-radius: 12px;
+    padding: 14px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .btn.cancel { background: var(--bg); color: var(--text-sub); }
+  .btn.save { background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: #fff; }
+  .btn.save:disabled { opacity: 0.5; }
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1><span class="coin">💰</span> かんたん家計簿</h1>
+    <div class="month-nav">
+      <button id="prevMonth" aria-label="前の月">‹</button>
+      <div class="month-label"><span class="yr" id="yearLabel"></span><span id="monthLabel"></span></div>
+      <button id="nextMonth" aria-label="次の月">›</button>
+    </div>
+  </header>
+
+  <div class="balance-card">
+    <div class="label">今月の残高</div>
+    <div class="amount"><span class="yen">¥</span><span id="balanceAmount">0</span></div>
+    <div class="sub-row">
+      <div class="sub-item">
+        <div class="s-label"><span class="dot in"></span>収入</div>
+        <div class="s-amount" id="totalIncome">¥0</div>
+      </div>
+      <div class="sub-item">
+        <div class="s-label"><span class="dot out"></span>支出</div>
+        <div class="s-amount" id="totalExpense">¥0</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-title">履歴</div>
+  <div id="txContainer"></div>
+</div>
+
+<button class="fab" id="openAdd">＋ 記録する</button>
+
+<div class="modal-backdrop" id="backdrop">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <h2>取引を追加</h2>
+
+    <div class="type-toggle">
+      <button type="button" class="active expense" id="typeExpense">支出</button>
+      <button type="button" id="typeIncome">収入</button>
+    </div>
+
+    <div class="field">
+      <label>金額</label>
+      <div class="amount-input-wrap">
+        <span class="yen-sign">¥</span>
+        <input type="number" id="amountInput" placeholder="0" inputmode="numeric">
+      </div>
+    </div>
+
+    <div class="field">
+      <label>カテゴリ</label>
+      <div class="cat-grid" id="catGrid"></div>
+    </div>
+
+    <div class="field">
+      <label>日付</label>
+      <input type="date" id="dateInput">
+    </div>
+
+    <div class="field">
+      <label>メモ（任意）</label>
+      <input type="text" id="memoInput" placeholder="例）スーパーで買い物">
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn cancel" id="cancelBtn">キャンセル</button>
+      <button class="btn save" id="saveBtn">保存する</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  const STORAGE_KEY = "kakeibo_transactions_v1";
+
+  const CATEGORIES = {
+    expense: [
+      { id: "food", label: "食費", icon: "🍙" },
+      { id: "daily", label: "日用品", icon: "🧴" },
+      { id: "transport", label: "交通費", icon: "🚃" },
+      { id: "leisure", label: "娯楽", icon: "🎮" },
+      { id: "clothes", label: "衣服・美容", icon: "👗" },
+      { id: "medical", label: "医療", icon: "💊" },
+      { id: "housing", label: "住居・光熱費", icon: "🏠" },
+      { id: "other_e", label: "その他", icon: "📦" },
+    ],
+    income: [
+      { id: "salary", label: "給与", icon: "💼" },
+      { id: "bonus", label: "賞与", icon: "🎁" },
+      { id: "side", label: "副業", icon: "💻" },
+      { id: "other_i", label: "その他", icon: "✨" },
+    ],
+  };
+
+  let transactions = loadTransactions();
+  let viewDate = new Date();
+  viewDate.setDate(1);
+
+  let modalType = "expense";
+  let modalCategory = CATEGORIES.expense[0].id;
+
+  const $ = (id) => document.getElementById(id);
+
+  const balanceAmountEl = $("balanceAmount");
+  const totalIncomeEl = $("totalIncome");
+  const totalExpenseEl = $("totalExpense");
+  const txContainer = $("txContainer");
+  const yearLabel = $("yearLabel");
+  const monthLabel = $("monthLabel");
+  const backdrop = $("backdrop");
+  const catGrid = $("catGrid");
+  const amountInput = $("amountInput");
+  const dateInput = $("dateInput");
+  const memoInput = $("memoInput");
+  const typeExpenseBtn = $("typeExpense");
+  const typeIncomeBtn = $("typeIncome");
+
+  function loadTransactions() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      return raw ? JSON.parse(raw) : [];
+    } catch (e) {
+      return [];
+    }
+  }
+
+  function saveTransactions() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(transactions));
+  }
+
+  function formatYen(n) {
+    return Math.round(n).toLocaleString("ja-JP");
+  }
+
+  function monthKey(d) {
+    return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0");
+  }
+
+  function findCategory(type, id) {
+    return CATEGORIES[type].find((c) => c.id === id) || { icon: "📦", label: id };
+  }
+
+  function renderMonthLabel() {
+    yearLabel.textContent = viewDate.getFullYear() + "年";
+    monthLabel.textContent = (viewDate.getMonth() + 1) + "月";
+  }
+
+  function renderSummaryAndList() {
+    const key = monthKey(viewDate);
+    const monthTx = transactions
+      .filter((t) => t.date.slice(0, 7) === key)
+      .sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : b.createdAt - a.createdAt));
+
+    let income = 0, expense = 0;
+    monthTx.forEach((t) => {
+      if (t.type === "income") income += t.amount;
+      else expense += t.amount;
+    });
+    const balance = income - expense;
+
+    balanceAmountEl.textContent = (balance < 0 ? "-" : "") + formatYen(Math.abs(balance));
+    totalIncomeEl.textContent = "¥" + formatYen(income);
+    totalExpenseEl.textContent = "¥" + formatYen(expense);
+
+    txContainer.innerHTML = "";
+
+    if (monthTx.length === 0) {
+      txContainer.innerHTML =
+        '<div class="empty-state"><div class="big">🧾</div><div class="msg">この月の記録はまだありません</div></div>';
+      return;
+    }
+
+    const groups = {};
+    monthTx.forEach((t) => {
+      if (!groups[t.date]) groups[t.date] = [];
+      groups[t.date].push(t);
+    });
+
+    Object.keys(groups)
+      .sort((a, b) => (a < b ? 1 : -1))
+      .forEach((date) => {
+        const dayWrap = document.createElement("div");
+        dayWrap.className = "day-group";
+
+        const d = new Date(date + "T00:00:00");
+        const weekday = ["日", "月", "火", "水", "木", "金", "土"][d.getDay()];
+        const header = document.createElement("div");
+        header.className = "day-header";
+        header.textContent = `${d.getMonth() + 1}月${d.getDate()}日（${weekday}）`;
+        dayWrap.appendChild(header);
+
+        const list = document.createElement("div");
+        list.className = "tx-list";
+
+        groups[date].forEach((t) => {
+          const cat = findCategory(t.type, t.category);
+          const item = document.createElement("div");
+          item.className = "tx-item";
+          item.innerHTML = `
+            <div class="tx-icon ${t.type}">${cat.icon}</div>
+            <div class="tx-info">
+              <div class="tx-cat">${cat.label}</div>
+              ${t.memo ? `<div class="tx-memo">${escapeHtml(t.memo)}</div>` : ""}
+            </div>
+            <div class="tx-amount ${t.type}">${t.type === "income" ? "+" : "-"}¥${formatYen(t.amount)}</div>
+            <button class="tx-delete" data-id="${t.id}" aria-label="削除">✕</button>
+          `;
+          list.appendChild(item);
+        });
+
+        dayWrap.appendChild(list);
+        txContainer.appendChild(dayWrap);
+      });
+  }
+
+  function escapeHtml(str) {
+    const div = document.createElement("div");
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  function render() {
+    renderMonthLabel();
+    renderSummaryAndList();
+  }
+
+  txContainer.addEventListener("click", (e) => {
+    const btn = e.target.closest(".tx-delete");
+    if (!btn) return;
+    const id = btn.getAttribute("data-id");
+    transactions = transactions.filter((t) => t.id !== id);
+    saveTransactions();
+    render();
+  });
+
+  $("prevMonth").addEventListener("click", () => {
+    viewDate.setMonth(viewDate.getMonth() - 1);
+    render();
+  });
+  $("nextMonth").addEventListener("click", () => {
+    viewDate.setMonth(viewDate.getMonth() + 1);
+    render();
+  });
+
+  function renderCatGrid() {
+    catGrid.innerHTML = "";
+    CATEGORIES[modalType].forEach((c) => {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = "cat-btn" + (c.id === modalCategory ? " active" : "");
+      b.innerHTML = `<span class="ic">${c.icon}</span>${c.label}`;
+      b.addEventListener("click", () => {
+        modalCategory = c.id;
+        renderCatGrid();
+      });
+      catGrid.appendChild(b);
+    });
+  }
+
+  function setModalType(type) {
+    modalType = type;
+    modalCategory = CATEGORIES[type][0].id;
+    typeExpenseBtn.classList.toggle("active", type === "expense");
+    typeIncomeBtn.classList.toggle("active", type === "income");
+    renderCatGrid();
+  }
+
+  typeExpenseBtn.addEventListener("click", () => setModalType("expense"));
+  typeIncomeBtn.addEventListener("click", () => setModalType("income"));
+
+  function openModal() {
+    setModalType("expense");
+    amountInput.value = "";
+    memoInput.value = "";
+    dateInput.value = new Date().toISOString().slice(0, 10);
+    backdrop.classList.add("open");
+    setTimeout(() => amountInput.focus(), 100);
+  }
+
+  function closeModal() {
+    backdrop.classList.remove("open");
+  }
+
+  $("openAdd").addEventListener("click", openModal);
+  $("cancelBtn").addEventListener("click", closeModal);
+  backdrop.addEventListener("click", (e) => {
+    if (e.target === backdrop) closeModal();
+  });
+
+  $("saveBtn").addEventListener("click", () => {
+    const amount = parseFloat(amountInput.value);
+    if (!amount || amount <= 0) {
+      amountInput.focus();
+      return;
+    }
+    const date = dateInput.value || new Date().toISOString().slice(0, 10);
+
+    transactions.push({
+      id: Date.now().toString(36) + Math.random().toString(36).slice(2, 8),
+      type: modalType,
+      category: modalCategory,
+      amount: amount,
+      memo: memoInput.value.trim(),
+      date: date,
+      createdAt: Date.now(),
+    });
+
+    saveTransactions();
+
+    const newViewDate = new Date(date + "T00:00:00");
+    viewDate = new Date(newViewDate.getFullYear(), newViewDate.getMonth(), 1);
+
+    closeModal();
+    render();
+  });
+
+  render();
+})();
+</script>
+<!-- hitotsu-cta -->
+<div style="max-width:720px;margin:40px auto 0;padding:24px 20px;border-radius:14px;
+  background:#14141a;color:#c9c9d1;
+  font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic',sans-serif;
+  font-size:14px;line-height:1.9;">
+  <p style="margin:0 0 12px;color:#f0b429;font-weight:bold;font-size:13px;letter-spacing:.08em;">
+    ⚙ この道具のつくられ方
+  </p>
+  <p style="margin:0 0 14px;">
+    昨日の夜、AI社員が勝手に作りました。<br>
+    人間がキーボードを触った時間は、<strong style="color:#fff;">0分</strong>です。
+  </p>
+  <p style="margin:0 0 18px;">
+    「うちの仕事でもこれ、動かせないかな」と思った方へ。<br>
+    受け取り方は3つあります。
+  </p>
+  <p style="margin:0 0 12px;">
+    <a href="https://line.me/R/ti/p/@188jocyd" style="display:inline-block;background:#06c755;color:#fff;
+      text-decoration:none;padding:14px 22px;border-radius:10px;font-weight:bold;">
+      ① 無料でもらう ─ LINEで「AI社員」と送る →
+    </a>
+  </p>
+  <p style="margin:0 0 12px;">
+    <a href="https://akooooola-max.github.io/hitotsu-company-hp/books.html" style="display:inline-block;background:transparent;color:#f0b429;
+      border:1px solid #f0b429;text-decoration:none;padding:13px 22px;border-radius:10px;font-weight:bold;">
+      ② じっくり読む ─ Kindleの本（500円〜）→
+    </a>
+  </p>
+  <p style="margin:0 0 8px;">
+    <a href="https://coconala.com/services/4325740" style="display:inline-block;background:#f0b429;color:#0d0d0f;
+      text-decoration:none;padding:14px 22px;border-radius:10px;font-weight:bold;">
+      ③ つくってもらう ─ ココナラで相談する →
+    </a><br>
+    <span style="font-size:12.5px;color:#8b8b95;">
+      現場のやり方をうかがってから、あなた専用の1本を作ります（10,000円・お届けまで3日）
+    </span>
+  </p>
+  <p style="margin:14px 0 0;font-size:12.5px;color:#71717a;">
+    ほかの道具は<a href="./" style="color:#f0b429;">道具箱</a>に／
+    仕組みの全体像は<a href="https://note.com/hitotsu_ai/n/n493aa3b424cd" style="color:#f0b429;">こちらのnote</a>で公開中<br>
+    hitotsu company
+  </p>
+</div>
+</body>
+</html>
