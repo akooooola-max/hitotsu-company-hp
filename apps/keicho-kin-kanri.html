@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>慶弔金管理表｜ブラウザで記録・集計できる無料ツール（Excel不要）</title>
+<meta name="description" content="慶弔見舞金・香典の支給履歴をブラウザ上で記録・集計できる無料ツール。二重支給や支給漏れを自動で警告。Excelテンプレートのダウンロード不要、そのまま使えてCSV書き出しも可能です。">
+<meta name="theme-color" content="#1f3a5f">
+<link rel="canonical" href="https://hitotsucompany.com/apps/keicho-kin-kanri.html">
+<meta property="og:type" content="website">
+<meta property="og:title" content="慶弔金管理表｜ブラウザで記録・集計できる無料ツール">
+<meta property="og:description" content="慶弔見舞金・香典の支給履歴を記録・集計。二重支給と支給漏れを自動警告。ダウンロード不要。">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:#1c2430; --sub:#5b6675; --line:#dfe4ea; --bg:#f4f6f9;
+  --card:#fff; --navy:#1f3a5f; --navy-l:#2f5583; --accent:#b5891f;
+  --ok:#1d7a4c; --warn:#b3521a; --danger:#b3251a;
+}
+body{font-family:"Hiragino Sans","Yu Gothic","Meiryo",system-ui,sans-serif;
+  background:var(--bg);color:var(--ink);line-height:1.75;padding:0 0 64px}
+.wrap{max-width:960px;margin:0 auto;padding:0 16px}
+header.hd{background:var(--navy);color:#fff;padding:26px 0 22px;margin-bottom:22px}
+header.hd h1{font-size:1.5rem;line-height:1.45;margin-bottom:.5rem;letter-spacing:.01em}
+header.hd p{font-size:.9rem;color:#c6d4e6;max-width:44em}
+.tagrow{display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.9rem}
+.tag{background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.24);
+  border-radius:999px;padding:.2rem .7rem;font-size:.72rem;color:#e7eefa}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;
+  padding:18px 18px 20px;margin-bottom:18px}
+.card > h2{font-size:1rem;color:var(--navy);margin-bottom:.9rem;
+  padding-bottom:.5rem;border-bottom:2px solid #eef1f5;display:flex;
+  align-items:center;gap:.5rem;flex-wrap:wrap}
+.card > h2 .cnt{font-size:.74rem;font-weight:400;color:var(--sub)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+label.f{display:block;font-size:.76rem;color:var(--sub);margin-bottom:.28rem;font-weight:700}
+input,select,textarea{width:100%;padding:.55rem .6rem;border:1px solid var(--line);
+  border-radius:6px;font-size:.92rem;font-family:inherit;background:#fff;color:var(--ink)}
+input:focus,select:focus,textarea:focus{outline:2px solid #9db8dd;outline-offset:-1px;border-color:var(--navy-l)}
+textarea{min-height:58px;resize:vertical}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.35rem;
+  padding:.6rem 1.1rem;border:1px solid transparent;border-radius:6px;cursor:pointer;
+  font-size:.88rem;font-weight:700;font-family:inherit;transition:filter .15s}
+.btn:hover{filter:brightness(1.08)}
+.btn-main{background:var(--navy);color:#fff}
+.btn-sub{background:#fff;color:var(--navy);border-color:#c3cdd9}
+.btn-ghost{background:transparent;color:var(--sub);border-color:var(--line)}
+.btn-sm{padding:.3rem .6rem;font-size:.76rem;font-weight:400}
+.btn-del{background:transparent;color:var(--danger);border-color:#e8c9c5}
+.actions{display:flex;gap:.55rem;flex-wrap:wrap;margin-top:14px;align-items:center}
+.alert{border-radius:7px;padding:.7rem .85rem;font-size:.83rem;margin-top:12px;line-height:1.65}
+.alert-warn{background:#fdf3e7;border:1px solid #f0d5b0;color:#7d3f13}
+.alert-ok{background:#eaf6ef;border:1px solid #bfe0cd;color:#155e3a}
+.sum{display:grid;grid-template-columns:repeat(auto-fit,minmax(128px,1fr));gap:10px;margin-bottom:4px}
+.sum div{background:#f8fafc;border:1px solid var(--line);border-radius:8px;padding:.7rem .8rem}
+.sum .k{display:block;font-size:.7rem;color:var(--sub);margin-bottom:.15rem}
+.sum .v{display:block;font-size:1.18rem;font-weight:700;color:var(--navy);line-height:1.3}
+.sum .v.alert-n{color:var(--warn)}
+.tblwrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+table{width:100%;border-collapse:collapse;font-size:.83rem;min-width:720px}
+th,td{padding:.5rem .55rem;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{background:#f8fafc;color:var(--sub);font-size:.72rem;white-space:nowrap;font-weight:700}
+td.num{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+tr.done td:first-child{border-left:3px solid var(--ok)}
+tr.todo td:first-child{border-left:3px solid var(--warn)}
+.pill{display:inline-block;border-radius:4px;padding:.05rem .38rem;font-size:.68rem;white-space:nowrap}
+.p-in{background:#e8eefa;color:#28477a}
+.p-out{background:#f3ece0;color:#7a5c1e}
+.p-todo{background:#fdefe0;color:#8a4415}
+.p-done{background:#e7f4ec;color:#156940}
+.filters{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:12px;align-items:flex-end}
+.filters > div{flex:1;min-width:118px}
+.empty{text-align:center;color:var(--sub);padding:32px 12px;font-size:.87rem}
+.note{font-size:.76rem;color:var(--sub);margin-top:.5rem}
+article.card > h2{display:block;font-size:1.12rem;color:var(--navy);margin:26px 0 .7rem;
+  padding-bottom:.45rem;border-bottom:2px solid #e5e9ef}
+article.card > h2:first-of-type{margin-top:4px}
+article h3{font-size:.96rem;color:var(--ink);margin:18px 0 .4rem}
+article p{font-size:.9rem;margin-bottom:.8rem}
+article ul,article ol{margin:0 0 .9rem 1.3rem;font-size:.9rem}
+article li{margin-bottom:.3rem}
+article table{min-width:0;font-size:.85rem;margin-bottom:1rem}
+.faq dt{font-weight:700;font-size:.92rem;margin-top:1rem;color:var(--navy)}
+.faq dd{font-size:.88rem;margin-left:0;color:#3a4553}
+footer{text-align:center;font-size:.78rem;color:var(--sub);padding:28px 16px 0;
+  border-top:1px solid var(--line);margin-top:30px}
+footer a{color:var(--navy-l)}
+.editing{background:#fffdf3}
+@media print{
+  header.hd,.actions,.filters,.no-print,footer{display:none!important}
+  body{background:#fff;padding:0}
+  .card{border:none;padding:0;margin-bottom:14px}
+  table{min-width:0;font-size:.72rem}
+}
+@media (max-width:600px){
+  header.hd h1{font-size:1.22rem}
+  .wrap{padding:0 12px}
+}
+</style>
+</head>
+<body>
+
+<header class="hd">
+  <div class="wrap">
+    <h1>慶弔金管理表</h1>
+    <p>慶弔見舞金・香典の支給履歴を記録して、二重支給と支給漏れを防ぐための無料ツールです。Excelのダウンロードは不要、この画面でそのまま使えます。</p>
+    <div class="tagrow">
+      <span class="tag">インストール不要</span>
+      <span class="tag">登録不要・無料</span>
+      <span class="tag">データは端末内のみに保存</span>
+      <span class="tag">CSV書き出し対応</span>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <!-- ============ 入力 ============ -->
+  <section class="card no-print">
+    <h2 id="formTitle">記録を追加する</h2>
+    <div class="grid">
+      <div>
+        <label class="f" for="f-date">発生日</label>
+        <input type="date" id="f-date">
+      </div>
+      <div>
+        <label class="f" for="f-scope">対象</label>
+        <select id="f-scope">
+          <option value="社内">社内（従業員）</option>
+          <option value="社外">社外（取引先）</option>
+        </select>
+      </div>
+      <div>
+        <label class="f" for="f-kind">名目</label>
+        <select id="f-kind">
+          <option>香典・弔慰金</option>
+          <option>結婚祝金</option>
+          <option>出産祝金</option>
+          <option>傷病見舞金</option>
+          <option>災害見舞金</option>
+          <option>就任・昇進祝</option>
+          <option>開業・周年祝</option>
+          <option>その他</option>
+        </select>
+      </div>
+      <div>
+        <label class="f" for="f-dir">区分</label>
+        <select id="f-dir">
+          <option value="支給">支給</option>
+          <option value="受領">受領</option>
+        </select>
+      </div>
+      <div>
+        <label class="f" for="f-name">対象者・取引先名</label>
+        <input type="text" id="f-name" placeholder="例）山田太郎／株式会社〇〇" autocomplete="off">
+      </div>
+      <div>
+        <label class="f" for="f-rel">続柄・関係</label>
+        <input type="text" id="f-rel" placeholder="例）本人の父／営業部 田中様" autocomplete="off">
+      </div>
+      <div>
+        <label class="f" for="f-amount">金額（円）</label>
+        <input type="number" id="f-amount" min="0" step="1000" placeholder="10000" inputmode="numeric">
+      </div>
+      <div>
+        <label class="f" for="f-status">状態</label>
+        <select id="f-status">
+          <option value="未対応">未対応</option>
+          <option value="完了">完了</option>
+        </select>
+      </div>
+    </div>
+    <div style="margin-top:10px">
+      <label class="f" for="f-note">備考（社内規程の条項、供花の有無、参列者など）</label>
+      <textarea id="f-note" placeholder="例）慶弔見舞金規程 第5条／上長承認済／課長が参列"></textarea>
+    </div>
+
+    <div id="dupAlert"></div>
+
+    <div class="actions">
+      <button class="btn btn-main" id="btnSave">この内容で登録</button>
+      <button class="btn btn-ghost" id="btnCancel" style="display:none">編集をやめる</button>
+      <span class="note" id="saveHint"></span>
+    </div>
+  </section>
+
+  <!-- ============ 集計 ============ -->
+  <section class="card">
+    <h2>集計 <span class="cnt" id="sumScope"></span></h2>
+    <div class="sum">
+      <div><span class="k">件数</span><span class="v" id="s-count">0</span></div>
+      <div><span class="k">支給 合計</span><span class="v" id="s-out">¥0</span></div>
+      <div><span class="k">受領 合計</span><span class="v" id="s-in">¥0</span></div>
+      <div><span class="k">未対応</span><span class="v" id="s-todo">0</span></div>
+    </div>
+  </section>
+
+  <!-- ============ 一覧 ============ -->
+  <section class="card">
+    <h2>記録一覧 <span class="cnt" id="listCnt"></span></h2>
+
+    <div class="filters no-print">
+      <div>
+        <label class="f" for="q-text">キーワード</label>
+        <input type="text" id="q-text" placeholder="氏名・取引先・備考" autocomplete="off">
+      </div>
+      <div>
+        <label class="f" for="q-year">年</label>
+        <select id="q-year"><option value="">すべて</option></select>
+      </div>
+      <div>
+        <label class="f" for="q-scope">対象</label>
+        <select id="q-scope"><option value="">すべて</option><option>社内</option><option>社外</option></select>
+      </div>
+      <div>
+        <label class="f" for="q-kind">名目</label>
+        <select id="q-kind"><option value="">すべて</option></select>
+      </div>
+      <div>
+        <label class="f" for="q-status">状態</label>
+        <select id="q-status"><option value="">すべて</option><option>未対応</option><option>完了</option></select>
+      </div>
+    </div>
+
+    <div class="tblwrap">
+      <table>
+        <thead>
+          <tr>
+            <th>発生日</th><th>対象</th><th>名目</th><th>対象者・取引先</th>
+            <th>続柄・関係</th><th>区分</th><th style="text-align:right">金額</th>
+            <th>状態</th><th>備考</th><th class="no-print"></th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+    <div class="empty" id="emptyMsg" style="display:none">まだ記録がありません。上のフォームから追加してください。</div>
+
+    <div class="actions no-print">
+      <button class="btn btn-sub" id="btnCsv">CSVで書き出す</button>
+      <button class="btn btn-sub" id="btnImport">CSVを読み込む</button>
+      <button class="btn btn-sub" id="btnPrint">印刷 / PDF保存</button>
+      <button class="btn btn-ghost" id="btnClear">すべて削除</button>
+      <input type="file" id="fileInput" accept=".csv,text/csv" style="display:none">
+    </div>
+    <p class="note">
+      入力内容はサーバーに送信されません。お使いのブラウザ内（localStorage）にのみ保存されます。
+      別の端末やブラウザには引き継がれないため、共有・バックアップにはCSV書き出しをお使いください。
+    </p>
+  </section>
+
+  <!-- ============ 解説（SEO本文） ============ -->
+  <article class="card">
+    <h2>慶弔金管理表とは</h2>
+    <p>
+      慶弔金管理表とは、従業員やその家族の慶事・弔事、および取引先への慶弔対応にともなって
+      <strong>支給した（または受領した）金銭の履歴を一元的に記録する台帳</strong>です。
+      慶弔見舞金は法律上の支給義務がある制度ではなく、各社が福利厚生として規程で定めるものですが、
+      多くの企業で運用されています。
+    </p>
+    <p>管理表を作る目的は、大きく次の3つです。</p>
+    <ol>
+      <li><strong>二重支給・支給漏れの防止</strong>：同じ事由で二度支給してしまう、逆に支給を忘れる、というトラブルを防ぐ</li>
+      <li><strong>支給基準の一貫性の担保</strong>：「前回は3万円だったのに今回は1万円」という不公平をなくす</li>
+      <li><strong>引き継ぎ可能にすること</strong>：担当者の記憶に依存させず、異動・退職時に情報が失われないようにする</li>
+    </ol>
+
+    <h3>Excelテンプレートではなく、このツールを使う理由</h3>
+    <p>
+      慶弔金管理表はExcelテンプレートとして配布されていることが多く、それでも管理はできます。
+      ただしExcelの場合、<strong>二重支給のチェックは目視に頼るしかありません</strong>。
+      このツールは、対象者名と名目が過去の記録と重複したときに、登録前に自動で警告を出します。
+      また未対応の案件が何件残っているかを常に表示するため、支給漏れにも気づけます。
+    </p>
+
+    <h2>管理表に入れるべき項目</h2>
+    <table>
+      <thead><tr><th>項目</th><th>なぜ必要か</th></tr></thead>
+      <tbody>
+        <tr><td>発生日</td><td>支給日ではなく事由の発生日で管理すると、規程上の支給期限を追える</td></tr>
+        <tr><td>対象（社内／社外）</td><td>社内は福利厚生費、社外は交際費と、経理上の扱いが分かれる</td></tr>
+        <tr><td>名目</td><td>規程のどの条項に基づく支給かを特定するため</td></tr>
+        <tr><td>対象者・取引先名</td><td>重複チェックの軸になる</td></tr>
+        <tr><td>続柄・関係</td><td>同じ弔事でも本人・配偶者・父母で支給額が変わるのが一般的</td></tr>
+        <tr><td>区分（支給／受領）</td><td>受領も記録しないと、お礼状や香典返しの対応漏れにつながる</td></tr>
+        <tr><td>金額</td><td>年間の予算管理と、経理への連携のため</td></tr>
+        <tr><td>状態</td><td>「決まったが未払い」の案件を可視化するため</td></tr>
+        <tr><td>備考</td><td>適用した規程の条項、供花・弔電の有無、参列者などを残す</td></tr>
+      </tbody>
+    </table>
+
+    <h2>運用のポイント</h2>
+    <h3>受領した分も必ず記録する</h3>
+    <p>
+      管理表は支給側だけを書きがちですが、<strong>先方からいただいた分の記録がないと、
+      お礼状や香典返しの対応が抜けます</strong>。区分を「受領」にして同じ表に残してください。
+    </p>
+    <h3>金額を決めた根拠を備考に残す</h3>
+    <p>
+      「なぜこの金額にしたか」は、担当者が代わると必ず失われます。
+      規程の条項番号、あるいは過去の同種案件の記録番号を備考に書いておくと、
+      次の担当者が同じ判断を再現できます。
+    </p>
+    <h3>取引先分は担当部署ごとに集約する</h3>
+    <p>
+      社外の慶弔は、営業部門が個別に対応して総務が把握していないケースが起きがちです。
+      一つの表に集約しておくと、同じ取引先に複数部署が重複して対応する事故を防げます。
+    </p>
+
+    <h2>よくある質問</h2>
+    <dl class="faq">
+      <dt>入力したデータはどこに保存されますか？</dt>
+      <dd>お使いのブラウザ内（localStorage）にのみ保存されます。外部のサーバーには一切送信されません。ブラウザのデータを消去すると記録も消えるため、定期的にCSVで書き出して保管してください。</dd>
+
+      <dt>複数人で共有できますか？</dt>
+      <dd>このツール単体では共有できません。CSVで書き出したファイルを共有フォルダに置く運用になります。</dd>
+
+      <dt>従業員への慶弔見舞金に税金はかかりますか？</dt>
+      <dd>社会通念上相当と認められる金額であれば、給与として課税されないのが一般的な扱いです。ただし金額が高額な場合や、規程がなく個別判断で支給している場合は扱いが変わることがあります。判断は顧問税理士にご確認ください。</dd>
+
+      <dt>取引先への香典は経費になりますか？</dt>
+      <dd>社外への慶弔費用は交際費として扱われるのが一般的です。損金算入には法人の規模に応じた上限があるため、具体的な処理は税理士にご確認ください。</dd>
+
+      <dt>支給額の相場はいくらですか？</dt>
+      <dd>社内は自社の慶弔見舞金規程で定めた額に従ってください。取引先については、関係の深さや役職によって幅があります。まず自社の規程を確認し、規程がない場合は上長に相談するのが確実です。</dd>
+    </dl>
+  </article>
+
+  <footer>
+    慶弔金管理表 ／ 提供：hitotsu company<br>
+    <a href="index.html">ほかの道具を見る →</a>
+    <p style="margin-top:.6rem;font-size:.72rem">
+      本ページの解説は一般的な実務慣行をまとめたもので、税務・法務上の助言ではありません。
+      個別の判断は顧問税理士・社会保険労務士にご確認ください。
+    </p>
+  </footer>
+</div>
+
+<script type="application/ld+json">
+{
+  "@context":"https://schema.org",
+  "@type":"FAQPage",
+  "mainEntity":[
+    {"@type":"Question","name":"入力したデータはどこに保存されますか？","acceptedAnswer":{"@type":"Answer","text":"お使いのブラウザ内（localStorage）にのみ保存されます。外部のサーバーには一切送信されません。ブラウザのデータを消去すると記録も消えるため、定期的にCSVで書き出して保管してください。"}},
+    {"@type":"Question","name":"従業員への慶弔見舞金に税金はかかりますか？","acceptedAnswer":{"@type":"Answer","text":"社会通念上相当と認められる金額であれば、給与として課税されないのが一般的な扱いです。金額が高額な場合や規程がなく個別判断で支給している場合は扱いが変わることがあるため、顧問税理士にご確認ください。"}},
+    {"@type":"Question","name":"取引先への香典は経費になりますか？","acceptedAnswer":{"@type":"Answer","text":"社外への慶弔費用は交際費として扱われるのが一般的です。損金算入には法人の規模に応じた上限があるため、具体的な処理は税理士にご確認ください。"}},
+    {"@type":"Question","name":"慶弔金管理表に入れるべき項目は？","acceptedAnswer":{"@type":"Answer","text":"発生日、対象（社内・社外）、名目、対象者名、続柄・関係、支給／受領の区分、金額、状態、備考の9項目が基本です。特に受領分と続柄を残しておくと、お礼対応と支給額の一貫性を保てます。"}}
+  ]
+}
+</script>
+
+<script>
+(function(){
+  'use strict';
+
+  var KEY = 'hitotsu_keicho_kin_v1';
+  var KINDS = ['香典・弔慰金','結婚祝金','出産祝金','傷病見舞金','災害見舞金','就任・昇進祝','開業・周年祝','その他'];
+  var records = [];
+  var editingId = null;
+
+  var $ = function(id){ return document.getElementById(id); };
+
+  /* ---------- 保存・読み込み ---------- */
+  function load(){
+    try {
+      var raw = localStorage.getItem(KEY);
+      records = raw ? JSON.parse(raw) : [];
+      if (!Array.isArray(records)) records = [];
+    } catch(e){ records = []; }
+  }
+  function save(){
+    try { localStorage.setItem(KEY, JSON.stringify(records)); }
+    catch(e){ alert('保存できませんでした。ブラウザの保存容量がいっぱいの可能性があります。'); }
+  }
+
+  /* ---------- 表示ヘルパー ---------- */
+  function yen(n){ return '¥' + (Number(n)||0).toLocaleString('ja-JP'); }
+  function esc(s){
+    return String(s == null ? '' : s)
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+      .replace(/"/g,'&quot;');
+  }
+  function today(){
+    var d = new Date(), p = function(n){ return ('0'+n).slice(-2); };
+    return d.getFullYear() + '-' + p(d.getMonth()+1) + '-' + p(d.getDate());
+  }
+
+  /* ---------- 重複チェック（Excelにできない差分） ---------- */
+  function findDuplicates(name, kind, date, excludeId){
+    var key = String(name||'').trim();
+    if (!key) return [];
+    var base = date ? new Date(date).getTime() : Date.now();
+    return records.filter(function(r){
+      if (r.id === excludeId) return false;
+      if (String(r.name||'').trim() !== key) return false;
+      if (r.kind !== kind) return false;
+      var t = r.date ? new Date(r.date).getTime() : 0;
+      if (!t) return true;
+      return Math.abs(base - t) < 365 * 24 * 60 * 60 * 1000;  /* 1年以内 */
+    });
+  }
+
+  function renderDupAlert(){
+    var box = $('dupAlert');
+    var dups = findDuplicates($('f-name').value, $('f-kind').value, $('f-date').value, editingId);
+    if (!dups.length){ box.innerHTML = ''; return; }
+    var lines = dups.map(function(r){
+      return '・' + esc(r.date || '日付なし') + '　' + esc(r.name) + '　' +
+             esc(r.kind) + '　' + yen(r.amount) + '（' + esc(r.direction) + '）';
+    }).join('<br>');
+    box.innerHTML =
+      '<div class="alert alert-warn"><strong>⚠ 重複の可能性があります</strong><br>' +
+      '同じ対象者・同じ名目の記録が、1年以内に' + dups.length + '件あります。<br>' +
+      lines + '<br>二重支給でないかご確認ください。問題なければそのまま登録できます。</div>';
+  }
+
+  /* ---------- フォーム ---------- */
+  function readForm(){
+    return {
+      date:      $('f-date').value,
+      scope:     $('f-scope').value,
+      kind:      $('f-kind').value,
+      direction: $('f-dir').value,
+      name:      $('f-name').value.trim(),
+      relation:  $('f-rel').value.trim(),
+      amount:    Number($('f-amount').value) || 0,
+      status:    $('f-status').value,
+      note:      $('f-note').value.trim()
+    };
+  }
+  function clearForm(){
+    $('f-date').value = today();
+    $('f-name').value = '';
+    $('f-rel').value  = '';
+    $('f-amount').value = '';
+    $('f-note').value = '';
+    $('f-status').value = '未対応';
+    $('dupAlert').innerHTML = '';
+    editingId = null;
+    $('formTitle').textContent = '記録を追加する';
+    $('btnSave').textContent = 'この内容で登録';
+    $('btnCancel').style.display = 'none';
+    document.querySelector('.card').classList.remove('editing');
+  }
+  function fillForm(r){
+    $('f-date').value = r.date || '';
+    $('f-scope').value = r.scope || '社内';
+    $('f-kind').value = r.kind || KINDS[0];
+    $('f-dir').value = r.direction || '支給';
+    $('f-name').value = r.name || '';
+    $('f-rel').value = r.relation || '';
+    $('f-amount').value = r.amount || '';
+    $('f-status').value = r.status || '未対応';
+    $('f-note').value = r.note || '';
+  }
+
+  function onSave(){
+    var d = readForm();
+    if (!d.name){ alert('対象者・取引先名を入力してください。'); $('f-name').focus(); return; }
+    if (!d.date){ alert('発生日を入力してください。'); $('f-date').focus(); return; }
+
+    if (editingId){
+      for (var i=0;i<records.length;i++){
+        if (records[i].id === editingId){
+          d.id = editingId;
+          records[i] = d;
+          break;
+        }
+      }
+      $('saveHint').textContent = '更新しました。';
+    } else {
+      d.id = 'r' + Date.now() + Math.floor(Math.random()*1000);
+      records.push(d);
+      $('saveHint').textContent = '登録しました。';
+    }
+    save(); clearForm(); refresh();
+    setTimeout(function(){ $('saveHint').textContent = ''; }, 2600);
+  }
+
+  function onEdit(id){
+    var r = records.filter(function(x){ return x.id === id; })[0];
+    if (!r) return;
+    editingId = id;
+    fillForm(r);
+    $('formTitle').textContent = '記録を編集する';
+    $('btnSave').textContent = 'この内容で更新';
+    $('btnCancel').style.display = 'inline-flex';
+    document.querySelector('.card').classList.add('editing');
+    renderDupAlert();
+    window.scrollTo({ top:0, behavior:'smooth' });
+  }
+
+  function onDelete(id){
+    var r = records.filter(function(x){ return x.id === id; })[0];
+    if (!r) return;
+    if (!confirm('「' + r.name + '／' + r.kind + '」の記録を削除します。よろしいですか？')) return;
+    records = records.filter(function(x){ return x.id !== id; });
+    if (editingId === id) clearForm();
+    save(); refresh();
+  }
+
+  function onToggleStatus(id){
+    for (var i=0;i<records.length;i++){
+      if (records[i].id === id){
+        records[i].status = (records[i].status === '完了') ? '未対応' : '完了';
+        break;
+      }
+    }
+    save(); refresh();
+  }
+
+  /* ---------- 絞り込み ---------- */
+  function filtered(){
+    var q  = $('q-text').value.trim().toLowerCase();
+    var yr = $('q-year').value;
+    var sc = $('q-scope').value;
+    var kd = $('q-kind').value;
+    var st = $('q-status').value;
+    return records.filter(function(r){
+      if (yr && String(r.date||'').slice(0,4) !== yr) return false;
+      if (sc && r.scope !== sc) return false;
+      if (kd && r.kind !== kd) return false;
+      if (st && r.status !== st) return false;
+      if (q){
+        var hay = [r.name, r.relation, r.note, r.kind].join(' ').toLowerCase();
+        if (hay.indexOf(q) === -1) return false;
+      }
+      return true;
+    }).sort(function(a,b){ return String(b.date||'').localeCompare(String(a.date||'')); });
+  }
+
+  function syncYearOptions(){
+    var years = {};
+    records.forEach(function(r){
+      var y = String(r.date||'').slice(0,4);
+      if (y) years[y] = 1;
+    });
+    var list = Object.keys(years).sort().reverse();
+    var sel = $('q-year'), cur = sel.value;
+    sel.innerHTML = '<option value="">すべて</option>' +
+      list.map(function(y){ return '<option value="'+y+'">'+y+'年</option>'; }).join('');
+    if (list.indexOf(cur) > -1) sel.value = cur;
+  }
+
+  /* ---------- 描画 ---------- */
+  function refresh(){
+    syncYearOptions();
+    var rows = filtered();
+
+    /* 集計 */
+    var out = 0, inn = 0, todo = 0;
+    rows.forEach(function(r){
+      if (r.direction === '受領') inn += Number(r.amount)||0;
+      else out += Number(r.amount)||0;
+      if (r.status !== '完了') todo++;
+    });
+    $('s-count').textContent = rows.length + '件';
+    $('s-out').textContent   = yen(out);
+    $('s-in').textContent    = yen(inn);
+    $('s-todo').textContent  = todo + '件';
+    $('s-todo').className    = 'v' + (todo ? ' alert-n' : '');
+    $('sumScope').textContent = (rows.length === records.length)
+      ? '（全' + records.length + '件）'
+      : '（絞り込み中：' + rows.length + ' / 全' + records.length + '件）';
+    $('listCnt').textContent = '';
+
+    /* 一覧 */
+    var tb = $('tbody');
+    tb.innerHTML = rows.map(function(r){
+      var dirPill = r.direction === '受領'
+        ? '<span class="pill p-in">受領</span>'
+        : '<span class="pill p-out">支給</span>';
+      var stPill = r.status === '完了'
+        ? '<span class="pill p-done">完了</span>'
+        : '<span class="pill p-todo">未対応</span>';
+      return '<tr class="' + (r.status === '完了' ? 'done' : 'todo') + '">' +
+        '<td>' + esc(r.date) + '</td>' +
+        '<td>' + esc(r.scope) + '</td>' +
+        '<td>' + esc(r.kind) + '</td>' +
+        '<td>' + esc(r.name) + '</td>' +
+        '<td>' + esc(r.relation) + '</td>' +
+        '<td>' + dirPill + '</td>' +
+        '<td class="num">' + yen(r.amount) + '</td>' +
+        '<td><button class="btn btn-sm btn-ghost no-print" data-act="st" data-id="' + r.id + '" ' +
+            'style="padding:0;border:none;background:none">' + stPill + '</button></td>' +
+        '<td>' + esc(r.note) + '</td>' +
+        '<td class="no-print" style="white-space:nowrap">' +
+          '<button class="btn btn-sm btn-sub" data-act="ed" data-id="' + r.id + '">編集</button> ' +
+          '<button class="btn btn-sm btn-del" data-act="rm" data-id="' + r.id + '">削除</button>' +
+        '</td>' +
+      '</tr>';
+    }).join('');
+
+    $('emptyMsg').style.display = rows.length ? 'none' : 'block';
+    $('emptyMsg').textContent = records.length
+      ? '条件に合う記録がありません。絞り込みを変えてください。'
+      : 'まだ記録がありません。上のフォームから追加してください。';
+  }
+
+  /* ---------- CSV ---------- */
+  var CSV_HEAD = ['発生日','対象','名目','対象者・取引先','続柄・関係','区分','金額','状態','備考'];
+
+  function csvCell(v){
+    var s = String(v == null ? '' : v);
+    return /[",\r\n]/.test(s) ? '"' + s.replace(/"/g,'""') + '"' : s;
+  }
+
+  function exportCsv(){
+    if (!records.length){ alert('書き出す記録がありません。'); return; }
+    var rows = filtered();
+    var lines = [CSV_HEAD.join(',')];
+    rows.forEach(function(r){
+      lines.push([r.date,r.scope,r.kind,r.name,r.relation,r.direction,r.amount,r.status,r.note]
+        .map(csvCell).join(','));
+    });
+    /* BOM付きUTF-8：Excelで開いても文字化けしない */
+    var blob = new Blob(['﻿' + lines.join('\r\n')], {type:'text/csv;charset=utf-8;'});
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = '慶弔金管理表_' + today() + '.csv';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
+  }
+
+  function parseCsv(text){
+    if (text.charCodeAt(0) === 0xFEFF) text = text.slice(1);
+    var rows = [], row = [], cell = '', q = false;
+    for (var i=0;i<text.length;i++){
+      var c = text[i];
+      if (q){
+        if (c === '"'){
+          if (text[i+1] === '"'){ cell += '"'; i++; }
+          else q = false;
+        } else cell += c;
+      } else {
+        if (c === '"') q = true;
+        else if (c === ','){ row.push(cell); cell = ''; }
+        else if (c === '\n'){ row.push(cell); rows.push(row); row = []; cell = ''; }
+        else if (c === '\r'){ /* skip */ }
+        else cell += c;
+      }
+    }
+    if (cell !== '' || row.length){ row.push(cell); rows.push(row); }
+    return rows.filter(function(r){ return r.some(function(x){ return String(x).trim() !== ''; }); });
+  }
+
+  function importCsv(file){
+    var reader = new FileReader();
+    reader.onload = function(e){
+      var rows = parseCsv(String(e.target.result));
+      if (rows.length < 2){ alert('読み込めるデータがありませんでした。'); return; }
+      var start = (rows[0][0] || '').indexOf('発生日') > -1 ? 1 : 0;
+      var added = 0;
+      for (var i=start;i<rows.length;i++){
+        var c = rows[i];
+        if (!c[3] && !c[0]) continue;
+        records.push({
+          id:'r' + Date.now() + '_' + i + Math.floor(Math.random()*1000),
+          date:      (c[0]||'').trim(),
+          scope:     (c[1]||'社内').trim(),
+          kind:      (c[2]||'その他').trim(),
+          name:      (c[3]||'').trim(),
+          relation:  (c[4]||'').trim(),
+          direction: (c[5]||'支給').trim(),
+          amount:    Number(String(c[6]||'').replace(/[^\d.-]/g,'')) || 0,
+          status:    (c[7]||'未対応').trim(),
+          note:      (c[8]||'').trim()
+        });
+        added++;
+      }
+      save(); refresh();
+      alert(added + '件を読み込みました。');
+    };
+    reader.readAsText(file, 'UTF-8');
+  }
+
+  /* ---------- イベント ---------- */
+  $('btnSave').addEventListener('click', onSave);
+  $('btnCancel').addEventListener('click', clearForm);
+  $('btnCsv').addEventListener('click', exportCsv);
+  $('btnPrint').addEventListener('click', function(){ window.print(); });
+  $('btnImport').addEventListener('click', function(){ $('fileInput').click(); });
+  $('fileInput').addEventListener('change', function(e){
+    if (e.target.files && e.target.files[0]) importCsv(e.target.files[0]);
+    e.target.value = '';
+  });
+  $('btnClear').addEventListener('click', function(){
+    if (!records.length){ alert('削除する記録がありません。'); return; }
+    if (!confirm('保存されている' + records.length + '件すべてを削除します。元に戻せません。よろしいですか？')) return;
+    if (!confirm('本当に削除してよろしいですか？　先にCSVで書き出しておくことをおすすめします。')) return;
+    records = []; save(); clearForm(); refresh();
+  });
+
+  ['f-name','f-kind','f-date'].forEach(function(id){
+    $(id).addEventListener('input', renderDupAlert);
+    $(id).addEventListener('change', renderDupAlert);
+  });
+  ['q-text','q-year','q-scope','q-kind','q-status'].forEach(function(id){
+    $(id).addEventListener('input', refresh);
+    $(id).addEventListener('change', refresh);
+  });
+
+  $('tbody').addEventListener('click', function(e){
+    var btn = e.target.closest('button[data-act]');
+    if (!btn) return;
+    var id = btn.getAttribute('data-id'), act = btn.getAttribute('data-act');
+    if (act === 'ed') onEdit(id);
+    else if (act === 'rm') onDelete(id);
+    else if (act === 'st') onToggleStatus(id);
+  });
+
+  /* ---------- 初期化 ---------- */
+  $('q-kind').innerHTML = '<option value="">すべて</option>' +
+    KINDS.map(function(k){ return '<option>' + k + '</option>'; }).join('');
+  load();
+  clearForm();
+  refresh();
+})();
+</script>
+</body>
+</html>
