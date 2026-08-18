@@ -95,17 +95,10 @@
   <div class="wrap">
     <div class="kicker">$ unlock toolbox/ --line</div>
     <h1>道具箱<span class="amp">ぜんぶ</span></h1>
-    <p class="lead">LINEに登録してくれた方だけのページです。<br><strong>全部無料・アプリ側の登録も不要。</strong>明日の朝、また1つ増えます。</p>
+    <p class="lead">LINEで受け取った方だけのページです。<br><strong>全部無料・登録も入力も不要。</strong>明日の朝、また1つ増えます。</p>
     <div class="counter"><b>15</b><span>個ぜんぶ使えます</span><span style="color:#f0b429;">／毎朝1つ増えます</span></div>
-    <div id="gate">
-      <h2>合言葉を入れてください</h2>
-      <p>LINEで「道具箱」と送ると、合言葉が届きます。<br>一度入れたら、次からは自動で開きます。</p>
-      <input id="pw" type="text" placeholder="ひらがな4文字" autocomplete="off">
-      <button id="go">開ける</button>
-      <div class="ng" id="ng"></div>
-      <p class="hint">まだの方は <a href="https://line.me/R/ti/p/@188jocyd">こちらから友だち追加</a> →「道具箱」と送信</p>
-    </div>
-<div id="boxlist" style="display:none">
+
+<div>
       <a class="card" href="../ai-tool-chooser.html">
         <span class="ic">🧰</span>
         <span class="body">
@@ -267,23 +260,5 @@
     <a class="back" href="../../card.html">← Hitotsu Company</a>
   </div>
 
-<script>
-const HASH = "c7c4426c1dc0998e957535b3f02c2827f43fbe7f77d01364f780302364a77b28";
-const box = document.getElementById('boxlist');
-const gate = document.getElementById('gate');
-async function sha(s) {
-  const b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s));
-  return [...new Uint8Array(b)].map(x => x.toString(16).padStart(2, '0')).join('');
-}
-function unlock() { gate.style.display = 'none'; box.style.display = 'block'; }
-if (localStorage.getItem('toolbox_ok') === HASH) unlock();
-async function check() {
-  const v = document.getElementById('pw').value.trim();
-  if (await sha(v) === HASH) { localStorage.setItem('toolbox_ok', HASH); unlock(); }
-  else document.getElementById('ng').textContent = '合言葉がちがうようです';
-}
-document.getElementById('go').onclick = check;
-document.getElementById('pw').addEventListener('keydown', e => { if (e.key === 'Enter') check(); });
-</script>
 </body>
 </html>
