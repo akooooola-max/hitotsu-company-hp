@@ -2,306 +2,553 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="AI選びで迷う初心者。仕事内容を答えるだけで使う道具が決まる">
-<title>仕事のAI使い分けナビ</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+<title>AIツール診断 | ChatGPT vs Claude Code</title>
 <style>
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body {
-  font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic", sans-serif;
-  background: #f5f7fa;
-  color: #333;
-  line-height: 1.7;
-  padding: 16px;
-}
-.container { max-width: 720px; margin: 0 auto; }
-h1 {
-  font-size: 22px;
-  color: #2c3e50;
-  margin-bottom: 8px;
-  text-align: center;
-}
-.lead {
-  text-align: center;
-  color: #666;
-  font-size: 14px;
-  margin-bottom: 24px;
-}
-.card {
-  background: white;
-  border-radius: 12px;
-  padding: 20px;
-  margin-bottom: 16px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-}
-.step-label {
-  display: inline-block;
-  background: #3498db;
-  color: white;
-  padding: 2px 10px;
-  border-radius: 12px;
-  font-size: 12px;
-  margin-bottom: 10px;
-}
-.question { font-size: 16px; font-weight: bold; margin-bottom: 14px; }
-.options { display: flex; flex-direction: column; gap: 10px; }
-.option-btn {
-  padding: 14px 16px;
-  background: #f8f9fa;
-  border: 2px solid #e1e4e8;
-  border-radius: 8px;
-  text-align: left;
-  font-size: 15px;
-  cursor: pointer;
-  transition: all 0.15s;
-  font-family: inherit;
-  color: #333;
-}
-.option-btn:hover { border-color: #3498db; background: #eaf4fc; }
-.option-btn:active { transform: scale(0.98); }
-.result-badge {
-  display: inline-block;
-  padding: 6px 14px;
-  border-radius: 20px;
-  color: white;
-  font-weight: bold;
-  font-size: 14px;
-  margin-bottom: 12px;
-}
-.badge-text { background: #27ae60; }
-.badge-code { background: #8e44ad; }
-.result-desc { margin-bottom: 16px; font-size: 15px; }
-.result-desc ul { margin-left: 20px; margin-top: 8px; }
-.result-desc li { margin-bottom: 4px; }
-.prompt-box {
-  background: #f4f6f8;
-  border-left: 4px solid #3498db;
-  padding: 12px 14px;
-  border-radius: 4px;
-  font-size: 14px;
-  margin: 12px 0;
-  white-space: pre-wrap;
-  word-break: break-word;
-}
-.btn-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
-.btn {
-  padding: 10px 18px;
-  border: none;
-  border-radius: 6px;
-  font-size: 14px;
-  cursor: pointer;
-  font-family: inherit;
-}
-.btn-primary { background: #3498db; color: white; }
-.btn-secondary { background: #ecf0f1; color: #333; }
-.btn:hover { opacity: 0.85; }
-.history {
-  margin-top: 24px;
-  padding: 16px;
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-}
-.history h3 { font-size: 15px; margin-bottom: 10px; color: #555; }
-.history-item {
-  padding: 8px 10px;
-  border-bottom: 1px solid #eee;
-  font-size: 13px;
-  color: #666;
-}
-.history-item:last-child { border-bottom: none; }
-.hint {
-  font-size: 13px;
-  color: #888;
-  margin-top: 8px;
-}
-.clear-btn {
-  font-size: 12px;
-  color: #999;
-  background: none;
-  border: none;
-  cursor: pointer;
-  text-decoration: underline;
-  float: right;
-}
+  :root{
+    --bg1:#f6f3ee;
+    --bg2:#efe9df;
+    --card:#ffffff;
+    --text:#2b2620;
+    --sub:#6f665a;
+    --border:#e8e1d5;
+    --gpt:#10a37f;
+    --gpt-soft:#e6f6f1;
+    --claude:#d97757;
+    --claude-soft:#fbeee7;
+    --shadow: 0 10px 30px -12px rgba(43,38,32,0.18);
+    --radius:20px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    min-height:100dvh;
+    font-family:"Hiragino Kaku Gothic ProN","Hiragino Sans",-apple-system,BlinkMacSystemFont,"Yu Gothic",sans-serif;
+    background:
+      radial-gradient(1200px 600px at 15% -10%, #fdf1e7 0%, transparent 60%),
+      radial-gradient(1000px 500px at 100% 0%, #e7f5f0 0%, transparent 55%),
+      linear-gradient(180deg,var(--bg1),var(--bg2));
+    color:var(--text);
+    display:flex;
+    align-items:flex-start;
+    justify-content:center;
+    padding:32px 16px 60px;
+  }
+  .app{
+    width:100%;
+    max-width:480px;
+  }
+  header.top{
+    text-align:center;
+    margin-bottom:22px;
+  }
+  header.top .badge{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    font-size:12px;
+    color:var(--sub);
+    background:var(--card);
+    border:1px solid var(--border);
+    padding:6px 14px;
+    border-radius:999px;
+    box-shadow:var(--shadow);
+    margin-bottom:14px;
+  }
+  header.top h1{
+    font-size:clamp(20px,5.5vw,26px);
+    line-height:1.4;
+    margin:0 0 6px;
+    letter-spacing:0.01em;
+  }
+  header.top p{
+    margin:0;
+    color:var(--sub);
+    font-size:13.5px;
+  }
+
+  .card{
+    background:var(--card);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    border:1px solid var(--border);
+    padding:26px 22px 24px;
+    position:relative;
+    overflow:hidden;
+  }
+
+  /* progress */
+  .progress-wrap{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin-bottom:22px;
+  }
+  .progress-track{
+    flex:1;
+    height:6px;
+    background:#eee7da;
+    border-radius:999px;
+    overflow:hidden;
+  }
+  .progress-fill{
+    height:100%;
+    width:33.3%;
+    border-radius:999px;
+    background:linear-gradient(90deg,var(--gpt),var(--claude));
+    transition:width .45s cubic-bezier(.4,0,.2,1);
+  }
+  .progress-label{
+    font-size:12px;
+    color:var(--sub);
+    font-variant-numeric:tabular-nums;
+    white-space:nowrap;
+  }
+
+  .q-tag{
+    font-size:11.5px;
+    font-weight:700;
+    letter-spacing:.06em;
+    color:var(--claude);
+    text-transform:uppercase;
+    margin-bottom:8px;
+  }
+  .q-text{
+    font-size:clamp(17px,4.6vw,20px);
+    font-weight:700;
+    line-height:1.55;
+    margin:0 0 20px;
+  }
+
+  .options{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+  }
+  .option{
+    display:flex;
+    align-items:flex-start;
+    gap:12px;
+    text-align:left;
+    width:100%;
+    border:1.5px solid var(--border);
+    background:#fdfcfa;
+    border-radius:14px;
+    padding:16px 16px;
+    font-size:14.5px;
+    line-height:1.55;
+    color:var(--text);
+    cursor:pointer;
+    transition:border-color .18s ease, background .18s ease, transform .12s ease;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .option:active{transform:scale(0.985);}
+  .option:hover{border-color:#d8cdb8; background:#fffaf1;}
+  .option .icon{
+    flex:none;
+    width:34px;
+    height:34px;
+    border-radius:10px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:16px;
+    background:#f1ece2;
+    color:var(--sub);
+  }
+  .option .opt-text b{
+    display:block;
+    font-weight:700;
+    margin-bottom:2px;
+  }
+  .option .opt-text span{
+    color:var(--sub);
+    font-size:13px;
+  }
+
+  .nav-row{
+    display:flex;
+    justify-content:flex-start;
+    margin-top:18px;
+  }
+  .back-btn{
+    border:none;
+    background:none;
+    color:var(--sub);
+    font-size:13px;
+    cursor:pointer;
+    padding:6px 4px;
+    display:flex;
+    align-items:center;
+    gap:4px;
+  }
+  .back-btn:hover{color:var(--text);}
+
+  /* result */
+  .result-head{
+    text-align:center;
+    margin-bottom:18px;
+  }
+  .result-eyebrow{
+    font-size:12px;
+    color:var(--sub);
+    margin-bottom:6px;
+  }
+  .result-name{
+    font-size:clamp(24px,7vw,30px);
+    font-weight:800;
+    margin:0 0 8px;
+  }
+  .result-name.gpt{color:var(--gpt);}
+  .result-name.claude{color:var(--claude);}
+  .result-desc{
+    font-size:14px;
+    color:var(--sub);
+    line-height:1.7;
+    max-width:380px;
+    margin:0 auto;
+  }
+
+  .score-bar{
+    display:flex;
+    height:12px;
+    border-radius:999px;
+    overflow:hidden;
+    margin:22px 0 8px;
+    background:#eee7da;
+  }
+  .score-bar .seg-gpt{background:var(--gpt);}
+  .score-bar .seg-claude{background:var(--claude);}
+  .score-legend{
+    display:flex;
+    justify-content:space-between;
+    font-size:12px;
+    color:var(--sub);
+    margin-bottom:20px;
+  }
+  .score-legend b{color:var(--text);}
+
+  .reason-box{
+    background:#faf7f1;
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:16px 16px 14px;
+    margin-bottom:14px;
+  }
+  .reason-box h3{
+    font-size:13px;
+    margin:0 0 10px;
+    display:flex;
+    align-items:center;
+    gap:6px;
+  }
+  .reason-box ul{
+    margin:0;
+    padding-left:18px;
+    font-size:13.5px;
+    line-height:1.85;
+    color:var(--text);
+  }
+
+  .alt-box{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    background:var(--card);
+    border:1px dashed var(--border);
+    border-radius:14px;
+    padding:12px 14px;
+    font-size:12.5px;
+    color:var(--sub);
+    margin-bottom:22px;
+  }
+
+  .restart-btn{
+    width:100%;
+    border:none;
+    padding:15px;
+    border-radius:14px;
+    font-size:15px;
+    font-weight:700;
+    color:#fff;
+    background:linear-gradient(90deg,var(--gpt),var(--claude));
+    cursor:pointer;
+    box-shadow:0 8px 20px -8px rgba(217,119,87,0.55);
+    transition:transform .12s ease, opacity .15s ease;
+  }
+  .restart-btn:active{transform:scale(0.98);}
+
+  .screen{display:none;}
+  .screen.active{display:block; animation:fadeIn .35s ease;}
+  @keyframes fadeIn{
+    from{opacity:0; transform:translateY(8px);}
+    to{opacity:1; transform:translateY(0);}
+  }
+
+  footer{
+    text-align:center;
+    margin-top:22px;
+    font-size:11.5px;
+    color:#a89e8d;
+  }
+
+  @media (max-width:360px){
+    .card{padding:20px 16px;}
+  }
 </style>
 </head>
 <body>
-<div class="container">
-  <h1>🧭 仕事のAI使い分けナビ</h1>
-  <p class="lead">3つの質問に答えるだけで、今の作業に合うAIタイプがわかります</p>
+<div class="app">
+  <header class="top">
+    <span class="badge">🧭 AI相棒診断</span>
+    <h1>ChatGPT と Claude Code、<br>どっちを使うべき？</h1>
+    <p>3つの質問に答えるだけ。今の悩みに合うAIツールを診断します。</p>
+  </header>
 
-  <div id="app" class="card"></div>
+  <div class="card">
 
-  <div id="history" class="history" style="display:none;">
-    <button class="clear-btn" onclick="clearHistory()">履歴を消す</button>
-    <h3>📋 前回までの判定結果</h3>
-    <div id="history-list"></div>
+    <!-- Question screens -->
+    <div id="screen-q" class="screen active">
+      <div class="progress-wrap">
+        <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+        <div class="progress-label" id="progressLabel">1 / 3</div>
+      </div>
+
+      <div id="questionArea"></div>
+
+      <div class="nav-row" id="navRow" style="display:none;">
+        <button class="back-btn" id="backBtn">← ひとつ前の質問に戻る</button>
+      </div>
+    </div>
+
+    <!-- Result screen -->
+    <div id="screen-result" class="screen">
+      <div class="result-head">
+        <div class="result-eyebrow">診断結果</div>
+        <h2 class="result-name" id="resultName">-</h2>
+        <p class="result-desc" id="resultDesc">-</p>
+      </div>
+
+      <div class="score-bar">
+        <div class="seg-gpt" id="segGpt" style="width:50%;"></div>
+        <div class="seg-claude" id="segClaude" style="width:50%;"></div>
+      </div>
+      <div class="score-legend">
+        <span>💬 ChatGPT <b id="scoreGptLabel">0%</b></span>
+        <span><b id="scoreClaudeLabel">0%</b> Claude Code ⌨️</span>
+      </div>
+
+      <div class="reason-box">
+        <h3>🔍 この結果になった理由</h3>
+        <ul id="reasonList"></ul>
+      </div>
+
+      <div class="alt-box" id="altBox"></div>
+
+      <button class="restart-btn" id="restartBtn">もう一度診断する</button>
+    </div>
+
   </div>
+
+  <footer>ai-navi · あなたの作業スタイルに合うAIを見つけよう</footer>
 </div>
 
 <script>
-const questions = [
-  {
-    q: "今から取りかかる作業は、どれに一番近いですか？",
-    options: [
-      { text: "📝 文章を書く・整える（メール、資料、報告書など）", score: "text" },
-      { text: "💻 プログラムやツールを作る・直す", score: "code" },
-      { text: "💡 アイデア出し・企画・翻訳・要約", score: "text" },
-      { text: "🔧 パソコンの作業を自動化したい", score: "code" }
-    ]
-  },
-  {
-    q: "作業のゴールに近いのはどちらですか？",
-    options: [
-      { text: "📄 読める文章・きれいな資料ができあがる", score: "text" },
-      { text: "⚙️ 動くファイルやプログラムができあがる", score: "code" },
-      { text: "🤔 まだ決まっていない／相談しながら決めたい", score: "text" }
-    ]
-  },
-  {
-    q: "普段の作業で扱うことが多いのは？",
-    options: [
-      { text: "📧 メール・Word・PowerPoint・議事録", score: "text" },
-      { text: "🗂️ Excel関数・マクロ・簡単なスクリプト", score: "code" },
-      { text: "🌐 ホームページやWebサービスの中身", score: "code" },
-      { text: "📚 調べもの・情報整理・企画書", score: "text" }
-    ]
+(function(){
+  const questions = [
+    {
+      tag: "Question 1",
+      text: "今いちばんやりたいことは？",
+      options: [
+        {
+          icon: "✍️",
+          title: "文章・アイデア出し・相談",
+          sub: "ブログ、企画、要約、雑談的に壁打ちしたい",
+          score: { gpt: 2, claude: 0 }
+        },
+        {
+          icon: "💻",
+          title: "コードを書く・直す・動かす",
+          sub: "アプリ開発、バグ修正、ファイル編集をしたい",
+          score: { gpt: 0, claude: 2 }
+        }
+      ]
+    },
+    {
+      tag: "Question 2",
+      text: "作業したい場所のイメージは？",
+      options: [
+        {
+          icon: "🌐",
+          title: "ブラウザでチャットしながら",
+          sub: "質問して、返ってきた答えをコピペして使いたい",
+          score: { gpt: 2, claude: 0 }
+        },
+        {
+          icon: "🖥️",
+          title: "ターミナルやエディタから直接",
+          sub: "実際のプロジェクトのファイルを触ってほしい",
+          score: { gpt: 0, claude: 2 }
+        }
+      ]
+    },
+    {
+      tag: "Question 3",
+      text: "どのくらい“自動でやってほしい”？",
+      options: [
+        {
+          icon: "🗣️",
+          title: "会話しながら自分でハンドルしたい",
+          sub: "一問一答でやり取りしながら進めたい",
+          score: { gpt: 2, claude: 0 }
+        },
+        {
+          icon: "🤖",
+          title: "タスクを丸ごと任せたい",
+          sub: "複数ファイルにまたがる作業も自動で進めてほしい",
+          score: { gpt: 0, claude: 2 }
+        }
+      ]
+    }
+  ];
+
+  const results = {
+    gpt: {
+      name: "ChatGPT",
+      className: "gpt",
+      desc: "文章作成やアイデア出し、日常的な相談まで、会話しながら幅広くこなすのが得意。ブラウザですぐ使える気軽さが魅力です。",
+      reasons: [
+        "文章・企画・要約など「言葉を扱う」作業が中心",
+        "コピペでサッと使いたい、環境構築が不要",
+        "自分でペースを握りながら会話的に進めたい"
+      ],
+      alt: "🔧 コードを書いたり、プロジェクトのファイルを直接編集したくなったら Claude Code もチェックしてみて。"
+    },
+    claude: {
+      name: "Claude Code",
+      className: "claude",
+      desc: "実際の開発環境で、ファイルの編集・実行・修正までまとめて任せられるのが強み。コーディング作業をぐっと加速させます。",
+      reasons: [
+        "コードを書く・直す・動かす作業が中心",
+        "ターミナルやエディタから直接プロジェクトに触れたい",
+        "複数ファイルにまたがる作業を自動でやってほしい"
+      ],
+      alt: "💬 文章作成やアイデア出し中心なら ChatGPT のほうが気軽に使えるかも。"
+    }
+  };
+
+  let current = 0;
+  const answers = new Array(questions.length).fill(null);
+
+  const questionArea = document.getElementById('questionArea');
+  const progressFill = document.getElementById('progressFill');
+  const progressLabel = document.getElementById('progressLabel');
+  const navRow = document.getElementById('navRow');
+  const backBtn = document.getElementById('backBtn');
+  const screenQ = document.getElementById('screen-q');
+  const screenResult = document.getElementById('screen-result');
+
+  function renderQuestion(){
+    const q = questions[current];
+    progressFill.style.width = ((current) / questions.length * 100 + (100/questions.length)) + '%';
+    progressLabel.textContent = (current+1) + ' / ' + questions.length;
+    navRow.style.display = current > 0 ? 'flex' : 'none';
+
+    questionArea.innerHTML = '';
+
+    const tagEl = document.createElement('div');
+    tagEl.className = 'q-tag';
+    tagEl.textContent = q.tag;
+
+    const textEl = document.createElement('p');
+    textEl.className = 'q-text';
+    textEl.textContent = q.text;
+
+    const optsWrap = document.createElement('div');
+    optsWrap.className = 'options';
+
+    q.options.forEach((opt, idx) => {
+      const btn = document.createElement('button');
+      btn.className = 'option';
+      btn.type = 'button';
+      if (answers[current] === idx) btn.style.borderColor = '#d97757';
+      btn.innerHTML =
+        '<span class="icon">' + opt.icon + '</span>' +
+        '<span class="opt-text"><b>' + opt.title + '</b><span>' + opt.sub + '</span></span>';
+      btn.addEventListener('click', () => selectOption(idx));
+      optsWrap.appendChild(btn);
+    });
+
+    questionArea.appendChild(tagEl);
+    questionArea.appendChild(textEl);
+    questionArea.appendChild(optsWrap);
   }
-];
 
-const results = {
-  text: {
-    title: "文章おたすけタイプのAI",
-    badgeClass: "badge-text",
-    desc: "対話しながら文章を作るのが得意なAIが向いています。",
-    good: [
-      "資料のたたき台作り",
-      "メール・議事録・報告書の下書き",
-      "アイデア出し・企画のブレスト",
-      "翻訳や要約、言い回しの修正"
-    ],
-    prompt: "あなたは丁寧なビジネス文章の専門家です。\n以下の目的で、〇〇向けに文章を作ってください。\n\n【目的】：\n【伝えたい内容】：\n【トーン】：丁寧／カジュアル／簡潔\n【文字数の目安】：\n\nまず構成案を出してから、本文を書いてください。"
-  },
-  code: {
-    title: "コード・作業自動化タイプのAI",
-    badgeClass: "badge-code",
-    desc: "コードを書いたり、手元のファイルを直接直せるAIが向いています。",
-    good: [
-      "プログラムのコード生成・修正",
-      "Webサイトの部分修正",
-      "エクセル作業の自動化スクリプト",
-      "小さな業務ツールの試作"
-    ],
-    prompt: "以下の作業を自動化する〇〇のコードを書いてください。\n\n【やりたいこと】：\n【入力データの形】：\n【出力したい形】：\n【使う環境】：Windows / Mac / ブラウザ など\n\nコードには日本語のコメントを入れ、実行手順も教えてください。"
+  function selectOption(idx){
+    answers[current] = idx;
+    if (current < questions.length - 1) {
+      current++;
+      renderQuestion();
+    } else {
+      showResult();
+    }
   }
-};
 
-let currentStep = 0;
-let scores = { text: 0, code: 0 };
+  backBtn.addEventListener('click', () => {
+    if (current > 0) {
+      current--;
+      renderQuestion();
+    }
+  });
 
-function render() {
-  const app = document.getElementById("app");
-  if (currentStep < questions.length) {
-    const q = questions[currentStep];
-    app.innerHTML = `
-      <div class="step-label">質問 ${currentStep + 1} / ${questions.length}</div>
-      <div class="question">${q.q}</div>
-      <div class="options">
-        ${q.options.map((o, i) => `<button class="option-btn" onclick="answer('${o.score}')">${o.text}</button>`).join("")}
-      </div>
-    `;
-  } else {
-    showResult();
+  function showResult(){
+    let gpt = 0, claude = 0;
+    answers.forEach((ansIdx, qIdx) => {
+      const opt = questions[qIdx].options[ansIdx];
+      gpt += opt.score.gpt;
+      claude += opt.score.claude;
+    });
+    const total = gpt + claude || 1;
+    const gptPct = Math.round(gpt/total*100);
+    const claudePct = 100 - gptPct;
+
+    const winnerKey = claude >= gpt ? 'claude' : 'gpt';
+    const winner = results[winnerKey];
+
+    document.getElementById('resultName').textContent =
+      (winnerKey === 'gpt' ? '💬 ' : '⌨️ ') + winner.name + ' がおすすめ';
+    document.getElementById('resultName').className = 'result-name ' + winner.className;
+    document.getElementById('resultDesc').textContent = winner.desc;
+
+    document.getElementById('segGpt').style.width = gptPct + '%';
+    document.getElementById('segClaude').style.width = claudePct + '%';
+    document.getElementById('scoreGptLabel').textContent = gptPct + '%';
+    document.getElementById('scoreClaudeLabel').textContent = claudePct + '%';
+
+    const reasonList = document.getElementById('reasonList');
+    reasonList.innerHTML = '';
+    winner.reasons.forEach(r => {
+      const li = document.createElement('li');
+      li.textContent = r;
+      reasonList.appendChild(li);
+    });
+
+    document.getElementById('altBox').textContent = winner.alt;
+
+    screenQ.classList.remove('active');
+    screenResult.classList.add('active');
   }
-}
 
-function answer(score) {
-  scores[score]++;
-  currentStep++;
-  render();
-}
+  document.getElementById('restartBtn').addEventListener('click', () => {
+    current = 0;
+    answers.fill(null);
+    screenResult.classList.remove('active');
+    screenQ.classList.add('active');
+    renderQuestion();
+  });
 
-function showResult() {
-  const winner = scores.text >= scores.code ? "text" : "code";
-  const r = results[winner];
-  const app = document.getElementById("app");
-  app.innerHTML = `
-    <div class="step-label">診断結果</div>
-    <div class="result-badge ${r.badgeClass}">${r.title}</div>
-    <div class="result-desc">
-      ${r.desc}
-      <br><br>
-      <strong>こんな作業が得意です：</strong>
-      <ul>${r.good.map(g => `<li>${g}</li>`).join("")}</ul>
-    </div>
-    <div>
-      <strong>💬 AIに貼るだけで使える依頼文テンプレ</strong>
-      <div class="prompt-box" id="promptText">${r.prompt}</div>
-      <div class="hint">※ 【　】の中を自分の状況に合わせて書き換えて、いつも使うAIチャットに貼り付けてください。</div>
-    </div>
-    <div class="btn-row">
-      <button class="btn btn-primary" onclick="copyPrompt()">📋 依頼文をコピー</button>
-      <button class="btn btn-secondary" onclick="restart()">🔄 もう一度診断</button>
-    </div>
-  `;
-  saveHistory(r.title);
-}
-
-function copyPrompt() {
-  const text = document.getElementById("promptText").innerText;
-  if (navigator.clipboard) {
-    navigator.clipboard.writeText(text).then(() => {
-      alert("依頼文をコピーしました。AIのチャット欄に貼り付けてください。");
-    }).catch(() => fallbackCopy(text));
-  } else {
-    fallbackCopy(text);
-  }
-}
-
-function fallbackCopy(text) {
-  const ta = document.createElement("textarea");
-  ta.value = text;
-  document.body.appendChild(ta);
-  ta.select();
-  try { document.execCommand("copy"); alert("依頼文をコピーしました。"); }
-  catch(e) { alert("コピーに失敗しました。手動で選択してください。"); }
-  document.body.removeChild(ta);
-}
-
-function restart() {
-  currentStep = 0;
-  scores = { text: 0, code: 0 };
-  render();
-}
-
-function saveHistory(title) {
-  const hist = JSON.parse(localStorage.getItem("aiChooserHistory") || "[]");
-  const now = new Date();
-  const dateStr = `${now.getMonth()+1}/${now.getDate()} ${String(now.getHours()).padStart(2,"0")}:${String(now.getMinutes()).padStart(2,"0")}`;
-  hist.unshift({ title, date: dateStr });
-  localStorage.setItem("aiChooserHistory", JSON.stringify(hist.slice(0, 5)));
-  renderHistory();
-}
-
-function renderHistory() {
-  const hist = JSON.parse(localStorage.getItem("aiChooserHistory") || "[]");
-  const box = document.getElementById("history");
-  const list = document.getElementById("history-list");
-  if (hist.length === 0) { box.style.display = "none"; return; }
-  box.style.display = "block";
-  list.innerHTML = hist.map(h => `<div class="history-item">${h.date} → ${h.title}</div>`).join("");
-}
-
-function clearHistory() {
-  if (confirm("履歴を消してよろしいですか？")) {
-    localStorage.removeItem("aiChooserHistory");
-    renderHistory();
-  }
-}
-
-render();
-renderHistory();
+  renderQuestion();
+})();
 </script>
 <!-- hitotsu-cta -->
 <div style="max-width:720px;margin:40px auto 0;padding:24px 20px;border-radius:14px;
