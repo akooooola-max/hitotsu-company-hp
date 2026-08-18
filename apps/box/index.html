@@ -3,9 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AI社員がつくった道具箱｜hitotsu company</title>
+<title>道具箱（LINE限定）｜hitotsu company</title>
 <meta name="theme-color" content="#0d0d0f">
-
+<meta name="robots" content="noindex,nofollow">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
 <style>
@@ -93,63 +93,65 @@
 </head>
 <body>
   <div class="wrap">
-    <div class="kicker">$ open toolbox/</div>
-    <h1>AI社員がつくった<span class="amp">道具箱</span></h1>
-    <p class="lead">夜のうちにAI社員が1つ作って、朝には増えています。<br>ここでは<strong>3個を見本として</strong>公開中。<strong>残り12個はLINEで</strong>受け取れます。</p>
-    <div class="counter"><b>15</b><span>個の道具が入っています</span><span style="color:#f0b429;">／このページで試せるのは3個</span></div>
-
-<div>
-    <a class="lockbar" href="https://line.me/R/ti/p/@188jocyd">
-      <span class="lb1">$ unlock toolbox/</span>
-      <span class="lb2">全15個をぜんぶ使うには</span>
-      <span class="lb3">公式LINEを友だち追加して「道具箱」と送ってください。合言葉がすぐ届きます（無料・売り込みなし）</span>
-    </a>
-      <a class="card lock" href="https://line.me/R/ti/p/@188jocyd">
-        <span class="ic">🔒</span>
+    <div class="kicker">$ unlock toolbox/ --line</div>
+    <h1>道具箱<span class="amp">ぜんぶ</span></h1>
+    <p class="lead">LINEに登録してくれた方だけのページです。<br><strong>全部無料・アプリ側の登録も不要。</strong>明日の朝、また1つ増えます。</p>
+    <div class="counter"><b>15</b><span>個ぜんぶ使えます</span><span style="color:#f0b429;">／毎朝1つ増えます</span></div>
+    <div id="gate">
+      <h2>合言葉を入れてください</h2>
+      <p>LINEで「道具箱」と送ると、合言葉が届きます。<br>一度入れたら、次からは自動で開きます。</p>
+      <input id="pw" type="text" placeholder="ひらがな4文字" autocomplete="off">
+      <button id="go">開ける</button>
+      <div class="ng" id="ng"></div>
+      <p class="hint">まだの方は <a href="https://line.me/R/ti/p/@188jocyd">こちらから友だち追加</a> →「道具箱」と送信</p>
+    </div>
+<div id="boxlist" style="display:none">
+      <a class="card" href="../ai-tool-chooser.html">
+        <span class="ic">🧰</span>
         <span class="body">
-          <span class="meta">今朝できたて</span>
+          <span class="meta">今朝できたて <b class="new">NEW</b></span>
           <span class="title">AIツール診断 | ChatGPT vs Claude Code</span>
-          <span class="desc">LINEで「道具箱」と送ると使えます</span>
+          <span class="desc">今日の記事から生まれた、できたての道具</span>
         </span>
         <span class="arrow">→</span>
       </a>
-      <a class="card lock" href="https://line.me/R/ti/p/@188jocyd">
-        <span class="ic">🔒</span>
+      <a class="card" href="../kakeibo.html">
+        <span class="ic">🧰</span>
         <span class="body">
           <span class="meta">昨日</span>
           <span class="title">かんたん家計簿</span>
-          <span class="desc">LINEで「道具箱」と送ると使えます</span>
+          <span class="desc">今日の記事から生まれた、できたての道具</span>
         </span>
         <span class="arrow">→</span>
       </a>
-      <a class="card lock" href="https://line.me/R/ti/p/@188jocyd">
-        <span class="ic">🔒</span>
+      <a class="card" href="../competitor-research-brief-maker.html">
+        <span class="ic">📋</span>
         <span class="body">
           <span class="meta">昨日</span>
           <span class="title">競合調査ブリーフ メーカー</span>
-          <span class="desc">LINEで「道具箱」と送ると使えます</span>
+          <span class="desc">「競合調査どこから？」を、そのまま渡せる指示書に落とす</span>
         </span>
         <span class="arrow">→</span>
       </a>
-      <a class="card lock" href="https://line.me/R/ti/p/@188jocyd">
-        <span class="ic">🔒</span>
+      <a class="card" href="../elevenlabs-yomiage-helper.html">
+        <span class="ic">🎙</span>
         <span class="body">
           <span class="meta">2日前</span>
           <span class="title">読み上げ原稿 準備ツール</span>
-          <span class="desc">LINEで「道具箱」と送ると使えます</span>
+          <span class="desc">読み上げ原稿の下ごしらえ。数字も記号も自然に読める形に</span>
         </span>
         <span class="arrow">→</span>
       </a>
-      <a class="card lock" href="https://line.me/R/ti/p/@188jocyd">
-        <span class="ic">🔒</span>
+      <a class="card" href="../research-prompt-maker.html">
+        <span class="ic">🔎</span>
         <span class="body">
           <span class="meta">3日前</span>
           <span class="title">リサーチ依頼文メーカー</span>
-          <span class="desc">LINEで「道具箱」と送ると使えます</span>
+          <span class="desc">調べものの丸投げ。埋めるだけでリサーチ依頼文が仕上がる</span>
         </span>
         <span class="arrow">→</span>
       </a>
-      <a class="card" href="prompt-builder.html">
+      <a class="card" href="../prompt-builder.html">
         <span class="ic">📝</span>
         <span class="body">
           <span class="meta">4日前</span>
@@ -158,16 +160,16 @@
         </span>
         <span class="arrow">→</span>
       </a>
-      <a class="card lock" href="https://line.me/R/ti/p/@188jocyd">
-        <span class="ic">🔒</span>
+      <a class="card" href="../ochugen-oseibo-kanri.html">
+        <span class="ic">🎁</span>
         <span class="body">
           <span class="meta">5日前</span>
           <span class="title">お中元・お歳暮 贈答記録簿</span>
-          <span class="desc">LINEで「道具箱」と送ると使えます</span>
+          <span class="desc">お中元とお歳暮。誰に何を贈ったか、来年の自分に引き継ぐ</span>
         </span>
         <span class="arrow">→</span>
       </a>
-      <a class="card" href="kanji-25min-checklist.html">
+      <a class="card" href="../kanji-25min-checklist.html">
         <span class="ic">🍻</span>
         <span class="body">
           <span class="meta">6日前</span>
@@ -176,25 +178,25 @@
         </span>
         <span class="arrow">→</span>
       </a>
-      <a class="card lock" href="https://line.me/R/ti/p/@188jocyd">
-        <span class="ic">🔒</span>
+      <a class="card" href="../kanji-gift-helper.html">
+        <span class="ic">💐</span>
         <span class="body">
           <span class="meta">2026-08-11</span>
           <span class="title">幹事のお助けツール - 贈り物&寄せ書きサポート</span>
-          <span class="desc">LINEで「道具箱」と送ると使えます</span>
+          <span class="desc">送別会の幹事。贈り物選びと寄せ書きを、まとめて片付ける</span>
         </span>
         <span class="arrow">→</span>
       </a>
-      <a class="card lock" href="https://line.me/R/ti/p/@188jocyd">
-        <span class="ic">🔒</span>
+      <a class="card" href="../kenshu-junbi-kit.html">
+        <span class="ic">📚</span>
         <span class="body">
           <span class="meta">2026-08-10</span>
           <span class="title">研修準備キット - 30分で片付ける</span>
-          <span class="desc">LINEで「道具箱」と送ると使えます</span>
+          <span class="desc">研修の準備。資料も進行も、30分で人前に立てる状態に</span>
         </span>
         <span class="arrow">→</span>
       </a>
-      <a class="card" href="survey-builder.html">
+      <a class="card" href="../survey-builder.html">
         <span class="ic">📊</span>
         <span class="body">
           <span class="meta">2026-08-09</span>
@@ -203,39 +205,39 @@
         </span>
         <span class="arrow">→</span>
       </a>
-      <a class="card lock" href="https://line.me/R/ti/p/@188jocyd">
-        <span class="ic">🔒</span>
+      <a class="card" href="../goal-setting-helper.html">
+        <span class="ic">🎯</span>
         <span class="body">
           <span class="meta">2026-08-07</span>
           <span class="title">目標設定モヤモヤ解消シート</span>
-          <span class="desc">LINEで「道具箱」と送ると使えます</span>
+          <span class="desc">「がんばります」で終わっていた目標を、測れる形に落とす</span>
         </span>
         <span class="arrow">→</span>
       </a>
-      <a class="card lock" href="https://line.me/R/ti/p/@188jocyd">
-        <span class="ic">🔒</span>
+      <a class="card" href="../keicho-taio-set.html">
+        <span class="ic">🎗</span>
         <span class="body">
           <span class="meta">2026-08-06</span>
           <span class="title">社内慶弔・お祝い対応セット</span>
-          <span class="desc">LINEで「道具箱」と送ると使えます</span>
+          <span class="desc">訃報の一報。相場もお悔やみの言葉も、迷わず決められる</span>
         </span>
         <span class="arrow">→</span>
       </a>
-      <a class="card lock" href="https://line.me/R/ti/p/@188jocyd">
-        <span class="ic">🔒</span>
+      <a class="card" href="../meishi-renrakusaki-kanri.html">
+        <span class="ic">📇</span>
         <span class="body">
           <span class="meta">2026-08-05</span>
           <span class="title">社内名刺・連絡先管理</span>
-          <span class="desc">LINEで「道具箱」と送ると使えます</span>
+          <span class="desc">机に積み上がった名刺の山を、探せる連絡先リストに変える</span>
         </span>
         <span class="arrow">→</span>
       </a>
-      <a class="card lock" href="https://line.me/R/ti/p/@188jocyd">
-        <span class="ic">🔒</span>
+      <a class="card" href="../customer-visit-checklist.html">
+        <span class="ic">☕</span>
         <span class="body">
           <span class="meta">2026-08-05</span>
           <span class="title">来客対応・お茶出し準備チェック</span>
-          <span class="desc">LINEで「道具箱」と送ると使えます</span>
+          <span class="desc">「あと10分で来客」から、お茶出しも応接も抜けなく間に合わせる</span>
         </span>
         <span class="arrow">→</span>
       </a>
@@ -262,8 +264,26 @@
       </div>
       <p class="fine">仕組みの全体像は<a href="https://note.com/hitotsu_ai/n/n493aa3b424cd">こちらのnote</a>でも公開中</p>
     </div>
-    <a class="back" href="../card.html">← Hitotsu Company</a>
+    <a class="back" href="../../card.html">← Hitotsu Company</a>
   </div>
 
+<script>
+const HASH = "c7c4426c1dc0998e957535b3f02c2827f43fbe7f77d01364f780302364a77b28";
+const box = document.getElementById('boxlist');
+const gate = document.getElementById('gate');
+async function sha(s) {
+  const b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s));
+  return [...new Uint8Array(b)].map(x => x.toString(16).padStart(2, '0')).join('');
+}
+function unlock() { gate.style.display = 'none'; box.style.display = 'block'; }
+if (localStorage.getItem('toolbox_ok') === HASH) unlock();
+async function check() {
+  const v = document.getElementById('pw').value.trim();
+  if (await sha(v) === HASH) { localStorage.setItem('toolbox_ok', HASH); unlock(); }
+  else document.getElementById('ng').textContent = '合言葉がちがうようです';
+}
+document.getElementById('go').onclick = check;
+document.getElementById('pw').addEventListener('keydown', e => { if (e.key === 'Enter') check(); });
+</script>
 </body>
 </html>
