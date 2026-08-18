@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="AI選びで迷う初心者。仕事内容を答えるだけで使う道具が決まる">
+<title>仕事のAI使い分けナビ</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic", sans-serif;
+  background: #f5f7fa;
+  color: #333;
+  line-height: 1.7;
+  padding: 16px;
+}
+.container { max-width: 720px; margin: 0 auto; }
+h1 {
+  font-size: 22px;
+  color: #2c3e50;
+  margin-bottom: 8px;
+  text-align: center;
+}
+.lead {
+  text-align: center;
+  color: #666;
+  font-size: 14px;
+  margin-bottom: 24px;
+}
+.card {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+.step-label {
+  display: inline-block;
+  background: #3498db;
+  color: white;
+  padding: 2px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  margin-bottom: 10px;
+}
+.question { font-size: 16px; font-weight: bold; margin-bottom: 14px; }
+.options { display: flex; flex-direction: column; gap: 10px; }
+.option-btn {
+  padding: 14px 16px;
+  background: #f8f9fa;
+  border: 2px solid #e1e4e8;
+  border-radius: 8px;
+  text-align: left;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: inherit;
+  color: #333;
+}
+.option-btn:hover { border-color: #3498db; background: #eaf4fc; }
+.option-btn:active { transform: scale(0.98); }
+.result-badge {
+  display: inline-block;
+  padding: 6px 14px;
+  border-radius: 20px;
+  color: white;
+  font-weight: bold;
+  font-size: 14px;
+  margin-bottom: 12px;
+}
+.badge-text { background: #27ae60; }
+.badge-code { background: #8e44ad; }
+.result-desc { margin-bottom: 16px; font-size: 15px; }
+.result-desc ul { margin-left: 20px; margin-top: 8px; }
+.result-desc li { margin-bottom: 4px; }
+.prompt-box {
+  background: #f4f6f8;
+  border-left: 4px solid #3498db;
+  padding: 12px 14px;
+  border-radius: 4px;
+  font-size: 14px;
+  margin: 12px 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.btn-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
+.btn {
+  padding: 10px 18px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  font-family: inherit;
+}
+.btn-primary { background: #3498db; color: white; }
+.btn-secondary { background: #ecf0f1; color: #333; }
+.btn:hover { opacity: 0.85; }
+.history {
+  margin-top: 24px;
+  padding: 16px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+.history h3 { font-size: 15px; margin-bottom: 10px; color: #555; }
+.history-item {
+  padding: 8px 10px;
+  border-bottom: 1px solid #eee;
+  font-size: 13px;
+  color: #666;
+}
+.history-item:last-child { border-bottom: none; }
+.hint {
+  font-size: 13px;
+  color: #888;
+  margin-top: 8px;
+}
+.clear-btn {
+  font-size: 12px;
+  color: #999;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-decoration: underline;
+  float: right;
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>🧭 仕事のAI使い分けナビ</h1>
+  <p class="lead">3つの質問に答えるだけで、今の作業に合うAIタイプがわかります</p>
+
+  <div id="app" class="card"></div>
+
+  <div id="history" class="history" style="display:none;">
+    <button class="clear-btn" onclick="clearHistory()">履歴を消す</button>
+    <h3>📋 前回までの判定結果</h3>
+    <div id="history-list"></div>
+  </div>
+</div>
+
+<script>
+const questions = [
+  {
+    q: "今から取りかかる作業は、どれに一番近いですか？",
+    options: [
+      { text: "📝 文章を書く・整える（メール、資料、報告書など）", score: "text" },
+      { text: "💻 プログラムやツールを作る・直す", score: "code" },
+      { text: "💡 アイデア出し・企画・翻訳・要約", score: "text" },
+      { text: "🔧 パソコンの作業を自動化したい", score: "code" }
+    ]
+  },
+  {
+    q: "作業のゴールに近いのはどちらですか？",
+    options: [
+      { text: "📄 読める文章・きれいな資料ができあがる", score: "text" },
+      { text: "⚙️ 動くファイルやプログラムができあがる", score: "code" },
+      { text: "🤔 まだ決まっていない／相談しながら決めたい", score: "text" }
+    ]
+  },
+  {
+    q: "普段の作業で扱うことが多いのは？",
+    options: [
+      { text: "📧 メール・Word・PowerPoint・議事録", score: "text" },
+      { text: "🗂️ Excel関数・マクロ・簡単なスクリプト", score: "code" },
+      { text: "🌐 ホームページやWebサービスの中身", score: "code" },
+      { text: "📚 調べもの・情報整理・企画書", score: "text" }
+    ]
+  }
+];
+
+const results = {
+  text: {
+    title: "文章おたすけタイプのAI",
+    badgeClass: "badge-text",
+    desc: "対話しながら文章を作るのが得意なAIが向いています。",
+    good: [
+      "資料のたたき台作り",
+      "メール・議事録・報告書の下書き",
+      "アイデア出し・企画のブレスト",
+      "翻訳や要約、言い回しの修正"
+    ],
+    prompt: "あなたは丁寧なビジネス文章の専門家です。\n以下の目的で、〇〇向けに文章を作ってください。\n\n【目的】：\n【伝えたい内容】：\n【トーン】：丁寧／カジュアル／簡潔\n【文字数の目安】：\n\nまず構成案を出してから、本文を書いてください。"
+  },
+  code: {
+    title: "コード・作業自動化タイプのAI",
+    badgeClass: "badge-code",
+    desc: "コードを書いたり、手元のファイルを直接直せるAIが向いています。",
+    good: [
+      "プログラムのコード生成・修正",
+      "Webサイトの部分修正",
+      "エクセル作業の自動化スクリプト",
+      "小さな業務ツールの試作"
+    ],
+    prompt: "以下の作業を自動化する〇〇のコードを書いてください。\n\n【やりたいこと】：\n【入力データの形】：\n【出力したい形】：\n【使う環境】：Windows / Mac / ブラウザ など\n\nコードには日本語のコメントを入れ、実行手順も教えてください。"
+  }
+};
+
+let currentStep = 0;
+let scores = { text: 0, code: 0 };
+
+function render() {
+  const app = document.getElementById("app");
+  if (currentStep < questions.length) {
+    const q = questions[currentStep];
+    app.innerHTML = `
+      <div class="step-label">質問 ${currentStep + 1} / ${questions.length}</div>
+      <div class="question">${q.q}</div>
+      <div class="options">
+        ${q.options.map((o, i) => `<button class="option-btn" onclick="answer('${o.score}')">${o.text}</button>`).join("")}
+      </div>
+    `;
+  } else {
+    showResult();
+  }
+}
+
+function answer(score) {
+  scores[score]++;
+  currentStep++;
+  render();
+}
+
+function showResult() {
+  const winner = scores.text >= scores.code ? "text" : "code";
+  const r = results[winner];
+  const app = document.getElementById("app");
+  app.innerHTML = `
+    <div class="step-label">診断結果</div>
+    <div class="result-badge ${r.badgeClass}">${r.title}</div>
+    <div class="result-desc">
+      ${r.desc}
+      <br><br>
+      <strong>こんな作業が得意です：</strong>
+      <ul>${r.good.map(g => `<li>${g}</li>`).join("")}</ul>
+    </div>
+    <div>
+      <strong>💬 AIに貼るだけで使える依頼文テンプレ</strong>
+      <div class="prompt-box" id="promptText">${r.prompt}</div>
+      <div class="hint">※ 【　】の中を自分の状況に合わせて書き換えて、いつも使うAIチャットに貼り付けてください。</div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="copyPrompt()">📋 依頼文をコピー</button>
+      <button class="btn btn-secondary" onclick="restart()">🔄 もう一度診断</button>
+    </div>
+  `;
+  saveHistory(r.title);
+}
+
+function copyPrompt() {
+  const text = document.getElementById("promptText").innerText;
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(text).then(() => {
+      alert("依頼文をコピーしました。AIのチャット欄に貼り付けてください。");
+    }).catch(() => fallbackCopy(text));
+  } else {
+    fallbackCopy(text);
+  }
+}
+
+function fallbackCopy(text) {
+  const ta = document.createElement("textarea");
+  ta.value = text;
+  document.body.appendChild(ta);
+  ta.select();
+  try { document.execCommand("copy"); alert("依頼文をコピーしました。"); }
+  catch(e) { alert("コピーに失敗しました。手動で選択してください。"); }
+  document.body.removeChild(ta);
+}
+
+function restart() {
+  currentStep = 0;
+  scores = { text: 0, code: 0 };
+  render();
+}
+
+function saveHistory(title) {
+  const hist = JSON.parse(localStorage.getItem("aiChooserHistory") || "[]");
+  const now = new Date();
+  const dateStr = `${now.getMonth()+1}/${now.getDate()} ${String(now.getHours()).padStart(2,"0")}:${String(now.getMinutes()).padStart(2,"0")}`;
+  hist.unshift({ title, date: dateStr });
+  localStorage.setItem("aiChooserHistory", JSON.stringify(hist.slice(0, 5)));
+  renderHistory();
+}
+
+function renderHistory() {
+  const hist = JSON.parse(localStorage.getItem("aiChooserHistory") || "[]");
+  const box = document.getElementById("history");
+  const list = document.getElementById("history-list");
+  if (hist.length === 0) { box.style.display = "none"; return; }
+  box.style.display = "block";
+  list.innerHTML = hist.map(h => `<div class="history-item">${h.date} → ${h.title}</div>`).join("");
+}
+
+function clearHistory() {
+  if (confirm("履歴を消してよろしいですか？")) {
+    localStorage.removeItem("aiChooserHistory");
+    renderHistory();
+  }
+}
+
+render();
+renderHistory();
+</script>
+<!-- hitotsu-cta -->
+<div style="max-width:720px;margin:40px auto 0;padding:24px 20px;border-radius:14px;
+  background:#14141a;color:#c9c9d1;
+  font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic',sans-serif;
+  font-size:14px;line-height:1.9;">
+  <p style="margin:0 0 12px;color:#f0b429;font-weight:bold;font-size:13px;letter-spacing:.08em;">
+    ⚙ この道具のつくられ方
+  </p>
+  <p style="margin:0 0 14px;">
+    昨日の夜、AI社員が勝手に作りました。<br>
+    人間がキーボードを触った時間は、<strong style="color:#fff;">0分</strong>です。
+  </p>
+  <p style="margin:0 0 18px;">
+    「うちの仕事でもこれ、動かせないかな」と思った方へ。<br>
+    受け取り方は3つあります。
+  </p>
+  <p style="margin:0 0 12px;">
+    <a href="https://line.me/R/ti/p/@188jocyd" style="display:inline-block;background:#06c755;color:#fff;
+      text-decoration:none;padding:14px 22px;border-radius:10px;font-weight:bold;">
+      ① 無料でもらう ─ LINEで「AI社員」と送る →
+    </a>
+  </p>
+  <p style="margin:0 0 12px;">
+    <a href="https://akooooola-max.github.io/hitotsu-company-hp/books.html" style="display:inline-block;background:transparent;color:#f0b429;
+      border:1px solid #f0b429;text-decoration:none;padding:13px 22px;border-radius:10px;font-weight:bold;">
+      ② じっくり読む ─ Kindleの本（500円〜）→
+    </a>
+  </p>
+  <p style="margin:0 0 8px;">
+    <a href="https://coconala.com/services/4325740" style="display:inline-block;background:#f0b429;color:#0d0d0f;
+      text-decoration:none;padding:14px 22px;border-radius:10px;font-weight:bold;">
+      ③ つくってもらう ─ ココナラで相談する →
+    </a><br>
+    <span style="font-size:12.5px;color:#8b8b95;">
+      現場のやり方をうかがってから、あなた専用の1本を作ります（10,000円・お届けまで3日）
+    </span>
+  </p>
+  <p style="margin:14px 0 0;font-size:12.5px;color:#71717a;">
+    ほかの道具は<a href="./" style="color:#f0b429;">道具箱</a>に／
+    仕組みの全体像は<a href="https://note.com/hitotsu_ai/n/n493aa3b424cd" style="color:#f0b429;">こちらのnote</a>で公開中<br>
+    hitotsu company
+  </p>
+</div>
+</body>
+</html>
