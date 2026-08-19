@@ -1,6 +1,6 @@
-// 道具箱ゲート：/apps 配下は PUBLIC 以外すべて合言葉で保護する。
-// 自動生成でツールが増えても、既定で限定扱いになる（公開したい見本は PUBLIC に追記）。
-const PUBLIC = ["/apps", "/apps/index", "/apps/kanji-25min-checklist", "/apps/prompt-builder", "/apps/survey-builder"];
+// 道具箱ゲート：「全部まとめて使える一覧」だけを合言葉で保護する。
+// 個別ツールは毎朝Threadsで告知する集客の入口なので公開のまま。
+const BOX = "/apps/box-9f4a7c2e";
 const LINE = "https://line.me/R/ti/p/@188jocyd";
 
 async function token(key) {
@@ -36,7 +36,7 @@ button{padding:13px 20px;border:0;border-radius:10px;background:var(--accent);co
 </style></head><body><div class="card">
 <span class="tag">LINE 限定</span>
 <h1>AI社員がつくった道具箱</h1>
-<p>道具箱のツールは、公式LINEにご登録いただいた方だけにお渡ししています。<br>合言葉をお持ちの方はご入力ください。</p>
+<p>道具箱の全ツールをまとめたページは、公式LINEにご登録いただいた方だけにお渡ししています。<br>合言葉をお持ちの方はご入力ください。</p>
 <a class="btn line" href="${LINE}">公式LINEで合言葉を受け取る</a>
 <form method="post"><input name="k" placeholder="合言葉" autocomplete="off" autofocus><button>入る</button></form>
 ${wrong ? '<p class="err">合言葉がちがうようです。公式LINEでご確認ください。</p>' : ""}
@@ -52,7 +52,7 @@ export default {
     const path = (url.pathname.replace(/\.html$/, "").replace(/\/+$/, "")) || "/";
 
     // 保護対象外はそのまま配信
-    if (!path.startsWith("/apps") || PUBLIC.includes(path)) return env.ASSETS.fetch(request);
+    if (!path.startsWith(BOX)) return env.ASSETS.fetch(request);
 
     const t = await token(env.BOX_KEY);
 
