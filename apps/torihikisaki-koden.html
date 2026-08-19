@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>取引先の香典 早見ツール｜金額・表書き・差出人の書き方が3分で決まる</title>
+<meta name="description" content="取引先の訃報を受けたときの香典を、故人の役職・取引の深さ・名義から自動判定。金額の目安、宗教別の表書き、差出人の表記、供花や弔電の要否、参列の判断までまとめて出します。法人対応に特化した無料ツール。">
+<meta name="theme-color" content="#3a3f4b">
+<link rel="canonical" href="https://hitotsucompany.com/apps/torihikisaki-koden.html">
+<meta property="og:type" content="website">
+<meta property="og:title" content="取引先の香典 早見ツール｜金額・表書き・差出人が3分で決まる">
+<meta property="og:description" content="故人の役職・取引の深さ・名義を選ぶだけ。金額の目安から表書き、差出人の書き方、供花・弔電の判断まで。">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:#22262e; --sub:#616875; --line:#dee1e7; --bg:#f5f5f7;
+  --card:#fff; --dark:#3a3f4b; --dark-l:#525968; --accent:#7a6034;
+  --ok:#1d6b4a; --warn:#a8551b; --danger:#a32d22; --soft:#f8f8fa;
+}
+body{font-family:"Hiragino Mincho ProN","Yu Mincho","Noto Serif JP",serif;
+  background:var(--bg);color:var(--ink);line-height:1.8;padding:0 0 64px}
+.ui{font-family:"Hiragino Sans","Yu Gothic","Meiryo",system-ui,sans-serif}
+.wrap{max-width:900px;margin:0 auto;padding:0 16px}
+header.hd{background:var(--dark);color:#fff;padding:28px 0 24px;margin-bottom:22px}
+header.hd h1{font-size:1.5rem;line-height:1.5;margin-bottom:.55rem}
+header.hd p{font-size:.9rem;color:#ccd0d8;max-width:44em;
+  font-family:"Hiragino Sans","Yu Gothic",sans-serif}
+.tagrow{display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.9rem;
+  font-family:"Hiragino Sans","Yu Gothic",sans-serif}
+.tag{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);
+  border-radius:999px;padding:.2rem .7rem;font-size:.72rem;color:#e8eaee}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;
+  padding:20px 18px;margin-bottom:18px}
+.card > h2{font-size:1.05rem;color:var(--dark);margin-bottom:1rem;
+  padding-bottom:.5rem;border-bottom:2px solid #edeef1}
+.q{margin-bottom:16px}
+.q > .qh{display:block;font-size:.86rem;font-weight:700;margin-bottom:.5rem;
+  font-family:"Hiragino Sans","Yu Gothic",sans-serif}
+.q > .qn{display:block;font-size:.76rem;color:var(--sub);margin-bottom:.5rem;
+  font-family:"Hiragino Sans","Yu Gothic",sans-serif}
+.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(158px,1fr));gap:8px}
+.opt{position:relative}
+.opt input{position:absolute;opacity:0;width:1px;height:1px;margin:0}
+.opt span{display:block;border:1px solid var(--line);border-radius:8px;
+  padding:.6rem .7rem;font-size:.84rem;cursor:pointer;background:#fff;
+  transition:all .14s;font-family:"Hiragino Sans","Yu Gothic",sans-serif;line-height:1.5}
+.opt span small{display:block;font-size:.71rem;color:var(--sub);margin-top:.12rem}
+.opt input:checked + span{border-color:var(--dark);background:#f0f1f4;
+  box-shadow:inset 0 0 0 1px var(--dark)}
+.opt input:focus-visible + span{outline:2px solid #8f9bb3;outline-offset:2px}
+.opt span:hover{border-color:#aeb4c0}
+input[type=text],input[type=number]{width:100%;padding:.55rem .6rem;border:1px solid var(--line);
+  border-radius:6px;font-size:.92rem;font-family:"Hiragino Sans","Yu Gothic",sans-serif;background:#fff}
+input:focus{outline:2px solid #9aa3b5;outline-offset:-1px}
+.inline{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}
+label.f{display:block;font-size:.76rem;color:var(--sub);margin-bottom:.28rem;font-weight:700;
+  font-family:"Hiragino Sans","Yu Gothic",sans-serif}
+#peopleWrap{display:none;margin-top:10px}
+
+/* --- 結果 --- */
+#result{display:none}
+.amt{background:var(--dark);color:#fff;border-radius:10px;padding:20px 18px;text-align:center;margin-bottom:14px}
+.amt .lab{display:block;font-size:.76rem;color:#c3c8d2;margin-bottom:.3rem;
+  font-family:"Hiragino Sans","Yu Gothic",sans-serif}
+.amt .big{display:block;font-size:2.3rem;font-weight:700;line-height:1.25;letter-spacing:.01em}
+.amt .rng{display:block;font-size:.84rem;color:#ccd1da;margin-top:.35rem;
+  font-family:"Hiragino Sans","Yu Gothic",sans-serif}
+.amt .calc{display:block;font-size:.75rem;color:#a8b0bd;margin-top:.5rem;
+  font-family:"Hiragino Sans","Yu Gothic",sans-serif}
+.rows{border:1px solid var(--line);border-radius:9px;overflow:hidden;margin-bottom:14px}
+.row{display:grid;grid-template-columns:8.5em 1fr;gap:0;border-bottom:1px solid var(--line)}
+.row:last-child{border-bottom:none}
+.row > dt{background:var(--soft);padding:.65rem .7rem;font-size:.78rem;color:var(--sub);
+  font-weight:700;font-family:"Hiragino Sans","Yu Gothic",sans-serif}
+.row > dd{padding:.65rem .8rem;font-size:.9rem}
+.row > dd .sub{display:block;font-size:.77rem;color:var(--sub);margin-top:.2rem;
+  font-family:"Hiragino Sans","Yu Gothic",sans-serif;line-height:1.65}
+.omote{font-size:1.35rem;font-weight:700;letter-spacing:.12em;color:var(--dark)}
+.sashidashi{background:var(--soft);border:1px solid var(--line);border-radius:7px;
+  padding:.7rem .85rem;white-space:pre-line;font-size:1rem;line-height:1.9;letter-spacing:.06em}
+.copy{margin-top:.5rem}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.35rem;
+  padding:.6rem 1.15rem;border:1px solid transparent;border-radius:6px;cursor:pointer;
+  font-size:.88rem;font-weight:700;transition:filter .15s;
+  font-family:"Hiragino Sans","Yu Gothic",sans-serif;text-decoration:none}
+.btn:hover{filter:brightness(1.07)}
+.btn-main{background:var(--dark);color:#fff}
+.btn-sub{background:#fff;color:var(--dark);border-color:#c4c9d2}
+.btn-sm{padding:.32rem .7rem;font-size:.76rem;font-weight:400}
+.alert{border-radius:8px;padding:.8rem .9rem;font-size:.86rem;margin-bottom:12px;
+  line-height:1.75;font-family:"Hiragino Sans","Yu Gothic",sans-serif}
+.alert strong{display:block;margin-bottom:.2rem}
+.a-stop{background:#fdeeeb;border:1px solid #f0c4bc;color:#8c2419}
+.a-warn{background:#fdf4e8;border:1px solid #efd8b4;color:#7a4413}
+.a-info{background:#eef1f6;border:1px solid #ccd4e0;color:#33415c}
+.checks{list-style:none;margin:0}
+.checks li{position:relative;padding-left:1.5em;margin-bottom:.45rem;font-size:.88rem;
+  font-family:"Hiragino Sans","Yu Gothic",sans-serif;line-height:1.7}
+.checks li::before{content:'□';position:absolute;left:0;color:var(--sub);font-size:1.05em}
+.actions{display:flex;gap:.55rem;flex-wrap:wrap;margin-top:16px;align-items:center}
+.hint{font-size:.78rem;color:var(--sub);font-family:"Hiragino Sans","Yu Gothic",sans-serif}
+
+article{font-family:"Hiragino Sans","Yu Gothic","Meiryo",sans-serif}
+article.card > h2{display:block;font-size:1.1rem;color:var(--dark);margin:26px 0 .7rem;
+  padding-bottom:.45rem;border-bottom:2px solid #e6e8ec}
+article.card > h2:first-of-type{margin-top:2px}
+article h3{font-size:.95rem;margin:18px 0 .4rem}
+article p{font-size:.89rem;margin-bottom:.8rem}
+article ul,article ol{margin:0 0 .9rem 1.3rem;font-size:.89rem}
+article li{margin-bottom:.3rem}
+article table{width:100%;border-collapse:collapse;font-size:.84rem;margin-bottom:1rem}
+article th,article td{padding:.5rem .6rem;border:1px solid var(--line);text-align:left;vertical-align:top}
+article th{background:var(--soft);color:var(--sub);font-size:.76rem;white-space:nowrap}
+.faq dt{font-weight:700;font-size:.9rem;margin-top:1rem;color:var(--dark)}
+.faq dd{font-size:.87rem;margin-left:0;color:#3d4450}
+footer{text-align:center;font-size:.78rem;color:var(--sub);padding:28px 16px 0;
+  border-top:1px solid var(--line);margin-top:30px;font-family:"Hiragino Sans","Yu Gothic",sans-serif}
+footer a{color:var(--dark-l)}
+@media print{header.hd,.no-print,footer{display:none!important}body{background:#fff}
+  .card{border:none;padding:0;margin-bottom:12px}}
+@media (max-width:560px){
+  header.hd h1{font-size:1.24rem}
+  .row{grid-template-columns:1fr}
+  .row > dt{padding:.5rem .7rem .1rem;background:#fff}
+  .amt .big{font-size:1.9rem}
+}
+</style>
+</head>
+<body>
+
+<header class="hd">
+  <div class="wrap">
+    <h1>取引先の香典 早見ツール</h1>
+    <p>取引先の訃報を受けたとき、香典の金額・表書き・差出人の書き方・供花や弔電の要否を、5つ選ぶだけでまとめて出します。個人ではなく<strong>会社として弔意を示す場面</strong>に特化しています。</p>
+    <div class="tagrow">
+      <span class="tag">法人向け</span>
+      <span class="tag">登録不要・無料</span>
+      <span class="tag">宗教別の表書き対応</span>
+      <span class="tag">そのまま印刷できます</span>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <!-- ===== 質問 ===== -->
+  <section class="card no-print">
+    <h2>5つ選んでください</h2>
+
+    <div class="q">
+      <span class="qh">Q1. 亡くなったのはどなたですか</span>
+      <div class="opts" id="q1">
+        <label class="opt"><input type="radio" name="who" value="president" checked>
+          <span>取引先の社長・会長<small>代表者・オーナー</small></span></label>
+        <label class="opt"><input type="radio" name="who" value="exec">
+          <span>取引先の役員<small>取締役・執行役員</small></span></label>
+        <label class="opt"><input type="radio" name="who" value="staff">
+          <span>取引先の担当者ご本人<small>日頃やり取りする方</small></span></label>
+        <label class="opt"><input type="radio" name="who" value="family">
+          <span>担当者のご家族<small>ご両親・配偶者など</small></span></label>
+      </div>
+    </div>
+
+    <div class="q">
+      <span class="qh">Q2. その取引先との関係は</span>
+      <div class="opts" id="q2">
+        <label class="opt"><input type="radio" name="rel" value="major">
+          <span>主要取引先<small>売上・仕入の柱、長い付き合い</small></span></label>
+        <label class="opt"><input type="radio" name="rel" value="normal" checked>
+          <span>通常の取引先<small>継続的に取引がある</small></span></label>
+        <label class="opt"><input type="radio" name="rel" value="light">
+          <span>取引が浅い<small>取引開始まもない・面識が少ない</small></span></label>
+      </div>
+    </div>
+
+    <div class="q">
+      <span class="qh">Q3. どなたの名義で出しますか</span>
+      <div class="opts" id="q3">
+        <label class="opt"><input type="radio" name="from" value="company" checked>
+          <span>会社名義<small>社名＋代表者名</small></span></label>
+        <label class="opt"><input type="radio" name="from" value="dept">
+          <span>部署・課一同<small>複数人で出し合う</small></span></label>
+        <label class="opt"><input type="radio" name="from" value="personal">
+          <span>個人名義<small>担当者が個人として</small></span></label>
+      </div>
+      <div id="peopleWrap">
+        <label class="f" for="people">出し合う人数（名）</label>
+        <input type="number" id="people" min="2" max="200" value="10" inputmode="numeric">
+      </div>
+    </div>
+
+    <div class="q">
+      <span class="qh">Q4. 葬儀の形式は</span>
+      <div class="opts" id="q4">
+        <label class="opt"><input type="radio" name="style" value="corp">
+          <span>社葬・合同葬<small>会社主催の葬儀</small></span></label>
+        <label class="opt"><input type="radio" name="style" value="normal" checked>
+          <span>一般葬<small>通常の葬儀・告別式</small></span></label>
+        <label class="opt"><input type="radio" name="style" value="family">
+          <span>家族葬<small>近親者のみ</small></span></label>
+        <label class="opt"><input type="radio" name="style" value="unknown">
+          <span>まだ分からない</span></label>
+      </div>
+    </div>
+
+    <div class="q">
+      <span class="qh">Q5. 宗教・宗派は</span>
+      <span class="qn">分からない場合は「分からない」を選んでください。無難な表書きをご案内します。</span>
+      <div class="opts" id="q5">
+        <label class="opt"><input type="radio" name="rel2" value="bud">
+          <span>仏式（宗派不明）</span></label>
+        <label class="opt"><input type="radio" name="rel2" value="jodo">
+          <span>仏式・浄土真宗</span></label>
+        <label class="opt"><input type="radio" name="rel2" value="shinto">
+          <span>神式</span></label>
+        <label class="opt"><input type="radio" name="rel2" value="catholic">
+          <span>キリスト教・カトリック</span></label>
+        <label class="opt"><input type="radio" name="rel2" value="protestant">
+          <span>キリスト教・プロテスタント</span></label>
+        <label class="opt"><input type="radio" name="rel2" value="unknown" checked>
+          <span>分からない</span></label>
+      </div>
+    </div>
+
+    <div class="q" style="margin-bottom:0">
+      <span class="qh">差出人の情報（任意・表記例の生成に使います）</span>
+      <span class="qn">入力はこの画面の中だけで使われ、どこにも送信されません。</span>
+      <div class="inline">
+        <div>
+          <label class="f" for="i-company">自社名</label>
+          <input type="text" id="i-company" placeholder="株式会社ひとつ" autocomplete="off">
+        </div>
+        <div>
+          <label class="f" for="i-title">役職</label>
+          <input type="text" id="i-title" placeholder="代表取締役" autocomplete="off">
+        </div>
+        <div>
+          <label class="f" for="i-name">氏名</label>
+          <input type="text" id="i-name" placeholder="山田 太郎" autocomplete="off">
+        </div>
+        <div>
+          <label class="f" for="i-dept">部署名</label>
+          <input type="text" id="i-dept" placeholder="営業部" autocomplete="off">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 結果 ===== -->
+  <section id="result">
+
+    <div id="alerts"></div>
+
+    <div class="amt">
+      <span class="lab">香典の目安</span>
+      <span class="big" id="r-amount">—</span>
+      <span class="rng" id="r-range"></span>
+      <span class="calc" id="r-calc"></span>
+    </div>
+
+    <div class="card">
+      <h2>書き方</h2>
+      <dl class="rows">
+        <div class="row">
+          <dt>表書き</dt>
+          <dd><span class="omote" id="r-omote">—</span>
+              <span class="sub" id="r-omote-why"></span></dd>
+        </div>
+        <div class="row">
+          <dt>名前の書き方</dt>
+          <dd><div class="sashidashi" id="r-sashidashi">—</div>
+              <span class="sub" id="r-sashidashi-note"></span>
+              <div class="copy no-print">
+                <button class="btn btn-sub btn-sm" id="btnCopy">この表記をコピー</button>
+                <span class="hint" id="copyMsg"></span>
+              </div></dd>
+        </div>
+        <div class="row">
+          <dt>香典袋</dt>
+          <dd id="r-fukuro">—</dd>
+        </div>
+        <div class="row">
+          <dt>お札</dt>
+          <dd id="r-satsu">—</dd>
+        </div>
+      </dl>
+    </div>
+
+    <div class="card">
+      <h2>香典以外にすること</h2>
+      <dl class="rows">
+        <div class="row"><dt>供花・供物</dt><dd id="r-kyoka">—</dd></div>
+        <div class="row"><dt>弔電</dt><dd id="r-choden">—</dd></div>
+        <div class="row"><dt>参列</dt><dd id="r-sanretsu">—</dd></div>
+      </dl>
+    </div>
+
+    <div class="card">
+      <h2>手順チェックリスト</h2>
+      <ul class="checks" id="r-checks"></ul>
+      <div class="actions no-print">
+        <button class="btn btn-main" id="btnPrint">印刷 / PDFで保存</button>
+        <a class="btn btn-sub" href="keicho-kin-kanri.html">この対応を慶弔金管理表に記録する →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 解説 ===== -->
+  <article class="card">
+    <h2>取引先への香典の相場</h2>
+    <p>
+      取引先への香典は、<strong>故人の役職と取引の深さ</strong>でおおよその水準が決まります。
+      一般に公開されている目安をまとめると、次のような幅になります。
+    </p>
+    <table>
+      <thead><tr><th>故人</th><th>一般的な目安</th></tr></thead>
+      <tbody>
+        <tr><td>取引先の社長・会長</td><td>3万円 〜 10万円</td></tr>
+        <tr><td>取引先の役員・重役</td><td>1万円 〜 5万円</td></tr>
+        <tr><td>取引先の担当者ご本人</td><td>1万円 前後（〜3万円）</td></tr>
+        <tr><td>担当者のご家族</td><td>3千円 〜 1万円</td></tr>
+        <tr><td>部署などで出し合う場合</td><td>1人あたり 3千円 〜 5千円 × 人数</td></tr>
+      </tbody>
+    </table>
+    <p>
+      ただし<strong>自社に慶弔見舞金規程がある場合は、その金額が最優先</strong>です。
+      規程で定められた額があるのに担当者の判断で増減させると、社内の前例が崩れて次の担当者が困ります。
+      まず規程を確認し、規程に定めがない場合に上記の目安を使ってください。
+    </p>
+
+    <h3>金額を決めるときに避けたい数字</h3>
+    <p>
+      「4」は死、「9」は苦を連想させるため、香典では避けるのが慣例です。
+      4万円・9千円といった金額は選ばず、3千円・5千円・1万円・3万円・5万円・10万円といった
+      区切りのよい額から選びます。
+    </p>
+
+    <h2>宗教・宗派別の表書き</h2>
+    <table>
+      <thead><tr><th>宗教・宗派</th><th>表書き</th><th>補足</th></tr></thead>
+      <tbody>
+        <tr><td>仏式（宗派不明）</td><td>御香典</td><td>どの宗派でも失礼にならない</td></tr>
+        <tr><td>仏式・浄土真宗</td><td>御仏前</td><td>「霊」の概念がないため御霊前は使わない</td></tr>
+        <tr><td>神式</td><td>御玉串料</td><td>御神前も可。蓮の絵の袋は使わない</td></tr>
+        <tr><td>キリスト教・カトリック</td><td>御ミサ料</td><td>お花料も可</td></tr>
+        <tr><td>キリスト教・プロテスタント</td><td>お花料</td><td>御ミサ料は使わない</td></tr>
+        <tr><td>分からない</td><td>御霊前</td><td>広く使えるが浄土真宗には不適。可能なら事前確認を</td></tr>
+      </tbody>
+    </table>
+    <p>
+      よく「迷ったら御霊前」と言われますが、<strong>浄土真宗では御霊前を使いません</strong>。
+      仏式であることまで分かっていて宗派が不明なら、
+      どの宗派でも問題にならない<strong>「御香典」</strong>を選ぶのが最も安全です。
+    </p>
+
+    <h2>差出人の書き方</h2>
+    <h3>会社として出す場合</h3>
+    <p>中央に代表者の氏名を書き、その右側に少し小さく社名を添えます。役職は氏名の上に入れます。</p>
+    <h3>部署で出し合う場合</h3>
+    <p>「〇〇部一同」とまとめます。3名程度までなら連名にでき、その場合は<strong>目上の人を右から順に</strong>書きます。人数が多いときは代表者名の左に「外一同」と添え、全員の氏名と金額を書いた紙を中袋に同封します。</p>
+    <h3>個人として出す場合</h3>
+    <p>社名は不要で、氏名のみを書きます。会社としての香典とは別に個人でも包む場合、両方に社名が入っていると二重に見えるため注意してください。</p>
+
+    <h2>家族葬・香典辞退のとき</h2>
+    <p>
+      近年は家族葬が増え、<strong>香典・供花・弔電のすべてを辞退される</strong>ケースが少なくありません。
+      辞退の意向が示されている場合に無理に渡すのは、かえって先方の負担になります
+      （香典返しの手配が発生するため）。
+    </p>
+    <p>
+      訃報を受けたら、まず<strong>香典・供花・参列の可否を確認</strong>してください。
+      辞退された場合は、後日あらためて弔意を伝える書面を送る、
+      四十九日を過ぎてから供物を送るなどの方法があります。
+    </p>
+
+    <h2>よくある質問</h2>
+    <dl class="faq">
+      <dt>取引先への香典は経費になりますか？</dt>
+      <dd>社外への慶弔費用は交際費として扱われるのが一般的です。損金算入には法人の規模に応じた上限があるため、具体的な処理は顧問税理士にご確認ください。会葬御礼などの書類は保管しておきます。</dd>
+
+      <dt>会社として出したうえで、担当者個人でも包むべきですか？</dt>
+      <dd>故人と個人的にも親しかった場合は、会社名義とは別に個人で包むことがあります。その場合、個人の香典袋に社名は書きません。判断に迷う場合は上長に確認してください。</dd>
+
+      <dt>金額の目安どおりに出せば間違いないですか？</dt>
+      <dd>目安はあくまで一般的な水準です。自社の慶弔見舞金規程、業界の慣習、地域の慣習が優先されます。特に規程がある場合は必ずそちらに従ってください。</dd>
+
+      <dt>通夜と告別式の両方に出る場合、香典は2回渡しますか？</dt>
+      <dd>香典は一度だけです。通常は通夜か告別式のどちらか、先に参列するほうで渡します。</dd>
+
+      <dt>入力した内容はどこかに送信されますか？</dt>
+      <dd>いいえ。すべてブラウザ内で処理しており、社名や氏名を含め外部に送信されることはありません。</dd>
+    </dl>
+  </article>
+
+  <footer>
+    取引先の香典 早見ツール ／ 提供：hitotsu company<br>
+    <a href="keicho-kin-kanri.html">慶弔金管理表</a> ・
+    <a href="index.html">ほかの道具を見る →</a>
+    <p style="margin-top:.6rem;font-size:.72rem">
+      本ページの内容は一般的な慣行をまとめた目安であり、税務・法務上の助言ではありません。
+      自社の慶弔見舞金規程および地域・業界の慣習を優先し、
+      経理処理は顧問税理士にご確認ください。
+    </p>
+  </footer>
+</div>
+
+<script type="application/ld+json">
+{
+  "@context":"https://schema.org",
+  "@type":"FAQPage",
+  "mainEntity":[
+    {"@type":"Question","name":"取引先の社長が亡くなった場合の香典の相場は？","acceptedAnswer":{"@type":"Answer","text":"取引先の社長・会長の場合は3万円〜10万円が一般的な目安です。主要取引先ほど高く、取引が浅い場合は1万円〜3万円程度になります。自社に慶弔見舞金規程がある場合はその金額が優先されます。"}},
+    {"@type":"Question","name":"取引先の担当者の家族が亡くなった場合はいくら包みますか？","acceptedAnswer":{"@type":"Answer","text":"担当者のご家族の場合は3千円〜1万円が目安です。部署で出し合う場合は1人あたり3千円〜5千円×人数で計算します。"}},
+    {"@type":"Question","name":"香典の表書きは宗派が分からないとき何にすればよいですか？","acceptedAnswer":{"@type":"Answer","text":"仏式であることが分かっていて宗派が不明な場合は「御香典」が最も安全です。「御霊前」は広く使えるとされますが、浄土真宗では使わないため注意が必要です。神式は「御玉串料」、キリスト教プロテスタントは「お花料」、カトリックは「御ミサ料」を用います。"}},
+    {"@type":"Question","name":"取引先への香典は経費になりますか？","acceptedAnswer":{"@type":"Answer","text":"社外への慶弔費用は交際費として扱われるのが一般的です。損金算入には法人の規模に応じた上限があるため、具体的な処理は顧問税理士にご確認ください。"}},
+    {"@type":"Question","name":"香典で避けるべき金額はありますか？","acceptedAnswer":{"@type":"Answer","text":"「4」は死、「9」は苦を連想させるため避けるのが慣例です。3千円・5千円・1万円・3万円・5万円・10万円など区切りのよい額から選びます。"}}
+  ]
+}
+</script>
+
+<script>
+(function(){
+  'use strict';
+  var $ = function(id){ return document.getElementById(id); };
+  function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  function yen(n){ return '¥' + Number(n).toLocaleString('ja-JP'); }
+
+  /* 香典で用いる区切りのよい額（4・9を含む額は除外） */
+  var STEPS = [3000, 5000, 10000, 30000, 50000, 100000];
+  function snap(v){          /* 直近の上の区切り額に丸める */
+    for (var i=0;i<STEPS.length;i++){ if (v <= STEPS[i]) return STEPS[i]; }
+    return STEPS[STEPS.length-1];
+  }
+  function snapDown(v){      /* 直近の下の区切り額に丸める */
+    for (var i=STEPS.length-1;i>=0;i--){ if (v >= STEPS[i]) return STEPS[i]; }
+    return STEPS[0];
+  }
+
+  /* 故人 × 取引の深さ → [下限, 上限] */
+  var TABLE = {
+    president:{ major:[30000,100000], normal:[30000,50000], light:[10000,30000] },
+    exec:     { major:[30000,50000],  normal:[10000,30000], light:[10000,10000] },
+    staff:    { major:[10000,30000],  normal:[10000,10000], light:[5000,10000]  },
+    family:   { major:[10000,10000],  normal:[5000,10000],  light:[3000,5000]   }
+  };
+  var WHO_LABEL = { president:'取引先の社長・会長', exec:'取引先の役員',
+                    staff:'取引先の担当者ご本人', family:'担当者のご家族' };
+  var REL_LABEL = { major:'主要取引先', normal:'通常の取引先', light:'取引が浅い' };
+
+  var OMOTE = {
+    bud:       { t:'御香典',  why:'仏式で宗派が分からない場合、「御香典」はどの宗派でも失礼になりません。「御霊前」は浄土真宗では用いないため、宗派不明のときはこちらが安全です。' },
+    jodo:      { t:'御仏前',  why:'浄土真宗では亡くなった方はすぐに仏になるとされ、「霊」の概念がありません。そのため通夜・葬儀の時点から「御仏前」を用います。' },
+    shinto:    { t:'御玉串料', why:'神式では「御玉串料」または「御神前」を用います。仏式用の蓮の花が描かれた袋は使えません。' },
+    catholic:  { t:'御ミサ料', why:'カトリックでは「御ミサ料」を用います。「お花料」も使えます。' },
+    protestant:{ t:'お花料',  why:'プロテスタントでは「お花料」を用います。「御ミサ料」はカトリックの表現のため使いません。' },
+    unknown:   { t:'御霊前',  why:'宗教が分からない場合は「御霊前」が広く使えます。ただし浄土真宗では用いないため、可能であれば先方や葬儀社に宗派を確認してください。' }
+  };
+
+  function val(name){
+    var el = document.querySelector('input[name="'+name+'"]:checked');
+    return el ? el.value : '';
+  }
+
+  function compute(){
+    var who = val('who'), rel = val('rel'), from = val('from'),
+        style = val('style'), rel2 = val('rel2');
+
+    var base = TABLE[who][rel].slice();
+    var lo = base[0], hi = base[1], calcNote = '';
+
+    /* 社葬は会社対会社の場面になるため上振れ */
+    if (style === 'corp' && who !== 'family'){
+      lo = snap(Math.round(lo * 1.5));
+      hi = snap(Math.round(hi * 1.5));
+      calcNote = '社葬のため目安を引き上げています。';
+    }
+
+    var deepOrBig = (rel === 'major' || who === 'president' || who === 'exec');
+    var per = 0, n = 0;
+
+    if (from === 'dept'){
+      n  = Math.max(2, Math.min(200, parseInt($('people').value,10) || 2));
+      lo = 3000 * n; hi = 5000 * n;
+      per = deepOrBig ? 5000 : 3000;
+      calcNote = '出し合う場合は1人あたりの額を揃えます。合計は人数の積になるため、' +
+                 '4や9を避ける慣例は1人あたりの額で考えます。';
+    } else if (from === 'personal'){
+      /* 個人名義は会社名義より控えめが基本。下の区切り額に丸める */
+      lo = Math.max(3000, snapDown(lo / 2));
+      hi = Math.max(5000, snapDown(hi / 2));
+      calcNote = '個人名義のため、会社名義より控えめな水準にしています。';
+    }
+
+    if (lo > hi){ var t = lo; lo = hi; hi = t; }
+
+    var rec = (from === 'dept') ? per * n : lo;
+
+    /* ---- 表示 ----
+       部署一同のときは「1人あたり」を主役にする。
+       合計額を大きく出すと 40,000 のような避けたい数字が見出しに来てしまうため。 */
+    if (from === 'dept'){
+      $('r-amount').textContent = '1人 ' + yen(per);
+      $('r-range').textContent  = n + '名で合計 ' + yen(rec) +
+                                  '（目安の幅：' + yen(lo) + ' 〜 ' + yen(hi) + '）';
+    } else {
+      $('r-amount').textContent = yen(rec);
+      $('r-range').textContent  = (lo === hi) ? '' : '目安の幅：' + yen(lo) + ' 〜 ' + yen(hi);
+    }
+    $('r-calc').textContent   = WHO_LABEL[who] + '／' + REL_LABEL[rel] +
+                                (calcNote ? '　' + calcNote : '');
+
+    var om = OMOTE[rel2];
+    $('r-omote').textContent     = om.t;
+    $('r-omote-why').textContent = om.why;
+
+    /* ---- 差出人表記 ---- */
+    var co    = ($('i-company').value || '（自社名）').trim();
+    var title = $('i-title').value.trim();
+    var name  = ($('i-name').value || '（氏名）').trim();
+    var dept  = ($('i-dept').value || '（部署名）').trim();
+    var text, note;
+    if (from === 'company'){
+      text = co + '\n' + (title ? title + '　' : '') + name;
+      note = '中央に氏名を大きく書き、その右上に社名を小さく添えます。役職は氏名の上に入れます。';
+    } else if (from === 'dept'){
+      text = co + '\n' + dept + '一同';
+      note = '3名程度までなら連名にでき、その場合は目上の方を右から順に書きます。人数が多いときは代表者名の左に「外一同」と添え、全員の氏名と金額を書いた紙を中袋に同封してください。';
+    } else {
+      text = name;
+      note = '個人名義では社名は書きません。会社としての香典と別に個人でも包む場合、両方に社名が入らないよう注意してください。';
+    }
+    $('r-sashidashi').textContent   = text;
+    $('r-sashidashi-note').textContent = note;
+
+    /* ---- 袋・お札 ---- */
+    var fukuroAmt = (rec >= 30000)
+      ? '金額が3万円以上のため、双銀の水引がかかった大判の袋を選びます。'
+      : '金額が1万円前後までであれば、黒白または双銀の水引の一般的な不祝儀袋で問題ありません。';
+    var fukuroRel = (rel2 === 'shinto')
+      ? '神式では蓮の花が描かれた袋は使えません。無地のものを選んでください。'
+      : (rel2 === 'catholic' || rel2 === 'protestant')
+        ? 'キリスト教では十字架や百合が描かれた袋、または無地の白封筒を用います。'
+        : '水引は結び切り（一度きりの意）を選びます。蝶結びは使いません。';
+    $('r-fukuro').innerHTML = esc(fukuroAmt) + '<span class="sub">' + esc(fukuroRel) + '</span>';
+
+    $('r-satsu').innerHTML =
+      '新札は「不幸を予期して用意していた」と受け取られるため避けます。' +
+      '<span class="sub">手元に新札しかない場合は、一度折り目をつけてから入れます。' +
+      '汚れや破れのひどい札も失礼にあたるため使いません。お札は肖像が裏・下向きになるよう入れます。</span>';
+
+    /* ---- 供花・弔電・参列 ---- */
+    var deep = (rel === 'major');
+    var big  = (who === 'president' || who === 'exec');
+
+    if (style === 'family'){
+      $('r-kyoka').innerHTML = '<strong>まず辞退の有無を確認してください。</strong><span class="sub">家族葬では供花も辞退されることが多くあります。辞退の場合は送らないのが礼儀です。</span>';
+    } else if (big || deep){
+      $('r-kyoka').innerHTML = '会社名義で供花を出すのが一般的です。<span class="sub">葬儀社に連絡し、他社と形式を揃えてもらうのが無難です。名札は正式な社名と代表者名で出します。</span>';
+    } else {
+      $('r-kyoka').innerHTML = '必須ではありません。<span class="sub">香典のみで差し支えありません。社内で前例がある場合はそちらに合わせてください。</span>';
+    }
+
+    if (style === 'family'){
+      $('r-choden').innerHTML = '辞退されていなければ送ります。<span class="sub">参列を控える場合、弔電は弔意を伝える有効な手段です。差出人は正式な社名と代表者名で。</span>';
+    } else {
+      $('r-choden').innerHTML = '参列できない場合は必ず送ります。<span class="sub">通夜の開始時刻までに斎場へ届くよう手配します。差出人は正式な社名と代表者名で出してください。</span>';
+    }
+
+    if (style === 'family'){
+      $('r-sanretsu').innerHTML = '<strong>参列は控えるのが基本です。</strong><span class="sub">案内がない限り伺いません。後日あらためて弔問の可否を確認してください。</span>';
+    } else if (style === 'corp'){
+      $('r-sanretsu').innerHTML = (deep || big)
+        ? '<strong>役員クラスの参列が望まれます。</strong><span class="sub">社葬は取引先の格が見られる場です。誰が参列するかを早めに決めてください。</span>'
+        : '部門長クラスが参列するのが一般的です。<span class="sub">受付での記帳は正式な社名で行います。</span>';
+    } else {
+      $('r-sanretsu').innerHTML = (deep || big)
+        ? '直接の担当者に加え、上長の参列が望まれます。<span class="sub">通夜・告別式のどちらかに伺えば失礼にあたりません。</span>'
+        : '直接の担当者が伺えば十分です。<span class="sub">都合がつかない場合は弔電で弔意を伝えます。</span>';
+    }
+
+    /* ---- 警告 ---- */
+    var al = [];
+    if (style === 'family'){
+      al.push('<div class="alert a-stop"><strong>先に確認してください</strong>' +
+        '家族葬では香典・供花・弔電のすべてを辞退されることがあります。辞退されている場合、お渡しするとかえって香典返しの手配というご負担をかけます。' +
+        '訃報の連絡元か葬儀社に、香典を受け取られるかどうかを必ず確認してください。</div>');
+    }
+    if (style === 'unknown'){
+      al.push('<div class="alert a-warn"><strong>葬儀の形式を確認してください</strong>' +
+        '形式によって香典の要否も参列の判断も変わります。まず「一般葬か家族葬か」「香典を受け取られるか」を確認してから動いてください。</div>');
+    }
+    if (rel2 === 'unknown'){
+      al.push('<div class="alert a-warn"><strong>宗派が分かると表書きが確定します</strong>' +
+        '「御霊前」は広く使えますが、浄土真宗では用いません。葬儀社に問い合わせれば宗派を教えてもらえることがほとんどです。</div>');
+    }
+    al.push('<div class="alert a-info"><strong>自社の慶弔見舞金規程が最優先です</strong>' +
+      '規程に金額の定めがある場合は、この目安ではなく規程の額に従ってください。担当者の判断で増減させると、次に同じ場面が来たときの基準が崩れます。</div>');
+    $('alerts').innerHTML = al.join('');
+
+    /* ---- チェックリスト ---- */
+    var ck = [];
+    ck.push('訃報の内容を確認する（通夜・告別式の日時、斎場、喪主のお名前）');
+    if (style === 'family' || style === 'unknown'){
+      ck.push('香典・供花・弔電を受け取られるかを確認する');
+    }
+    ck.push('自社の慶弔見舞金規程を確認し、金額の定めがあるか調べる');
+    ck.push('上長に金額と参列者を報告し、承認を得る');
+    ck.push('社内の他部署が同じ取引先に対応していないか確認する');
+    ck.push('香典袋を用意する（表書き：' + om.t + '／新札は避ける）');
+    if (style !== 'family'){
+      if (big || deep) ck.push('供花を葬儀社に手配する（会社名義）');
+      ck.push('参列できない場合は弔電を通夜の開始時刻までに手配する');
+    }
+    ck.push('袱紗に包んで持参し、受付では正式な社名で記帳する');
+    ck.push('会葬御礼・領収書を保管し、経理へ交際費として提出する');
+    ck.push('対応内容を慶弔記録に残す（次の担当者が同じ判断を再現できるように）');
+    $('r-checks').innerHTML = ck.map(function(c){ return '<li>' + esc(c) + '</li>'; }).join('');
+
+    $('result').style.display = 'block';
+  }
+
+  /* ---- イベント ---- */
+  document.querySelectorAll('input[type=radio]').forEach(function(el){
+    el.addEventListener('change', function(){
+      $('peopleWrap').style.display = (val('from') === 'dept') ? 'block' : 'none';
+      compute();
+    });
+  });
+  ['people','i-company','i-title','i-name','i-dept'].forEach(function(id){
+    $(id).addEventListener('input', compute);
+  });
+
+  $('btnPrint').addEventListener('click', function(){ window.print(); });
+
+  $('btnCopy').addEventListener('click', function(){
+    var t = $('r-sashidashi').textContent;
+    var done = function(){
+      $('copyMsg').textContent = 'コピーしました';
+      setTimeout(function(){ $('copyMsg').textContent = ''; }, 2200);
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(t).then(done, function(){ fallback(t, done); });
+    } else { fallback(t, done); }
+  });
+  function fallback(t, done){
+    var ta = document.createElement('textarea');
+    ta.value = t; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); done(); } catch(e){}
+    document.body.removeChild(ta);
+  }
+
+  compute();
+})();
+</script>
+</body>
+</html>
