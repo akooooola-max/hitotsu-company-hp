@@ -1,5 +1,5 @@
-// 道具箱ゲート：LINE限定13本を合言葉で保護する
-const BOX = "/apps/box-9f4a7c2e";
+// 道具箱ゲート：/apps 配下は PUBLIC 以外すべて合言葉で保護する。
+// 自動生成でツールが増えても、既定で限定扱いになる（公開したい見本は PUBLIC に追記）。
 const PUBLIC = ["/apps", "/apps/index", "/apps/kanji-25min-checklist", "/apps/prompt-builder", "/apps/survey-builder"];
 const LINE = "https://line.me/R/ti/p/@188jocyd";
 
@@ -36,7 +36,7 @@ button{padding:13px 20px;border:0;border-radius:10px;background:var(--accent);co
 </style></head><body><div class="card">
 <span class="tag">LINE 限定</span>
 <h1>AI社員がつくった道具箱</h1>
-<p>13本のツールは、公式LINEにご登録いただいた方だけにお渡ししています。<br>合言葉をお持ちの方はご入力ください。</p>
+<p>道具箱のツールは、公式LINEにご登録いただいた方だけにお渡ししています。<br>合言葉をお持ちの方はご入力ください。</p>
 <a class="btn line" href="${LINE}">公式LINEで合言葉を受け取る</a>
 <form method="post"><input name="k" placeholder="合言葉" autocomplete="off" autofocus><button>入る</button></form>
 ${wrong ? '<p class="err">合言葉がちがうようです。公式LINEでご確認ください。</p>' : ""}
@@ -57,9 +57,7 @@ export default {
     const t = await token(env.BOX_KEY);
 
     // 入場済み
-    if ((request.headers.get("Cookie") || "").includes(`box=${t}`)) {
-      return path.startsWith(BOX) ? env.ASSETS.fetch(request) : Response.redirect(url.origin + BOX + "/", 302);
-    }
+    if ((request.headers.get("Cookie") || "").includes(`box=${t}`)) return env.ASSETS.fetch(request);
 
     // 合言葉つきURL、または入力フォーム
     let given = url.searchParams.get("k");
@@ -69,7 +67,7 @@ export default {
       return new Response(null, {
         status: 302,
         headers: {
-          Location: path.startsWith(BOX) ? url.toString() : url.origin + BOX + "/",
+          Location: url.toString(),
           "Set-Cookie": `box=${t}; Path=/apps/; Max-Age=7776000; Secure; HttpOnly; SameSite=Lax`,
         },
       });
