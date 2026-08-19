@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>競合調査ブリーフ メーカー</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Sans", "Yu Gothic", sans-serif;
+    background: #f5f7fa;
+    color: #222;
+    margin: 0;
+    padding: 16px;
+    line-height: 1.6;
+  }
+  .container {
+    max-width: 780px;
+    margin: 0 auto;
+    background: #fff;
+    padding: 24px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  }
+  h1 {
+    font-size: 1.4em;
+    margin: 0 0 8px;
+    color: #1a4b8c;
+  }
+  .lead {
+    font-size: 0.95em;
+    color: #555;
+    margin-bottom: 20px;
+  }
+  label {
+    display: block;
+    font-weight: bold;
+    margin-top: 16px;
+    margin-bottom: 4px;
+    font-size: 0.95em;
+  }
+  .hint {
+    font-size: 0.82em;
+    color: #777;
+    font-weight: normal;
+    margin-left: 6px;
+  }
+  input[type="text"], textarea, select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 1em;
+    font-family: inherit;
+  }
+  textarea { min-height: 70px; resize: vertical; }
+  .row { display: flex; gap: 12px; flex-wrap: wrap; }
+  .row > div { flex: 1; min-width: 200px; }
+  .checks {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 4px;
+  }
+  .checks label {
+    font-weight: normal;
+    margin: 0;
+    background: #eef2f7;
+    padding: 6px 12px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.9em;
+  }
+  .checks input { margin-right: 5px; }
+  .btn-row {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+  }
+  button {
+    background: #1a4b8c;
+    color: #fff;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 6px;
+    font-size: 1em;
+    cursor: pointer;
+    font-weight: bold;
+  }
+  button.secondary {
+    background: #e0e6ee;
+    color: #333;
+  }
+  button:hover { opacity: 0.9; }
+  .output {
+    margin-top: 20px;
+    background: #fafbfc;
+    border: 1px solid #dde3ea;
+    border-radius: 8px;
+    padding: 16px;
+    white-space: pre-wrap;
+    font-family: "SF Mono", Consolas, monospace;
+    font-size: 0.88em;
+    display: none;
+  }
+  .output.show { display: block; }
+  .tips {
+    background: #fff8e1;
+    border-left: 4px solid #f0b400;
+    padding: 12px 14px;
+    margin-top: 24px;
+    font-size: 0.88em;
+    border-radius: 4px;
+  }
+  .tips b { color: #8a6d00; }
+  .copied {
+    color: #1a8c3f;
+    font-size: 0.85em;
+    margin-left: 10px;
+    display: none;
+  }
+  .copied.show { display: inline; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>競合調査ブリーフ メーカー</h1>
+  <p class="lead">
+    競合調査や業界リサーチをAIにお願いするための「依頼文」を作ります。<br>
+    項目を埋めて「依頼文を作成」を押すだけ。作った依頼文をAIに貼り付けて実行してもらいましょう。
+  </p>
+
+  <label>調査テーマ <span class="hint">例：国内のサブスク型英会話市場</span></label>
+  <input type="text" id="theme" placeholder="調査したい市場・分野・製品カテゴリなど">
+
+  <label>調査の目的 <span class="hint">なぜ調べるのか</span></label>
+  <select id="purpose">
+    <option value="">選んでください</option>
+    <option value="新規事業・企画立案の下調べのため">新規事業・企画立案の下調べ</option>
+    <option value="自社サービスの価格・機能改定の参考にするため">自社サービスの改定の参考</option>
+    <option value="営業提案・商談で使う情報を集めるため">営業提案・商談で使う情報収集</option>
+    <option value="社内会議に向けた業界動向の共有のため">社内会議での業界動向共有</option>
+    <option value="上司への報告資料を作るため">上司への報告資料作成</option>
+  </select>
+
+  <div class="row">
+    <div>
+      <label>比較したい会社・サービス <span class="hint">最大5つ程度</span></label>
+      <textarea id="companies" placeholder="例：A社サービス、B社サービス、C社サービス"></textarea>
+    </div>
+    <div>
+      <label>特に気になるポイント <span class="hint">自由記入</span></label>
+      <textarea id="focus" placeholder="例：初心者向けプランの有無、料金の違い、無料枠"></textarea>
+    </div>
+  </div>
+
+  <label>比較したい項目 <span class="hint">当てはまるものにチェック</span></label>
+  <div class="checks" id="items">
+    <label><input type="checkbox" value="料金プラン" checked>料金プラン</label>
+    <label><input type="checkbox" value="主な機能・特徴" checked>主な機能・特徴</label>
+    <label><input type="checkbox" value="ターゲット顧客">ターゲット顧客</label>
+    <label><input type="checkbox" value="強み・弱み" checked>強み・弱み</label>
+    <label><input type="checkbox" value="無料プラン・トライアルの有無">無料/トライアル</label>
+    <label><input type="checkbox" value="サポート体制">サポート体制</label>
+    <label><input type="checkbox" value="導入実績・利用者数">導入実績</label>
+    <label><input type="checkbox" value="口コミ・評判">口コミ・評判</label>
+  </div>
+
+  <div class="row">
+    <div>
+      <label>成果物の形式</label>
+      <select id="format">
+        <option value="比較表（Markdown形式の表）">比較表（表形式）</option>
+        <option value="文章形式のレポート">文章形式のレポート</option>
+        <option value="箇条書きの要点まとめ">箇条書き要点</option>
+        <option value="スライドに使える見出し＋要点">スライド用の見出し</option>
+      </select>
+    </div>
+    <div>
+      <label>共有相手</label>
+      <select id="audience">
+        <option value="社内のチームメンバー">社内のチームメンバー</option>
+        <option value="上司・役員">上司・役員</option>
+        <option value="クライアント">クライアント</option>
+        <option value="自分用のメモ">自分用のメモ</option>
+      </select>
+    </div>
+  </div>
+
+  <label>禁止事項・注意点 <span class="hint">任意</span></label>
+  <textarea id="notes" placeholder="例：推測ではなく出典URLを必ず示す／数値は最新のものに限る"></textarea>
+
+  <div class="btn-row">
+    <button onclick="generate()">依頼文を作成</button>
+    <button class="secondary" onclick="copyText()">コピー</button>
+    <button class="secondary" onclick="saveDraft()">下書き保存</button>
+    <button class="secondary" onclick="clearAll()">クリア</button>
+    <span class="copied" id="copied">✓ コピーしました</span>
+  </div>
+
+  <div class="output" id="output"></div>
+
+  <div class="tips">
+    <b>使い方のコツ</b><br>
+    ・作った依頼文はコピーして、お使いのAIサービスの入力欄に貼り付けてください。<br>
+    ・最初は「調査テーマ」「比較したい会社」だけでもOK。物足りなければ項目を足していきます。<br>
+    ・AIの回答は必ず一次情報（公式サイト・IR資料など）で裏取りしましょう。
+  </div>
+</div>
+
+<script>
+function generate() {
+  const theme = document.getElementById('theme').value.trim();
+  const purpose = document.getElementById('purpose').value;
+  const companies = document.getElementById('companies').value.trim();
+  const focus = document.getElementById('focus').value.trim();
+  const format = document.getElementById('format').value;
+  const audience = document.getElementById('audience').value;
+  const notes = document.getElementById('notes').value.trim();
+  const items = Array.from(document.querySelectorAll('#items input:checked')).map(i => i.value);
+
+  if (!theme) {
+    alert('調査テーマを入力してください。');
+    return;
+  }
+
+  let text = '';
+  text += `【依頼概要】\n`;
+  text += `${theme} について調査し、${audience}向けに ${format} でまとめてください。\n`;
+  if (purpose) text += `目的：${purpose}\n`;
+  text += `\n`;
+
+  if (companies) {
+    text += `【比較対象】\n${companies}\n\n`;
+  } else {
+    text += `【比較対象】\n主要なプレイヤーを3〜5社ピックアップして比較してください。\n\n`;
+  }
+
+  if (items.length > 0) {
+    text += `【比較項目】\n`;
+    items.forEach((v, i) => { text += `${i+1}. ${v}\n`; });
+    text += `\n`;
+  }
+
+  if (focus) {
+    text += `【特に知りたいこと】\n${focus}\n\n`;
+  }
+
+  text += `【アウトプット条件】\n`;
+  text += `・形式：${format}\n`;
+  text += `・情報源のURLを必ず併記してください\n`;
+  text += `・不明な項目は「不明」と明記し、憶測で埋めないでください\n`;
+  text += `・数値・料金は最新の公式情報を優先してください\n`;
+  text += `・最後に「調査結果からの示唆」を3点、簡潔にまとめてください\n`;
+  if (notes) {
+    text += `・その他の注意点：${notes}\n`;
+  }
+  text += `\n`;
+  text += `【進め方】\n`;
+  text += `1. 各社の公式サイトを確認\n`;
+  text += `2. 比較項目に沿って情報を整理\n`;
+  text += `3. 指定の形式でまとめ、出典を明記\n`;
+
+  const out = document.getElementById('output');
+  out.textContent = text;
+  out.classList.add('show');
+  saveDraft(true);
+}
+
+function copyText() {
+  const out = document.getElementById('output');
+  if (!out.classList.contains('show') || !out.textContent) {
+    alert('先に「依頼文を作成」を押してください。');
+    return;
+  }
+  const ta = document.createElement('textarea');
+  ta.value = out.textContent;
+  document.body.appendChild(ta);
+  ta.select();
+  try { document.execCommand('copy'); } catch(e) {}
+  document.body.removeChild(ta);
+  const c = document.getElementById('copied');
+  c.classList.add('show');
+  setTimeout(() => c.classList.remove('show'), 2000);
+}
+
+function saveDraft(silent) {
+  const data = {
+    theme: document.getElementById('theme').value,
+    purpose: document.getElementById('purpose').value,
+    companies: document.getElementById('companies').value,
+    focus: document.getElementById('focus').value,
+    format: document.getElementById('format').value,
+    audience: document.getElementById('audience').value,
+    notes: document.getElementById('notes').value,
+    items: Array.from(document.querySelectorAll('#items input')).map(i => ({v: i.value, c: i.checked}))
+  };
+  localStorage.setItem('brief_draft', JSON.stringify(data));
+  if (!silent) alert('下書きを保存しました。');
+}
+
+function loadDraft() {
+  const raw = localStorage.getItem('brief_draft');
+  if (!raw) return;
+  try {
+    const d = JSON.parse(raw);
+    document.getElementById('theme').value = d.theme || '';
+    document.getElementById('purpose').value = d.purpose || '';
+    document.getElementById('companies').value = d.companies || '';
+    document.getElementById('focus').value = d.focus || '';
+    document.getElementById('format').value = d.format || document.getElementById('format').value;
+    document.getElementById('audience').value = d.audience || document.getElementById('audience').value;
+    document.getElementById('notes').value = d.notes || '';
+    if (d.items) {
+      document.querySelectorAll('#items input').forEach(inp => {
+        const m = d.items.find(x => x.v === inp.value);
+        if (m) inp.checked = m.c;
+      });
+    }
+  } catch(e) {}
+}
+
+function clearAll() {
+  if (!confirm('入力内容をすべて消去します。よろしいですか？')) return;
+  document.getElementById('theme').value = '';
+  document.getElementById('purpose').value = '';
+  document.getElementById('companies').value = '';
+  document.getElementById('focus').value = '';
+  document.getElementById('notes').value = '';
+  document.getElementById('output').classList.remove('show');
+  document.getElementById('output').textContent = '';
+  localStorage.removeItem('brief_draft');
+}
+
+loadDraft();
+</script>
+<!-- hitotsu-cta -->
+<div style="max-width:720px;margin:40px auto 0;padding:24px 20px;border-radius:14px;
+  background:#14141a;color:#c9c9d1;
+  font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic',sans-serif;
+  font-size:14px;line-height:1.9;">
+  <p style="margin:0 0 12px;color:#f0b429;font-weight:bold;font-size:13px;letter-spacing:.08em;">
+    ⚙ この道具のつくられ方
+  </p>
+  <p style="margin:0 0 14px;">
+    昨日の夜、AI社員が勝手に作りました。<br>
+    人間がキーボードを触った時間は、<strong style="color:#fff;">0分</strong>です。
+  </p>
+  <p style="margin:0 0 18px;">
+    「うちの仕事でもこれ、動かせないかな」と思った方へ。<br>
+    受け取り方は3つあります。
+  </p>
+  <p style="margin:0 0 12px;">
+    <a href="https://line.me/R/ti/p/@188jocyd" style="display:inline-block;background:#06c755;color:#fff;
+      text-decoration:none;padding:14px 22px;border-radius:10px;font-weight:bold;">
+      ① 無料でもらう ─ LINEで「AI社員」と送る →
+    </a>
+  </p>
+  <p style="margin:0 0 12px;">
+    <a href="https://akooooola-max.github.io/hitotsu-company-hp/books.html" style="display:inline-block;background:transparent;color:#f0b429;
+      border:1px solid #f0b429;text-decoration:none;padding:13px 22px;border-radius:10px;font-weight:bold;">
+      ② じっくり読む ─ Kindleの本（500円〜）→
+    </a>
+  </p>
+  <p style="margin:0 0 8px;">
+    <a href="https://coconala.com/services/4325740" style="display:inline-block;background:#f0b429;color:#0d0d0f;
+      text-decoration:none;padding:14px 22px;border-radius:10px;font-weight:bold;">
+      ③ つくってもらう ─ ココナラで相談する →
+    </a><br>
+    <span style="font-size:12.5px;color:#8b8b95;">
+      現場のやり方をうかがってから、あなた専用の1本を作ります（10,000円・お届けまで3日）
+    </span>
+  </p>
+  <p style="margin:14px 0 0;font-size:12.5px;color:#71717a;">
+    ほかの道具は<a href="./" style="color:#f0b429;">道具箱</a>に／
+    仕組みの全体像は<a href="https://note.com/hitotsu_ai/n/n493aa3b424cd" style="color:#f0b429;">こちらのnote</a>で公開中<br>
+    hitotsu company
+  </p>
+</div>
+</body>
+</html>

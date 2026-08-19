@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+<title>AIツール診断 | ChatGPT vs Claude Code</title>
+<style>
+  :root{
+    --bg1:#f6f3ee;
+    --bg2:#efe9df;
+    --card:#ffffff;
+    --text:#2b2620;
+    --sub:#6f665a;
+    --border:#e8e1d5;
+    --gpt:#10a37f;
+    --gpt-soft:#e6f6f1;
+    --claude:#d97757;
+    --claude-soft:#fbeee7;
+    --shadow: 0 10px 30px -12px rgba(43,38,32,0.18);
+    --radius:20px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    min-height:100dvh;
+    font-family:"Hiragino Kaku Gothic ProN","Hiragino Sans",-apple-system,BlinkMacSystemFont,"Yu Gothic",sans-serif;
+    background:
+      radial-gradient(1200px 600px at 15% -10%, #fdf1e7 0%, transparent 60%),
+      radial-gradient(1000px 500px at 100% 0%, #e7f5f0 0%, transparent 55%),
+      linear-gradient(180deg,var(--bg1),var(--bg2));
+    color:var(--text);
+    display:flex;
+    align-items:flex-start;
+    justify-content:center;
+    padding:32px 16px 60px;
+  }
+  .app{
+    width:100%;
+    max-width:480px;
+  }
+  header.top{
+    text-align:center;
+    margin-bottom:22px;
+  }
+  header.top .badge{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    font-size:12px;
+    color:var(--sub);
+    background:var(--card);
+    border:1px solid var(--border);
+    padding:6px 14px;
+    border-radius:999px;
+    box-shadow:var(--shadow);
+    margin-bottom:14px;
+  }
+  header.top h1{
+    font-size:clamp(20px,5.5vw,26px);
+    line-height:1.4;
+    margin:0 0 6px;
+    letter-spacing:0.01em;
+  }
+  header.top p{
+    margin:0;
+    color:var(--sub);
+    font-size:13.5px;
+  }
+
+  .card{
+    background:var(--card);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    border:1px solid var(--border);
+    padding:26px 22px 24px;
+    position:relative;
+    overflow:hidden;
+  }
+
+  /* progress */
+  .progress-wrap{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin-bottom:22px;
+  }
+  .progress-track{
+    flex:1;
+    height:6px;
+    background:#eee7da;
+    border-radius:999px;
+    overflow:hidden;
+  }
+  .progress-fill{
+    height:100%;
+    width:33.3%;
+    border-radius:999px;
+    background:linear-gradient(90deg,var(--gpt),var(--claude));
+    transition:width .45s cubic-bezier(.4,0,.2,1);
+  }
+  .progress-label{
+    font-size:12px;
+    color:var(--sub);
+    font-variant-numeric:tabular-nums;
+    white-space:nowrap;
+  }
+
+  .q-tag{
+    font-size:11.5px;
+    font-weight:700;
+    letter-spacing:.06em;
+    color:var(--claude);
+    text-transform:uppercase;
+    margin-bottom:8px;
+  }
+  .q-text{
+    font-size:clamp(17px,4.6vw,20px);
+    font-weight:700;
+    line-height:1.55;
+    margin:0 0 20px;
+  }
+
+  .options{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+  }
+  .option{
+    display:flex;
+    align-items:flex-start;
+    gap:12px;
+    text-align:left;
+    width:100%;
+    border:1.5px solid var(--border);
+    background:#fdfcfa;
+    border-radius:14px;
+    padding:16px 16px;
+    font-size:14.5px;
+    line-height:1.55;
+    color:var(--text);
+    cursor:pointer;
+    transition:border-color .18s ease, background .18s ease, transform .12s ease;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .option:active{transform:scale(0.985);}
+  .option:hover{border-color:#d8cdb8; background:#fffaf1;}
+  .option .icon{
+    flex:none;
+    width:34px;
+    height:34px;
+    border-radius:10px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:16px;
+    background:#f1ece2;
+    color:var(--sub);
+  }
+  .option .opt-text b{
+    display:block;
+    font-weight:700;
+    margin-bottom:2px;
+  }
+  .option .opt-text span{
+    color:var(--sub);
+    font-size:13px;
+  }
+
+  .nav-row{
+    display:flex;
+    justify-content:flex-start;
+    margin-top:18px;
+  }
+  .back-btn{
+    border:none;
+    background:none;
+    color:var(--sub);
+    font-size:13px;
+    cursor:pointer;
+    padding:6px 4px;
+    display:flex;
+    align-items:center;
+    gap:4px;
+  }
+  .back-btn:hover{color:var(--text);}
+
+  /* result */
+  .result-head{
+    text-align:center;
+    margin-bottom:18px;
+  }
+  .result-eyebrow{
+    font-size:12px;
+    color:var(--sub);
+    margin-bottom:6px;
+  }
+  .result-name{
+    font-size:clamp(24px,7vw,30px);
+    font-weight:800;
+    margin:0 0 8px;
+  }
+  .result-name.gpt{color:var(--gpt);}
+  .result-name.claude{color:var(--claude);}
+  .result-desc{
+    font-size:14px;
+    color:var(--sub);
+    line-height:1.7;
+    max-width:380px;
+    margin:0 auto;
+  }
+
+  .score-bar{
+    display:flex;
+    height:12px;
+    border-radius:999px;
+    overflow:hidden;
+    margin:22px 0 8px;
+    background:#eee7da;
+  }
+  .score-bar .seg-gpt{background:var(--gpt);}
+  .score-bar .seg-claude{background:var(--claude);}
+  .score-legend{
+    display:flex;
+    justify-content:space-between;
+    font-size:12px;
+    color:var(--sub);
+    margin-bottom:20px;
+  }
+  .score-legend b{color:var(--text);}
+
+  .reason-box{
+    background:#faf7f1;
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:16px 16px 14px;
+    margin-bottom:14px;
+  }
+  .reason-box h3{
+    font-size:13px;
+    margin:0 0 10px;
+    display:flex;
+    align-items:center;
+    gap:6px;
+  }
+  .reason-box ul{
+    margin:0;
+    padding-left:18px;
+    font-size:13.5px;
+    line-height:1.85;
+    color:var(--text);
+  }
+
+  .alt-box{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    background:var(--card);
+    border:1px dashed var(--border);
+    border-radius:14px;
+    padding:12px 14px;
+    font-size:12.5px;
+    color:var(--sub);
+    margin-bottom:22px;
+  }
+
+  .restart-btn{
+    width:100%;
+    border:none;
+    padding:15px;
+    border-radius:14px;
+    font-size:15px;
+    font-weight:700;
+    color:#fff;
+    background:linear-gradient(90deg,var(--gpt),var(--claude));
+    cursor:pointer;
+    box-shadow:0 8px 20px -8px rgba(217,119,87,0.55);
+    transition:transform .12s ease, opacity .15s ease;
+  }
+  .restart-btn:active{transform:scale(0.98);}
+
+  .screen{display:none;}
+  .screen.active{display:block; animation:fadeIn .35s ease;}
+  @keyframes fadeIn{
+    from{opacity:0; transform:translateY(8px);}
+    to{opacity:1; transform:translateY(0);}
+  }
+
+  footer{
+    text-align:center;
+    margin-top:22px;
+    font-size:11.5px;
+    color:#a89e8d;
+  }
+
+  @media (max-width:360px){
+    .card{padding:20px 16px;}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <span class="badge">🧭 AI相棒診断</span>
+    <h1>ChatGPT と Claude Code、<br>どっちを使うべき？</h1>
+    <p>3つの質問に答えるだけ。今の悩みに合うAIツールを診断します。</p>
+  </header>
+
+  <div class="card">
+
+    <!-- Question screens -->
+    <div id="screen-q" class="screen active">
+      <div class="progress-wrap">
+        <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+        <div class="progress-label" id="progressLabel">1 / 3</div>
+      </div>
+
+      <div id="questionArea"></div>
+
+      <div class="nav-row" id="navRow" style="display:none;">
+        <button class="back-btn" id="backBtn">← ひとつ前の質問に戻る</button>
+      </div>
+    </div>
+
+    <!-- Result screen -->
+    <div id="screen-result" class="screen">
+      <div class="result-head">
+        <div class="result-eyebrow">診断結果</div>
+        <h2 class="result-name" id="resultName">-</h2>
+        <p class="result-desc" id="resultDesc">-</p>
+      </div>
+
+      <div class="score-bar">
+        <div class="seg-gpt" id="segGpt" style="width:50%;"></div>
+        <div class="seg-claude" id="segClaude" style="width:50%;"></div>
+      </div>
+      <div class="score-legend">
+        <span>💬 ChatGPT <b id="scoreGptLabel">0%</b></span>
+        <span><b id="scoreClaudeLabel">0%</b> Claude Code ⌨️</span>
+      </div>
+
+      <div class="reason-box">
+        <h3>🔍 この結果になった理由</h3>
+        <ul id="reasonList"></ul>
+      </div>
+
+      <div class="alt-box" id="altBox"></div>
+
+      <button class="restart-btn" id="restartBtn">もう一度診断する</button>
+    </div>
+
+  </div>
+
+  <footer>ai-navi · あなたの作業スタイルに合うAIを見つけよう</footer>
+</div>
+
+<script>
+(function(){
+  const questions = [
+    {
+      tag: "Question 1",
+      text: "今いちばんやりたいことは？",
+      options: [
+        {
+          icon: "✍️",
+          title: "文章・アイデア出し・相談",
+          sub: "ブログ、企画、要約、雑談的に壁打ちしたい",
+          score: { gpt: 2, claude: 0 }
+        },
+        {
+          icon: "💻",
+          title: "コードを書く・直す・動かす",
+          sub: "アプリ開発、バグ修正、ファイル編集をしたい",
+          score: { gpt: 0, claude: 2 }
+        }
+      ]
+    },
+    {
+      tag: "Question 2",
+      text: "作業したい場所のイメージは？",
+      options: [
+        {
+          icon: "🌐",
+          title: "ブラウザでチャットしながら",
+          sub: "質問して、返ってきた答えをコピペして使いたい",
+          score: { gpt: 2, claude: 0 }
+        },
+        {
+          icon: "🖥️",
+          title: "ターミナルやエディタから直接",
+          sub: "実際のプロジェクトのファイルを触ってほしい",
+          score: { gpt: 0, claude: 2 }
+        }
+      ]
+    },
+    {
+      tag: "Question 3",
+      text: "どのくらい“自動でやってほしい”？",
+      options: [
+        {
+          icon: "🗣️",
+          title: "会話しながら自分でハンドルしたい",
+          sub: "一問一答でやり取りしながら進めたい",
+          score: { gpt: 2, claude: 0 }
+        },
+        {
+          icon: "🤖",
+          title: "タスクを丸ごと任せたい",
+          sub: "複数ファイルにまたがる作業も自動で進めてほしい",
+          score: { gpt: 0, claude: 2 }
+        }
+      ]
+    }
+  ];
+
+  const results = {
+    gpt: {
+      name: "ChatGPT",
+      className: "gpt",
+      desc: "文章作成やアイデア出し、日常的な相談まで、会話しながら幅広くこなすのが得意。ブラウザですぐ使える気軽さが魅力です。",
+      reasons: [
+        "文章・企画・要約など「言葉を扱う」作業が中心",
+        "コピペでサッと使いたい、環境構築が不要",
+        "自分でペースを握りながら会話的に進めたい"
+      ],
+      alt: "🔧 コードを書いたり、プロジェクトのファイルを直接編集したくなったら Claude Code もチェックしてみて。"
+    },
+    claude: {
+      name: "Claude Code",
+      className: "claude",
+      desc: "実際の開発環境で、ファイルの編集・実行・修正までまとめて任せられるのが強み。コーディング作業をぐっと加速させます。",
+      reasons: [
+        "コードを書く・直す・動かす作業が中心",
+        "ターミナルやエディタから直接プロジェクトに触れたい",
+        "複数ファイルにまたがる作業を自動でやってほしい"
+      ],
+      alt: "💬 文章作成やアイデア出し中心なら ChatGPT のほうが気軽に使えるかも。"
+    }
+  };
+
+  let current = 0;
+  const answers = new Array(questions.length).fill(null);
+
+  const questionArea = document.getElementById('questionArea');
+  const progressFill = document.getElementById('progressFill');
+  const progressLabel = document.getElementById('progressLabel');
+  const navRow = document.getElementById('navRow');
+  const backBtn = document.getElementById('backBtn');
+  const screenQ = document.getElementById('screen-q');
+  const screenResult = document.getElementById('screen-result');
+
+  function renderQuestion(){
+    const q = questions[current];
+    progressFill.style.width = ((current) / questions.length * 100 + (100/questions.length)) + '%';
+    progressLabel.textContent = (current+1) + ' / ' + questions.length;
+    navRow.style.display = current > 0 ? 'flex' : 'none';
+
+    questionArea.innerHTML = '';
+
+    const tagEl = document.createElement('div');
+    tagEl.className = 'q-tag';
+    tagEl.textContent = q.tag;
+
+    const textEl = document.createElement('p');
+    textEl.className = 'q-text';
+    textEl.textContent = q.text;
+
+    const optsWrap = document.createElement('div');
+    optsWrap.className = 'options';
+
+    q.options.forEach((opt, idx) => {
+      const btn = document.createElement('button');
+      btn.className = 'option';
+      btn.type = 'button';
+      if (answers[current] === idx) btn.style.borderColor = '#d97757';
+      btn.innerHTML =
+        '<span class="icon">' + opt.icon + '</span>' +
+        '<span class="opt-text"><b>' + opt.title + '</b><span>' + opt.sub + '</span></span>';
+      btn.addEventListener('click', () => selectOption(idx));
+      optsWrap.appendChild(btn);
+    });
+
+    questionArea.appendChild(tagEl);
+    questionArea.appendChild(textEl);
+    questionArea.appendChild(optsWrap);
+  }
+
+  function selectOption(idx){
+    answers[current] = idx;
+    if (current < questions.length - 1) {
+      current++;
+      renderQuestion();
+    } else {
+      showResult();
+    }
+  }
+
+  backBtn.addEventListener('click', () => {
+    if (current > 0) {
+      current--;
+      renderQuestion();
+    }
+  });
+
+  function showResult(){
+    let gpt = 0, claude = 0;
+    answers.forEach((ansIdx, qIdx) => {
+      const opt = questions[qIdx].options[ansIdx];
+      gpt += opt.score.gpt;
+      claude += opt.score.claude;
+    });
+    const total = gpt + claude || 1;
+    const gptPct = Math.round(gpt/total*100);
+    const claudePct = 100 - gptPct;
+
+    const winnerKey = claude >= gpt ? 'claude' : 'gpt';
+    const winner = results[winnerKey];
+
+    document.getElementById('resultName').textContent =
+      (winnerKey === 'gpt' ? '💬 ' : '⌨️ ') + winner.name + ' がおすすめ';
+    document.getElementById('resultName').className = 'result-name ' + winner.className;
+    document.getElementById('resultDesc').textContent = winner.desc;
+
+    document.getElementById('segGpt').style.width = gptPct + '%';
+    document.getElementById('segClaude').style.width = claudePct + '%';
+    document.getElementById('scoreGptLabel').textContent = gptPct + '%';
+    document.getElementById('scoreClaudeLabel').textContent = claudePct + '%';
+
+    const reasonList = document.getElementById('reasonList');
+    reasonList.innerHTML = '';
+    winner.reasons.forEach(r => {
+      const li = document.createElement('li');
+      li.textContent = r;
+      reasonList.appendChild(li);
+    });
+
+    document.getElementById('altBox').textContent = winner.alt;
+
+    screenQ.classList.remove('active');
+    screenResult.classList.add('active');
+  }
+
+  document.getElementById('restartBtn').addEventListener('click', () => {
+    current = 0;
+    answers.fill(null);
+    screenResult.classList.remove('active');
+    screenQ.classList.add('active');
+    renderQuestion();
+  });
+
+  renderQuestion();
+})();
+</script>
+<!-- hitotsu-cta -->
+<div style="max-width:720px;margin:40px auto 0;padding:24px 20px;border-radius:14px;
+  background:#14141a;color:#c9c9d1;
+  font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic',sans-serif;
+  font-size:14px;line-height:1.9;">
+  <p style="margin:0 0 12px;color:#f0b429;font-weight:bold;font-size:13px;letter-spacing:.08em;">
+    ⚙ この道具のつくられ方
+  </p>
+  <p style="margin:0 0 14px;">
+    昨日の夜、AI社員が勝手に作りました。<br>
+    人間がキーボードを触った時間は、<strong style="color:#fff;">0分</strong>です。
+  </p>
+  <p style="margin:0 0 18px;">
+    「うちの仕事でもこれ、動かせないかな」と思った方へ。<br>
+    受け取り方は3つあります。
+  </p>
+  <p style="margin:0 0 12px;">
+    <a href="https://line.me/R/ti/p/@188jocyd" style="display:inline-block;background:#06c755;color:#fff;
+      text-decoration:none;padding:14px 22px;border-radius:10px;font-weight:bold;">
+      ① 無料でもらう ─ LINEで「AI社員」と送る →
+    </a>
+  </p>
+  <p style="margin:0 0 12px;">
+    <a href="https://akooooola-max.github.io/hitotsu-company-hp/books.html" style="display:inline-block;background:transparent;color:#f0b429;
+      border:1px solid #f0b429;text-decoration:none;padding:13px 22px;border-radius:10px;font-weight:bold;">
+      ② じっくり読む ─ Kindleの本（500円〜）→
+    </a>
+  </p>
+  <p style="margin:0 0 8px;">
+    <a href="https://coconala.com/services/4325740" style="display:inline-block;background:#f0b429;color:#0d0d0f;
+      text-decoration:none;padding:14px 22px;border-radius:10px;font-weight:bold;">
+      ③ つくってもらう ─ ココナラで相談する →
+    </a><br>
+    <span style="font-size:12.5px;color:#8b8b95;">
+      現場のやり方をうかがってから、あなた専用の1本を作ります（10,000円・お届けまで3日）
+    </span>
+  </p>
+  <p style="margin:14px 0 0;font-size:12.5px;color:#71717a;">
+    ほかの道具は<a href="./" style="color:#f0b429;">道具箱</a>に／
+    仕組みの全体像は<a href="https://note.com/hitotsu_ai/n/n493aa3b424cd" style="color:#f0b429;">こちらのnote</a>で公開中<br>
+    hitotsu company
+  </p>
+</div>
+</body>
+</html>

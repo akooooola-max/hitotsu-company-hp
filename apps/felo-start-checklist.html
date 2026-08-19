@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="AI検索を初めて使う人。登録から最初の質問まで迷わず完走">
+<title>AI検索スタートガイド</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, "Hiragino Sans", "Yu Gothic", sans-serif;
+  background: #f5f7fa;
+  color: #2c3e50;
+  line-height: 1.7;
+  padding: 16px;
+}
+.container { max-width: 720px; margin: 0 auto; }
+header {
+  background: linear-gradient(135deg, #4a90e2, #5ba8f5);
+  color: white;
+  padding: 24px 20px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+}
+header h1 { font-size: 1.4rem; margin-bottom: 6px; }
+header p { font-size: 0.9rem; opacity: 0.95; }
+.card {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+.card h2 {
+  font-size: 1.1rem;
+  color: #4a90e2;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #e8f0fa;
+}
+.step {
+  display: flex;
+  align-items: flex-start;
+  padding: 12px;
+  margin-bottom: 8px;
+  background: #f9fbfd;
+  border-radius: 8px;
+  border-left: 4px solid #d0dae5;
+  transition: all 0.2s;
+}
+.step.done {
+  background: #e8f5e9;
+  border-left-color: #4caf50;
+}
+.step.done .step-text { text-decoration: line-through; color: #888; }
+.step input[type="checkbox"] {
+  width: 22px; height: 22px;
+  margin-right: 12px;
+  margin-top: 2px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.step-content { flex: 1; }
+.step-title { font-weight: bold; margin-bottom: 4px; }
+.step-text { font-size: 0.9rem; color: #555; }
+.progress-bar {
+  background: #e0e6ed;
+  border-radius: 20px;
+  height: 12px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+.progress-fill {
+  background: linear-gradient(90deg, #4caf50, #66bb6a);
+  height: 100%;
+  transition: width 0.4s;
+  width: 0%;
+}
+.progress-text {
+  text-align: center;
+  font-size: 0.9rem;
+  color: #666;
+}
+.tab-buttons {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+.tab-btn {
+  flex: 1;
+  min-width: 100px;
+  padding: 10px;
+  background: #e8f0fa;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  color: #4a90e2;
+  font-weight: bold;
+}
+.tab-btn.active {
+  background: #4a90e2;
+  color: white;
+}
+.template {
+  background: #fafbfc;
+  border: 1px solid #e0e6ed;
+  border-radius: 8px;
+  padding: 14px;
+  margin-bottom: 10px;
+}
+.template-title {
+  font-weight: bold;
+  color: #4a90e2;
+  margin-bottom: 6px;
+  font-size: 0.95rem;
+}
+.template-text {
+  background: white;
+  padding: 10px;
+  border-radius: 6px;
+  font-size: 0.88rem;
+  color: #333;
+  white-space: pre-wrap;
+  border: 1px dashed #d0dae5;
+  margin-bottom: 8px;
+  font-family: "Consolas", monospace;
+}
+.copy-btn {
+  background: #4a90e2;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  width: 100%;
+}
+.copy-btn:hover { background: #3a7bc8; }
+.copy-btn.copied { background: #4caf50; }
+.custom-area {
+  background: #fff8e1;
+  padding: 14px;
+  border-radius: 8px;
+  margin-top: 10px;
+}
+.custom-area label {
+  display: block;
+  font-size: 0.85rem;
+  margin-bottom: 4px;
+  color: #666;
+}
+.custom-area input {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #d0dae5;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  margin-bottom: 8px;
+}
+.tip {
+  background: #fff9e6;
+  border-left: 4px solid #ffc107;
+  padding: 12px;
+  border-radius: 6px;
+  font-size: 0.88rem;
+  margin-top: 10px;
+}
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+.reset-btn {
+  background: transparent;
+  border: 1px solid #ccc;
+  color: #888;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  margin-top: 8px;
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+<header>
+  <h1>🚀 AI検索スタートガイド</h1>
+  <p>登録から最初の検索まで、迷わずゴールまで進めます</p>
+</header>
+
+<div class="card">
+  <h2>📋 進捗チェック</h2>
+  <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+  <div class="progress-text" id="progressText">0 / 5 完了</div>
+  <div id="stepsContainer"></div>
+  <button class="reset-btn" onclick="resetSteps()">チェックをリセット</button>
+</div>
+
+<div class="card">
+  <h2>💬 最初の質問文テンプレ</h2>
+  <p style="font-size:0.88rem;color:#666;margin-bottom:12px;">用途を選んで、そのままコピーしてAI検索に貼り付けるだけでOKです。</p>
+
+  <div class="tab-buttons">
+    <button class="tab-btn active" onclick="switchTab('biz')">仕事調査</button>
+    <button class="tab-btn" onclick="switchTab('side')">副業リサーチ</button>
+    <button class="tab-btn" onclick="switchTab('life')">日常の疑問</button>
+  </div>
+
+  <div id="tab-biz" class="tab-content active">
+    <div class="template">
+      <div class="template-title">▶ 業界動向を10分で把握</div>
+      <div class="template-text" id="t1">[業界名]の2024年〜2025年の最新動向を、営業担当者向けに以下の観点でまとめてください。
+・市場規模と成長率
+・主要プレイヤー3社
+・注目のトレンド3つ
+・営業トーク時に使える最新ニュース
+参照元URLも明記してください。</div>
+      <button class="copy-btn" onclick="copyText('t1', this)">📋 コピーする</button>
+    </div>
+    <div class="template">
+      <div class="template-title">▶ 会議資料の下調べ</div>
+      <div class="template-text" id="t2">[テーマ]について、社内会議で説明できるレベルに整理してください。
+・背景（なぜ今この話題か）
+・現状の課題
+・想定される解決策
+・参考にすべき企業事例
+初心者にもわかる言葉でお願いします。</div>
+      <button class="copy-btn" onclick="copyText('t2', this)">📋 コピーする</button>
+    </div>
+  </div>
+
+  <div id="tab-side" class="tab-content">
+    <div class="template">
+      <div class="template-title">▶ 副業ジャンル比較</div>
+      <div class="template-text" id="t3">2025年に会社員が始めやすい副業を、以下の観点で5つ比較してください。
+・初期費用の目安
+・月に稼げる金額の相場
+・必要なスキル
+・始めるまでの期間
+・向いている人の特徴
+最新の情報と参照元URLをお願いします。</div>
+      <button class="copy-btn" onclick="copyText('t3', this)">📋 コピーする</button>
+    </div>
+    <div class="template">
+      <div class="template-title">▶ 競合サービスの調査</div>
+      <div class="template-text" id="t4">[サービス名やジャンル]の競合を5つピックアップし、以下の観点で比較表を作ってください。
+・料金プラン
+・主な機能
+・ターゲット層
+・強みと弱み
+・ユーザーの評判
+参照元URLも忘れずに。</div>
+      <button class="copy-btn" onclick="copyText('t4', this)">📋 コピーする</button>
+    </div>
+  </div>
+
+  <div id="tab-life" class="tab-content">
+    <div class="template">
+      <div class="template-title">▶ 買い物の比較検討</div>
+      <div class="template-text" id="t5">[商品カテゴリ]を初めて買う人向けに、選び方のポイントとおすすめ製品3つを教えてください。
+・選ぶときに見るべきポイント
+・予算別（安い/中間/高い）のおすすめ
+・買う前に注意すべきこと
+・実際のユーザーの口コミ傾向</div>
+      <button class="copy-btn" onclick="copyText('t5', this)">📋 コピーする</button>
+    </div>
+  </div>
+
+  <div class="custom-area">
+    <label>🖊 自分の言葉で質問を組み立てる（[ ]を埋めるだけ）</label>
+    <input type="text" id="topicInput" placeholder="調べたいテーマ（例：ChatGPT活用法）">
+    <input type="text" id="targetInput" placeholder="誰向け？（例：新入社員）">
+    <div class="template-text" id="customTemplate">テーマを入力すると自動で文章が生成されます</div>
+    <button class="copy-btn" onclick="copyText('customTemplate', this)">📋 コピーする</button>
+  </div>
+</div>
+
+<div class="card">
+  <h2>💡 うまく検索するコツ</h2>
+  <div class="tip">
+    <strong>① 具体的に聞く</strong><br>
+    「副業について」ではなく「30代会社員が月3万稼ぐ副業を5つ」のように、対象・目標・数を入れると精度が上がります。
+  </div>
+  <div class="tip" style="margin-top:8px;">
+    <strong>② 出力形式を指定する</strong><br>
+    「比較表で」「箇条書きで」「初心者向けに」など、欲しい形を先に伝えると期待通りの答えになります。
+  </div>
+  <div class="tip" style="margin-top:8px;">
+    <strong>③ 参照元URLを必ず要求</strong><br>
+    「参照元URLも明記してください」と付け加えると、後から元記事で裏取りできます。
+  </div>
+</div>
+
+</div>
+
+<script>
+const steps = [
+  { title: "1. 公式サイトにアクセス", text: "ブラウザで対象のAI検索サービスの公式サイトを開きます。URLは検索エンジンで正式名称を確認しましょう。" },
+  { title: "2. アカウント登録", text: "「Sign up」または「登録」ボタンをクリック。メールアドレスまたはGoogleアカウントでの登録が一般的です。無料プランで十分です。" },
+  { title: "3. メール認証を完了", text: "登録メールに認証リンクが届くのでクリック。届かない場合は迷惑メールフォルダを確認してください。" },
+  { title: "4. 検索画面を開く", text: "ログイン後、中央の検索ボックスが「質問を入力する場所」です。ここに知りたいことを日本語でそのまま打ちます。" },
+  { title: "5. 最初の質問を投げる", text: "下のテンプレをコピー＆ペーストしてEnter。数十秒待つと参照元URL付きの答えが返ってきます。" }
+];
+
+const STORAGE_KEY = "ai_search_start_steps";
+
+function loadState() {
+  try {
+    return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+  } catch { return {}; }
+}
+function saveState(state) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
+function renderSteps() {
+  const state = loadState();
+  const container = document.getElementById("stepsContainer");
+  container.innerHTML = "";
+  let doneCount = 0;
+  steps.forEach((s, i) => {
+    const checked = !!state[i];
+    if (checked) doneCount++;
+    const div = document.createElement("div");
+    div.className = "step" + (checked ? " done" : "");
+    div.innerHTML = `
+      <input type="checkbox" ${checked ? "checked" : ""} data-idx="${i}">
+      <div class="step-content">
+        <div class="step-title">${s.title}</div>
+        <div class="step-text">${s.text}</div>
+      </div>`;
+    container.appendChild(div);
+  });
+  container.querySelectorAll("input[type=checkbox]").forEach(cb => {
+    cb.addEventListener("change", e => {
+      const idx = e.target.dataset.idx;
+      const st = loadState();
+      st[idx] = e.target.checked;
+      saveState(st);
+      renderSteps();
+    });
+  });
+  const pct = (doneCount / steps.length) * 100;
+  document.getElementById("progressFill").style.width = pct + "%";
+  document.getElementById("progressText").textContent = `${doneCount} / ${steps.length} 完了`;
+}
+
+function resetSteps() {
+  if (confirm("チェックをすべてリセットしますか？")) {
+    localStorage.removeItem(STORAGE_KEY);
+    renderSteps();
+  }
+}
+
+function switchTab(name) {
+  document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+  document.querySelectorAll(".tab-content").forEach(c => c.classList.remove("active"));
+  event.target.classList.add("active");
+  document.getElementById("tab-" + name).classList.add("active");
+}
+
+function copyText(id, btn) {
+  const text = document.getElementById(id).textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    const orig = btn.textContent;
+    btn.textContent = "✅ コピーしました！";
+    btn.classList.add("copied");
+    setTimeout(() => {
+      btn.textContent = orig;
+      btn.classList.remove("copied");
+    }, 1800);
+  }).catch(() => {
+    const ta = document.createElement("textarea");
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand("copy");
+    document.body.removeChild(ta);
+    btn.textContent = "✅ コピーしました！";
+  });
+}
+
+function updateCustom() {
+  const topic = document.getElementById("topicInput").value.trim() || "[テーマ]";
+  const target = document.getElementById("targetInput").value.trim() || "[誰向けか]";
+  const tpl = `${topic}について、${target}にわかりやすくまとめてください。
+・基本的な内容
+・押さえるべきポイント3つ
+・注意点
+・参考になる事例
+初心者でもわかる言葉で、参照元URLも明記してください。`;
+  document.getElementById("customTemplate").textContent = tpl;
+}
+
+document.getElementById("topicInput").addEventListener("input", updateCustom);
+document.getElementById("targetInput").addEventListener("input", updateCustom);
+
+renderSteps();
+updateCustom();
+</script>
+<!-- hitotsu-cta -->
+<div style="max-width:720px;margin:40px auto 0;padding:24px 20px;border-radius:14px;
+  background:#14141a;color:#c9c9d1;
+  font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic',sans-serif;
+  font-size:14px;line-height:1.9;">
+  <p style="margin:0 0 12px;color:#f0b429;font-weight:bold;font-size:13px;letter-spacing:.08em;">
+    ⚙ この道具のつくられ方
+  </p>
+  <p style="margin:0 0 14px;">
+    昨日の夜、AI社員が勝手に作りました。<br>
+    人間がキーボードを触った時間は、<strong style="color:#fff;">0分</strong>です。
+  </p>
+  <p style="margin:0 0 18px;">
+    「うちの仕事でもこれ、動かせないかな」と思った方へ。<br>
+    受け取り方は3つあります。
+  </p>
+  <p style="margin:0 0 12px;">
+    <a href="https://line.me/R/ti/p/@188jocyd" style="display:inline-block;background:#06c755;color:#fff;
+      text-decoration:none;padding:14px 22px;border-radius:10px;font-weight:bold;">
+      ① 無料でもらう ─ LINEで「AI社員」と送る →
+    </a>
+  </p>
+  <p style="margin:0 0 12px;">
+    <a href="https://akooooola-max.github.io/hitotsu-company-hp/books.html" style="display:inline-block;background:transparent;color:#f0b429;
+      border:1px solid #f0b429;text-decoration:none;padding:13px 22px;border-radius:10px;font-weight:bold;">
+      ② じっくり読む ─ Kindleの本（500円〜）→
+    </a>
+  </p>
+  <p style="margin:0 0 8px;">
+    <a href="https://coconala.com/services/4325740" style="display:inline-block;background:#f0b429;color:#0d0d0f;
+      text-decoration:none;padding:14px 22px;border-radius:10px;font-weight:bold;">
+      ③ つくってもらう ─ ココナラで相談する →
+    </a><br>
+    <span style="font-size:12.5px;color:#8b8b95;">
+      現場のやり方をうかがってから、あなた専用の1本を作ります（10,000円・お届けまで3日）
+    </span>
+  </p>
+  <p style="margin:14px 0 0;font-size:12.5px;color:#71717a;">
+    ほかの道具は<a href="./" style="color:#f0b429;">道具箱</a>に／
+    仕組みの全体像は<a href="https://note.com/hitotsu_ai/n/n493aa3b424cd" style="color:#f0b429;">こちらのnote</a>で公開中<br>
+    hitotsu company
+  </p>
+</div>
+</body>
+</html>

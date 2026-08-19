@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>社内慶弔・お祝い対応セット</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: "Hiragino Sans", "Yu Gothic", "Meiryo", sans-serif;
+  background: #f5f2ec;
+  color: #333;
+  line-height: 1.6;
+  padding: 12px;
+}
+.container { max-width: 900px; margin: 0 auto; }
+h1 {
+  font-size: 1.4rem;
+  color: #5c4a3a;
+  margin-bottom: 8px;
+  text-align: center;
+}
+.subtitle {
+  text-align: center;
+  color: #888;
+  font-size: 0.85rem;
+  margin-bottom: 16px;
+}
+.tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+.tab {
+  flex: 1;
+  min-width: 80px;
+  padding: 10px 6px;
+  background: #e8ded0;
+  border: none;
+  cursor: pointer;
+  border-radius: 6px 6px 0 0;
+  font-size: 0.85rem;
+  color: #5c4a3a;
+  font-weight: bold;
+}
+.tab.active {
+  background: #fff;
+  color: #a0522d;
+  border-bottom: 3px solid #a0522d;
+}
+.panel {
+  background: #fff;
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+  display: none;
+}
+.panel.active { display: block; }
+h2 {
+  font-size: 1.1rem;
+  color: #a0522d;
+  margin-bottom: 10px;
+  border-left: 4px solid #a0522d;
+  padding-left: 8px;
+}
+h3 {
+  font-size: 0.95rem;
+  color: #5c4a3a;
+  margin: 12px 0 6px;
+}
+select, input, textarea, button {
+  font-family: inherit;
+  font-size: 0.9rem;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 100%;
+  margin-bottom: 8px;
+}
+button.primary {
+  background: #a0522d;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+  padding: 10px;
+}
+button.primary:hover { background: #8b4513; }
+button.small {
+  width: auto;
+  padding: 6px 12px;
+  font-size: 0.8rem;
+  background: #a0522d;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  margin-right: 4px;
+}
+button.danger {
+  background: #c0504d;
+}
+.row { display: flex; gap: 8px; flex-wrap: wrap; }
+.row > * { flex: 1; min-width: 120px; }
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+  margin-top: 8px;
+}
+th, td {
+  border: 1px solid #ddd;
+  padding: 6px 4px;
+  text-align: left;
+}
+th {
+  background: #f0e6d6;
+  color: #5c4a3a;
+}
+tr:nth-child(even) td { background: #faf7f2; }
+.result-box {
+  background: #fdf9f0;
+  border: 1px solid #e0d5b8;
+  border-radius: 6px;
+  padding: 12px;
+  margin-top: 10px;
+}
+.amount {
+  font-size: 1.3rem;
+  color: #a0522d;
+  font-weight: bold;
+}
+.message-box {
+  background: #fdf9f0;
+  border: 1px solid #e0d5b8;
+  border-radius: 6px;
+  padding: 12px;
+  margin-top: 10px;
+  white-space: pre-wrap;
+  font-size: 0.9rem;
+  line-height: 1.8;
+}
+.hint {
+  font-size: 0.75rem;
+  color: #888;
+  margin-bottom: 8px;
+}
+label {
+  font-size: 0.85rem;
+  color: #5c4a3a;
+  display: block;
+  margin-bottom: 4px;
+  font-weight: bold;
+}
+.empty {
+  text-align: center;
+  color: #999;
+  padding: 20px;
+  font-size: 0.85rem;
+}
+@media (max-width: 480px) {
+  table { font-size: 0.75rem; }
+  th, td { padding: 4px 2px; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>🎌 社内慶弔・お祝い対応セット</h1>
+  <p class="subtitle">相場・文例・記録をこれ一つで</p>
+
+  <div class="tabs">
+    <button class="tab active" onclick="showTab('sohba')">相場早見</button>
+    <button class="tab" onclick="showTab('message')">文例作成</button>
+    <button class="tab" onclick="showTab('kiroku')">年次記録簿</button>
+  </div>
+
+  <!-- 相場早見表 -->
+  <div id="sohba" class="panel active">
+    <h2>💰 相場早見表</h2>
+    <p class="hint">相手との関係と用途を選ぶと目安金額が表示されます（一般的な相場です。社内慣習を優先してください）</p>
+    <div class="row">
+      <div>
+        <label>用途</label>
+        <select id="yoto">
+          <option value="kouden">香典（お悔やみ）</option>
+          <option value="kekkon">結婚祝い</option>
+          <option value="shussan">出産祝い</option>
+          <option value="byouki">お見舞い</option>
+          <option value="taisyoku">退職祝い</option>
+          <option value="eiten">昇進・栄転祝い</option>
+        </select>
+      </div>
+      <div>
+        <label>相手との関係</label>
+        <select id="kankei">
+          <option value="joshi">上司・役員</option>
+          <option value="doryo">同僚・同期</option>
+          <option value="kohai">部下・後輩</option>
+          <option value="busho">部署一同として</option>
+        </select>
+      </div>
+    </div>
+    <div class="result-box">
+      <div>目安金額</div>
+      <div class="amount" id="amount">—</div>
+      <div id="note" class="hint" style="margin-top:6px;"></div>
+    </div>
+    <h3>マナーメモ</h3>
+    <div id="manner" class="message-box" style="font-size:0.82rem;"></div>
+  </div>
+
+  <!-- 文例作成 -->
+  <div id="message" class="panel">
+    <h2>✉️ メッセージ文例作成</h2>
+    <div class="row">
+      <div>
+        <label>シーン</label>
+        <select id="msgScene">
+          <option value="kekkon">結婚祝い</option>
+          <option value="shussan">出産祝い</option>
+          <option value="kouden">お悔やみ</option>
+          <option value="byouki">お見舞い</option>
+          <option value="taisyoku">退職祝い</option>
+          <option value="eiten">昇進・栄転祝い</option>
+        </select>
+      </div>
+      <div>
+        <label>相手のお名前</label>
+        <input type="text" id="msgName" placeholder="例：田中様">
+      </div>
+    </div>
+    <div class="row">
+      <div>
+        <label>文体</label>
+        <select id="msgTone">
+          <option value="formal">フォーマル（上司・取引先向け）</option>
+          <option value="casual">カジュアル（同僚・後輩向け）</option>
+        </select>
+      </div>
+      <div>
+        <label>用途</label>
+        <select id="msgUse">
+          <option value="card">メッセージカード</option>
+          <option value="mail">連絡メール</option>
+        </select>
+      </div>
+    </div>
+    <button class="primary" onclick="makeMessage()">文例を作成</button>
+    <div class="message-box" id="msgResult">シーンを選んで「文例を作成」を押してください。</div>
+    <button class="small" onclick="copyMessage()" style="margin-top:8px;">📋 コピー</button>
+  </div>
+
+  <!-- 年次記録簿 -->
+  <div id="kiroku" class="panel">
+    <h2>📓 年次記録簿</h2>
+    <p class="hint">部署で対応した慶弔・お祝いを記録。来年「去年いくら出したっけ？」を解消します。</p>
+    <div class="row">
+      <div>
+        <label>日付</label>
+        <input type="date" id="recDate">
+      </div>
+      <div>
+        <label>対象者</label>
+        <input type="text" id="recName" placeholder="例：田中さん">
+      </div>
+    </div>
+    <div class="row">
+      <div>
+        <label>種別</label>
+        <select id="recType">
+          <option>香典</option>
+          <option>結婚祝い</option>
+          <option>出産祝い</option>
+          <option>お見舞い</option>
+          <option>退職祝い</option>
+          <option>昇進・栄転祝い</option>
+          <option>その他</option>
+        </select>
+      </div>
+      <div>
+        <label>金額</label>
+        <input type="number" id="recAmount" placeholder="例：5000">
+      </div>
+    </div>
+    <label>メモ（贈答品・対応者など）</label>
+    <input type="text" id="recMemo" placeholder="例：花束と一緒に贈呈">
+    <button class="primary" onclick="addRecord()">記録を追加</button>
+    <div id="recordList"></div>
+  </div>
+</div>
+
+<script>
+// 相場データ
+const sohbaData = {
+  kouden: {
+    joshi:  {amount:"5,000〜10,000円", note:"直属の上司ご本人の場合は10,000円程度が目安"},
+    doryo:  {amount:"3,000〜5,000円", note:""},
+    kohai:  {amount:"3,000〜5,000円", note:""},
+    busho:  {amount:"10,000〜30,000円", note:"部署一同として連名で"}
+  },
+  kekkon: {
+    joshi:  {amount:"10,000〜30,000円", note:"披露宴出席の場合は30,000円が目安"},
+    doryo:  {amount:"10,000〜30,000円", note:"披露宴なしなら5,000〜10,000円"},
+    kohai:  {amount:"5,000〜10,000円", note:""},
+    busho:  {amount:"10,000〜30,000円", note:"連名で贈答品にする場合が多い"}
+  },
+  shussan: {
+    joshi:  {amount:"5,000〜10,000円", note:""},
+    doryo:  {amount:"3,000〜5,000円", note:""},
+    kohai:  {amount:"3,000〜5,000円", note:""},
+    busho:  {amount:"5,000〜10,000円", note:"ベビー用品などの品物も好まれます"}
+  },
+  byouki: {
+    joshi:  {amount:"5,000〜10,000円", note:"病状によっては品物のみでも可"},
+    doryo:  {amount:"3,000〜5,000円", note:""},
+    kohai:  {amount:"3,000〜5,000円", note:""},
+    busho:  {amount:"5,000〜10,000円", note:"果物やお花など日持ちする品物と一緒に"}
+  },
+  taisyoku: {
+    joshi:  {amount:"5,000〜10,000円", note:"長年の感謝を込めて"},
+    doryo:  {amount:"3,000〜5,000円", note:""},
+    kohai:  {amount:"3,000〜5,000円", note:""},
+    busho:  {amount:"10,000〜30,000円", note:"記念品・花束と一緒に"}
+  },
+  eiten: {
+    joshi:  {amount:"5,000〜10,000円", note:""},
+    doryo:  {amount:"3,000〜5,000円", note:""},
+    kohai:  {amount:"3,000〜5,000円", note:""},
+    busho:  {amount:"5,000〜10,000円", note:""}
+  }
+};
+
+const mannerData = {
+  kouden: "・袋は「御霊前」（浄土真宗は「御仏前」）／宗派不明なら「御香典」\n・新札は避け、一度折り目をつけたお札を包む\n・表書きは薄墨、金額は「金 伍仟円」など旧字体で\n・4・9の金額は避ける",
+  kekkon: "・ご祝儀袋は「寿」または「御結婚御祝」\n・新札を用意し、金額は割り切れない奇数（3・5・7万円等）に\n・「切れる」「別れる」など忌み言葉は避ける",
+  shussan: "・お七夜〜お宮参りの頃（生後1ヶ月前後）に贈るのが一般的\n・現金なら「御出産御祝」、品物ならベビー用品や消耗品が好まれる",
+  byouki: "・「御見舞」と書く。のしは付けない\n・現金は目上の方には失礼にあたる場合があるため要注意\n・重ね言葉「重ね重ね」「たびたび」は避ける",
+  taisyoku: "・「御礼」「感謝」「御餞別（目上には失礼）」\n・定年退職なら「祝御定年」も可\n・花束や記念品と組み合わせると喜ばれる",
+  eiten: "・「御昇進御祝」「御栄転御祝」\n・水引は紅白蝶結び\n・餞別的な意味合いなら軽めの品物でも可"
+};
+
+// タブ切替
+function showTab(id) {
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById(id).classList.add('active');
+}
+
+// 相場表示
+function updateSohba() {
+  const y = document.getElementById('yoto').value;
+  const k = document.getElementById('kankei').value;
+  const d = sohbaData[y][k];
+  document.getElementById('amount').textContent = d.amount;
+  document.getElementById('note').textContent = d.note || "";
+  document.getElementById('manner').textContent = mannerData[y];
+}
+document.getElementById('yoto').addEventListener('change', updateSohba);
+document.getElementById('kankei').addEventListener('change', updateSohba);
+updateSohba();
+
+// 文例
+const messageTemplates = {
+  kekkon: {
+    formal: {
+      card: "ご結婚おめでとうございます。\nお二人の門出を心よりお祝い申し上げます。\n末永いお幸せと、ご健康を祈念いたしております。",
+      mail: "件名：ご結婚のお祝いを申し上げます\n\n{name}\n\nこのたびはご結婚、誠におめでとうございます。\nお二人の新たな門出を心よりお祝い申し上げます。\n末永いお幸せをお祈りいたします。"
+    },
+    casual: {
+      card: "ご結婚おめでとうございます！\nお二人らしい温かい家庭を築いてくださいね。\nこれからのお幸せを願っています。",
+      mail: "件名：結婚おめでとうございます！\n\n{name}\n\nご結婚おめでとうございます！\nお二人のこれからが幸せいっぱいでありますよう願っています。\nまた落ち着いたらお話聞かせてくださいね。"
+    }
+  },
+  shussan: {
+    formal: {
+      card: "ご出産おめでとうございます。\nお健やかなご成長を心よりお祈り申し上げます。\nどうぞご無理のないよう、お身体を大切になさってください。",
+      mail: "件名：ご出産のお祝いを申し上げます\n\n{name}\n\nこのたびはご出産、誠におめでとうございます。\nお子様のお健やかなご成長を心よりお祈り申し上げます。\nどうぞご無理なさらず、ご自愛くださいませ。"
+    },
+    casual: {
+      card: "ご出産おめでとうございます！\n可愛い赤ちゃんとの毎日、素敵ですね。\n無理せず、身体を休めてくださいね。",
+      mail: "件名：ご出産おめでとうございます！\n\n{name}\n\nご出産おめでとうございます！\n新しい家族を迎えて、大変な時期だと思いますが、どうか無理をなさらず。\nまた落ち着いた頃に、赤ちゃんに会わせてくださいね。"
+    }
+  },
+  kouden: {
+    formal: {
+      card: "この度はご愁傷様でございます。\n心よりお悔やみ申し上げます。\nどうかお力落としのございませんよう、お祈り申し上げます。",
+      mail: "件名：お悔やみ申し上げます\n\n{name}\n\nこの度のご不幸、心よりお悔やみ申し上げます。\nさぞかしお力落としのことと存じますが、どうかご無理のないようお過ごしください。\n略儀ながらメールにて失礼いたします。"
+    },
+    casual: {
+      card: "この度はご愁傷様です。\n心よりお悔やみ申し上げます。\nお身体を大切に、無理なさらないでください。",
+      mail: "件名：お悔やみ申し上げます\n\n{name}\n\nこの度はご愁傷様です。心よりお悔やみ申し上げます。\n何かできることがあればいつでも声をかけてください。\nどうかご無理なさらず。"
+    }
+  },
+  byouki: {
+    formal: {
+      card: "この度のご入院、心よりお見舞い申し上げます。\n一日も早いご回復を、心よりお祈り申し上げます。\nどうぞご養生ください。",
+      mail: "件名：お見舞い申し上げます\n\n{name}\n\nこの度のご入院、心よりお見舞い申し上げます。\n一日も早くご回復されますよう、お祈り申し上げます。\n業務のことはご心配なさらず、ご養生ください。"
+    },
+    casual: {
+      card: "お加減いかがですか。\n心よりお見舞い申し上げます。\nゆっくり休んで、早く元気になってくださいね。",
+      mail: "件名：お大事にしてください\n\n{name}\n\n体調はいかがですか。\n心配しています。仕事のことは気にせず、まずはしっかり休んでくださいね。\n早い回復を願っています。"
+    }
+  },
+  taisyoku: {
+    formal: {
+      card: "長きに渡るお勤め、誠にお疲れ様でございました。\nこれまでのご指導に、心より感謝申し上げます。\n今後益々のご健勝とご多幸をお祈り申し上げます。",
+      mail: "件名：ご退職に際して\n\n{name}\n\nこの度はご退職、誠にお疲れ様でございました。\n在職中は大変お世話になり、心より感謝申し上げます。\n今後のご健勝とご多幸を心よりお祈り申し上げます。"
+    },
+    casual: {
+      card: "長い間、本当にお疲れ様でした！\nたくさんのことを教えていただき、感謝しています。\nこれからも素敵な日々をお過ごしください。",
+      mail: "件名：お疲れ様でした！\n\n{name}\n\n長い間、本当にお疲れ様でした。\nいろいろとお世話になり、たくさん学ばせていただきました。\nこれからもお身体大切に、素敵な毎日をお過ごしください。"
+    }
+  },
+  eiten: {
+    formal: {
+      card: "この度のご昇進、誠におめでとうございます。\n益々のご活躍を、心よりお祈り申し上げます。",
+      mail: "件名：ご昇進のお祝いを申し上げます\n\n{name}\n\nこの度のご昇進、誠におめでとうございます。\n日頃のご精進の賜物と、心よりお慶び申し上げます。\n今後益々のご活躍をお祈り申し上げます。"
+    },
+    casual: {
+      card: "ご昇進おめでとうございます！\nこれからのご活躍、楽しみにしています。",
+      mail: "件名：ご昇進おめでとうございます！\n\n{name}\n\nご昇進おめでとうございます！\n日頃の努力が実った結果ですね。\nこれからのますますのご活躍を応援しています。"
+    }
+  }
+};
+
+function makeMessage() {
+  const s = document.getElementById('msgScene').value;
+  const t = document.getElementById('msgTone').value;
+  const u = document.getElementById('msgUse').value;
+  const name = document.getElementById('msgName').value || "○○様";
+  let msg = messageTemplates[s][t][u];
+  msg = msg.replace('{name}', name);
+  document.getElementById('msgResult').textContent = msg;
+}
+
+function copyMessage() {
+  const text = document.getElementById('msgResult').textContent;
+  navigator.clipboard.writeText(text).then(()=>{
+    alert("コピーしました");
+  }).catch(()=>{
+    // フォールバック
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    alert("コピーしました");
+  });
+}
+
+// 記録簿
+function loadRecords() {
+  return JSON.parse(localStorage.getItem('keichoRecords') || '[]');
+}
+function saveRecords(recs) {
+  localStorage.setItem('keichoRecords', JSON.stringify(recs));
+}
+function renderRecords() {
+  const recs = loadRecords();
+  const container = document.getElementById('recordList');
+  if (recs.length === 0) {
+    container.innerHTML = '<div class="empty">まだ記録がありません</div>';
+    return;
+  }
+  recs.sort((a,b)=>b.date.localeCompare(a.date));
+  let html = '<table><thead><tr><th>日付</th><th>対象者</th><th>種別</th><th>金額</th><th>メモ</th><th></th></tr></thead><tbody>';
+  recs.forEach(r=>{
+    html += `<tr>
+      <td>${r.date}</td>
+      <td>${escapeHtml(r.name)}</td>
+      <td>${escapeHtml(r.type)}</td>
+      <td>${Number(r.amount).toLocaleString()}円</td>
+      <td>${escapeHtml(r.memo||'')}</td>
+      <td><button class="small danger" onclick="delRecord('${r.id}')">削除</button></td>
+    </tr>`;
+  });
+  html += '</tbody></table>';
+  container.innerHTML = html;
+}
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function addRecord() {
+  const date = document.getElementById('recDate').value;
+  const name = document.getElementById('recName').value.trim();
+  const type = document.getElementById('recType').value;
+  const amount = document.getElementById('recAmount').value;
+  const memo = document.getElementById('recMemo').value.trim();
+  if (!date || !name || !amount) {
+    alert('日付・対象者・金額は必須です');
+    return;
+  }
+  const recs = loadRecords();
+  recs.push({id:Date.now().toString(), date, name, type, amount, memo});
+  saveRecords(recs);
+  document.getElementById('recName').value='';
+  document.getElementById('recAmount').value='';
+  document.getElementById('recMemo').value='';
+  renderRecords();
+}
+function delRecord(id) {
+  if (!confirm('削除しますか？')) return;
+  const recs = loadRecords().filter(r=>r.id!==id);
+  saveRecords(recs);
+  renderRecords();
+}
+
+// 初期化
+document.getElementById('recDate').valueAsDate = new Date();
+renderRecords();
+</script>
+<!-- hitotsu-cta -->
+<div style="max-width:720px;margin:40px auto 0;padding:24px 20px;border-radius:14px;
+  background:#14141a;color:#c9c9d1;
+  font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic',sans-serif;
+  font-size:14px;line-height:1.9;">
+  <p style="margin:0 0 12px;color:#f0b429;font-weight:bold;font-size:13px;letter-spacing:.08em;">
+    ⚙ この道具のつくられ方
+  </p>
+  <p style="margin:0 0 14px;">
+    昨日の夜、AI社員が勝手に作りました。<br>
+    人間がキーボードを触った時間は、<strong style="color:#fff;">0分</strong>です。
+  </p>
+  <p style="margin:0 0 18px;">
+    「うちの仕事でもこれ、動かせないかな」と思った方へ。<br>
+    受け取り方は3つあります。
+  </p>
+  <p style="margin:0 0 12px;">
+    <a href="https://line.me/R/ti/p/@188jocyd" style="display:inline-block;background:#06c755;color:#fff;
+      text-decoration:none;padding:14px 22px;border-radius:10px;font-weight:bold;">
+      ① 無料でもらう ─ LINEで「AI社員」と送る →
+    </a>
+  </p>
+  <p style="margin:0 0 12px;">
+    <a href="https://akooooola-max.github.io/hitotsu-company-hp/books.html" style="display:inline-block;background:transparent;color:#f0b429;
+      border:1px solid #f0b429;text-decoration:none;padding:13px 22px;border-radius:10px;font-weight:bold;">
+      ② じっくり読む ─ Kindleの本（500円〜）→
+    </a>
+  </p>
+  <p style="margin:0 0 8px;">
+    <a href="https://coconala.com/services/4325740" style="display:inline-block;background:#f0b429;color:#0d0d0f;
+      text-decoration:none;padding:14px 22px;border-radius:10px;font-weight:bold;">
+      ③ つくってもらう ─ ココナラで相談する →
+    </a><br>
+    <span style="font-size:12.5px;color:#8b8b95;">
+      現場のやり方をうかがってから、あなた専用の1本を作ります（10,000円・お届けまで3日）
+    </span>
+  </p>
+  <p style="margin:14px 0 0;font-size:12.5px;color:#71717a;">
+    ほかの道具は<a href="./" style="color:#f0b429;">道具箱</a>に／
+    仕組みの全体像は<a href="https://note.com/hitotsu_ai/n/n493aa3b424cd" style="color:#f0b429;">こちらのnote</a>で公開中<br>
+    hitotsu company
+  </p>
+</div>
+</body>
+</html>

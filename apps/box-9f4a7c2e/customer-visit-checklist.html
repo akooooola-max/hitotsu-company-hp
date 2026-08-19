@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>来客対応・お茶出し準備チェック</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: "Hiragino Sans", "Meiryo", sans-serif;
+    background: #f5f7fa;
+    color: #333;
+    margin: 0;
+    padding: 16px;
+    line-height: 1.6;
+  }
+  .container {
+    max-width: 640px;
+    margin: 0 auto;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+    padding: 20px;
+  }
+  h1 {
+    font-size: 1.3rem;
+    margin: 0 0 4px;
+    color: #2c5282;
+  }
+  .subtitle {
+    font-size: 0.85rem;
+    color: #718096;
+    margin-bottom: 16px;
+  }
+  .info-section {
+    background: #edf2f7;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 16px;
+  }
+  .info-section label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: bold;
+    margin-bottom: 4px;
+    color: #4a5568;
+  }
+  .info-section input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #cbd5e0;
+    border-radius: 6px;
+    font-size: 1rem;
+    margin-bottom: 8px;
+  }
+  .timer-box {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #fff5b1;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+  .timer-display {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #744210;
+    min-width: 90px;
+    font-variant-numeric: tabular-nums;
+  }
+  .timer-box button {
+    padding: 8px 14px;
+    border: none;
+    background: #ecc94b;
+    color: #744210;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 0.9rem;
+  }
+  .timer-box button:hover { background: #d69e2e; }
+  .checklist h2 {
+    font-size: 1rem;
+    margin: 16px 0 8px;
+    color: #2c5282;
+    border-bottom: 2px solid #bee3f8;
+    padding-bottom: 4px;
+  }
+  .check-item {
+    display: flex;
+    align-items: flex-start;
+    padding: 10px;
+    background: #f7fafc;
+    border-radius: 6px;
+    margin-bottom: 6px;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .check-item:hover { background: #edf2f7; }
+  .check-item input[type="checkbox"] {
+    margin-right: 10px;
+    margin-top: 4px;
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+  }
+  .check-item.done {
+    background: #c6f6d5;
+    text-decoration: line-through;
+    color: #718096;
+  }
+  .check-item label {
+    flex: 1;
+    cursor: pointer;
+    font-size: 0.95rem;
+  }
+  .progress {
+    background: #e2e8f0;
+    border-radius: 10px;
+    height: 10px;
+    overflow: hidden;
+    margin: 8px 0 16px;
+  }
+  .progress-bar {
+    background: linear-gradient(90deg, #4299e1, #48bb78);
+    height: 100%;
+    width: 0%;
+    transition: width 0.3s;
+  }
+  .reset-btn {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    background: #fed7d7;
+    color: #c53030;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 12px;
+    font-size: 0.9rem;
+  }
+  .reset-btn:hover { background: #feb2b2; }
+  .note {
+    font-size: 0.8rem;
+    color: #718096;
+    text-align: center;
+    margin-top: 12px;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>☕ 来客対応・お茶出し準備チェック</h1>
+  <p class="subtitle">15分前から順にチェック。ソワソワ解消！</p>
+
+  <div class="info-section">
+    <label>お客様名・会社名</label>
+    <input type="text" id="visitorName" placeholder="例：〇〇株式会社 △△様">
+    <label>人数</label>
+    <input type="number" id="visitorCount" placeholder="例：3" min="1">
+    <label>会議室 / 予定時刻</label>
+    <input type="text" id="roomTime" placeholder="例：応接室A / 14:00">
+  </div>
+
+  <div class="timer-box">
+    <div class="timer-display" id="timerDisplay">15:00</div>
+    <button onclick="startTimer()">開始</button>
+    <button onclick="pauseTimer()">一時停止</button>
+    <button onclick="resetTimer()">リセット</button>
+  </div>
+
+  <div class="progress"><div class="progress-bar" id="progressBar"></div></div>
+
+  <div class="checklist" id="checklist"></div>
+
+  <button class="reset-btn" onclick="resetAll()">🔄 チェックをすべてリセット</button>
+  <p class="note">※データはこのブラウザに保存されます</p>
+</div>
+
+<script>
+const tasks = [
+  { section: "🕐 15分前：情報確認", items: [
+    "来客名・人数・時刻を再確認",
+    "担当者に到着連絡の段取りを共有",
+    "会議室の予約状況を確認"
+  ]},
+  { section: "🧹 10分前：会議室準備", items: [
+    "テーブル・椅子を人数分セット",
+    "机の上を拭く・ゴミを片付ける",
+    "エアコン・照明を調整",
+    "資料・名刺入れを準備"
+  ]},
+  { section: "☕ 5分前：お茶出し準備", items: [
+    "湯呑み/茶碗を人数分＋予備1つ用意",
+    "お茶（またはコーヒー）の温度を確認",
+    "お盆・おしぼり・コースターを準備",
+    "運ぶ順番をイメージ（上座から）"
+  ]},
+  { section: "🚪 到着時", items: [
+    "笑顔でお迎え・会議室へご案内",
+    "お茶を上座からお出しする",
+    "担当者へ到着を連絡"
+  ]}
+];
+
+const checklistEl = document.getElementById('checklist');
+let state = JSON.parse(localStorage.getItem('visitCheck') || '{}');
+
+function render() {
+  checklistEl.innerHTML = '';
+  let total = 0, done = 0;
+  tasks.forEach((sec, si) => {
+    const h = document.createElement('h2');
+    h.textContent = sec.section;
+    checklistEl.appendChild(h);
+    sec.items.forEach((item, ii) => {
+      const key = `${si}-${ii}`;
+      total++;
+      const checked = state[key] || false;
+      if (checked) done++;
+      const div = document.createElement('div');
+      div.className = 'check-item' + (checked ? ' done' : '');
+      div.innerHTML = `<input type="checkbox" id="c${key}" ${checked?'checked':''}><label for="c${key}">${item}</label>`;
+      div.querySelector('input').addEventListener('change', e => {
+        state[key] = e.target.checked;
+        localStorage.setItem('visitCheck', JSON.stringify(state));
+        render();
+      });
+      checklistEl.appendChild(div);
+    });
+  });
+  document.getElementById('progressBar').style.width = (total ? (done/total*100) : 0) + '%';
+}
+
+// 情報保存
+['visitorName','visitorCount','roomTime'].forEach(id => {
+  const el = document.getElementById(id);
+  el.value = localStorage.getItem('vi_'+id) || '';
+  el.addEventListener('input', () => localStorage.setItem('vi_'+id, el.value));
+});
+
+// タイマー
+let timerSec = 15*60, timerInt = null;
+function updateTimer() {
+  const m = String(Math.floor(timerSec/60)).padStart(2,'0');
+  const s = String(timerSec%60).padStart(2,'0');
+  document.getElementById('timerDisplay').textContent = `${m}:${s}`;
+}
+function startTimer() {
+  if (timerInt) return;
+  timerInt = setInterval(() => {
+    if (timerSec > 0) { timerSec--; updateTimer(); }
+    else { clearInterval(timerInt); timerInt = null; alert('⏰ 時間です！お出迎えの準備を！'); }
+  }, 1000);
+}
+function pauseTimer() { clearInterval(timerInt); timerInt = null; }
+function resetTimer() { pauseTimer(); timerSec = 15*60; updateTimer(); }
+
+function resetAll() {
+  if (confirm('チェックをすべてリセットしますか？')) {
+    state = {};
+    localStorage.removeItem('visitCheck');
+    render();
+  }
+}
+
+updateTimer();
+render();
+</script>
+<!-- hitotsu-cta -->
+<div style="max-width:720px;margin:40px auto 0;padding:24px 20px;border-radius:14px;
+  background:#14141a;color:#c9c9d1;
+  font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic',sans-serif;
+  font-size:14px;line-height:1.9;">
+  <p style="margin:0 0 12px;color:#f0b429;font-weight:bold;font-size:13px;letter-spacing:.08em;">
+    ⚙ この道具のつくられ方
+  </p>
+  <p style="margin:0 0 14px;">
+    昨日の夜、AI社員が勝手に作りました。<br>
+    人間がキーボードを触った時間は、<strong style="color:#fff;">0分</strong>です。
+  </p>
+  <p style="margin:0 0 18px;">
+    「うちの仕事でもこれ、動かせないかな」と思った方へ。<br>
+    受け取り方は3つあります。
+  </p>
+  <p style="margin:0 0 12px;">
+    <a href="https://line.me/R/ti/p/@188jocyd" style="display:inline-block;background:#06c755;color:#fff;
+      text-decoration:none;padding:14px 22px;border-radius:10px;font-weight:bold;">
+      ① 無料でもらう ─ LINEで「AI社員」と送る →
+    </a>
+  </p>
+  <p style="margin:0 0 12px;">
+    <a href="https://akooooola-max.github.io/hitotsu-company-hp/books.html" style="display:inline-block;background:transparent;color:#f0b429;
+      border:1px solid #f0b429;text-decoration:none;padding:13px 22px;border-radius:10px;font-weight:bold;">
+      ② じっくり読む ─ Kindleの本（500円〜）→
+    </a>
+  </p>
+  <p style="margin:0 0 8px;">
+    <a href="https://coconala.com/services/4325740" style="display:inline-block;background:#f0b429;color:#0d0d0f;
+      text-decoration:none;padding:14px 22px;border-radius:10px;font-weight:bold;">
+      ③ つくってもらう ─ ココナラで相談する →
+    </a><br>
+    <span style="font-size:12.5px;color:#8b8b95;">
+      現場のやり方をうかがってから、あなた専用の1本を作ります（10,000円・お届けまで3日）
+    </span>
+  </p>
+  <p style="margin:14px 0 0;font-size:12.5px;color:#71717a;">
+    ほかの道具は<a href="./" style="color:#f0b429;">道具箱</a>に／
+    仕組みの全体像は<a href="https://note.com/hitotsu_ai/n/n493aa3b424cd" style="color:#f0b429;">こちらのnote</a>で公開中<br>
+    hitotsu company
+  </p>
+</div>
+</body>
+</html>
