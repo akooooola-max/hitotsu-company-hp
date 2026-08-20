@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="動画BGM作成。用途を選ぶだけでAI音楽生成の指示文が完成">
+<title>BGM指示文ナビ - AI音楽生成の依頼文づくり</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic", sans-serif;
+  background: #f5f7fa;
+  color: #333;
+  line-height: 1.6;
+  padding: 16px;
+}
+.container { max-width: 720px; margin: 0 auto; }
+h1 { font-size: 1.4rem; color: #2c3e50; margin-bottom: 8px; }
+.lead { color: #666; font-size: 0.9rem; margin-bottom: 20px; }
+.card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+.card h2 {
+  font-size: 1.05rem;
+  color: #2c3e50;
+  margin-bottom: 12px;
+  padding-left: 10px;
+  border-left: 4px solid #4a90e2;
+}
+label { display: block; font-size: 0.9rem; font-weight: bold; margin-bottom: 6px; color: #444; }
+select, input[type=text], textarea {
+  width: 100%;
+  padding: 10px;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background: #fff;
+  font-family: inherit;
+}
+textarea { min-height: 80px; resize: vertical; }
+.field { margin-bottom: 14px; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
+.chip {
+  padding: 6px 12px;
+  background: #eef2f7;
+  border: 1px solid #d0d7e2;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  user-select: none;
+}
+.chip.active { background: #4a90e2; color: #fff; border-color: #4a90e2; }
+.output {
+  background: #f9fafc;
+  border: 1px dashed #b0bccb;
+  padding: 14px;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  white-space: pre-wrap;
+  word-break: break-word;
+  min-height: 80px;
+}
+.btn {
+  display: inline-block;
+  padding: 10px 18px;
+  background: #4a90e2;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  margin-top: 10px;
+  margin-right: 8px;
+}
+.btn.sub { background: #7f8c9b; }
+.btn:hover { opacity: 0.9; }
+.recommend {
+  background: #fff8e1;
+  border-left: 4px solid #f5a623;
+  padding: 10px 14px;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  margin-top: 10px;
+}
+.history-item {
+  background: #f5f7fa;
+  padding: 10px;
+  border-radius: 6px;
+  margin-bottom: 8px;
+  font-size: 0.85rem;
+  position: relative;
+}
+.history-item .meta { color: #888; font-size: 0.75rem; margin-bottom: 4px; }
+.history-item .del {
+  position: absolute; top: 8px; right: 8px;
+  background: #e74c3c; color: #fff; border: none;
+  padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; cursor: pointer;
+}
+.toast {
+  position: fixed;
+  bottom: 20px; left: 50%;
+  transform: translateX(-50%);
+  background: #333; color: #fff;
+  padding: 10px 20px; border-radius: 6px;
+  font-size: 0.9rem;
+  opacity: 0; transition: opacity 0.3s;
+  pointer-events: none;
+}
+.toast.show { opacity: 1; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>🎵 BGM指示文ナビ</h1>
+  <p class="lead">用途を選ぶだけで、AI音楽生成サービスに貼り付けるだけの指示文ができます。</p>
+
+  <div class="card">
+    <h2>1. 使う場面を選ぶ</h2>
+    <div class="field">
+      <label>用途</label>
+      <div class="chips" id="purpose-chips">
+        <div class="chip" data-value="研修動画">社内研修動画</div>
+        <div class="chip" data-value="マニュアル動画">マニュアル動画</div>
+        <div class="chip" data-value="プレゼン">プレゼン冒頭</div>
+        <div class="chip" data-value="YouTube">YouTube副業</div>
+        <div class="chip" data-value="店舗BGM">店舗・イベント</div>
+        <div class="chip" data-value="お祝いソング">お祝いソング</div>
+      </div>
+    </div>
+    <div class="field">
+      <label>雰囲気</label>
+      <div class="chips" id="mood-chips">
+        <div class="chip" data-value="落ち着いた">落ち着いた</div>
+        <div class="chip" data-value="明るい">明るい</div>
+        <div class="chip" data-value="爽やか">爽やか</div>
+        <div class="chip" data-value="真面目な">真面目</div>
+        <div class="chip" data-value="ワクワクする">ワクワク</div>
+        <div class="chip" data-value="感動的な">感動的</div>
+      </div>
+    </div>
+    <div class="field">
+      <label>楽器・スタイル</label>
+      <div class="chips" id="style-chips">
+        <div class="chip" data-value="ピアノ">ピアノ</div>
+        <div class="chip" data-value="アコースティックギター">アコギ</div>
+        <div class="chip" data-value="オーケストラ">オーケストラ</div>
+        <div class="chip" data-value="ローファイ">ローファイ</div>
+        <div class="chip" data-value="ジャズ">ジャズ</div>
+        <div class="chip" data-value="ポップス">ポップス</div>
+      </div>
+    </div>
+    <div class="field">
+      <label>歌の有無</label>
+      <div class="chips" id="vocal-chips">
+        <div class="chip active" data-value="インスト">歌なし（BGM）</div>
+        <div class="chip" data-value="日本語歌詞">日本語の歌入り</div>
+      </div>
+    </div>
+    <div class="field">
+      <label>長さの目安（任意）</label>
+      <input type="text" id="length" placeholder="例: 30秒 / 1分程度">
+    </div>
+    <div class="field">
+      <label>追加したいイメージ（任意）</label>
+      <textarea id="extra" placeholder="例: カフェで流れているような、雨の日の朝など"></textarea>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>2. できあがった指示文</h2>
+    <div id="recommend" class="recommend"></div>
+    <div class="output" id="output" style="margin-top:12px;">まずは上の項目を選んでください。</div>
+    <button class="btn" id="copyBtn">📋 コピーする</button>
+    <button class="btn sub" id="saveBtn">💾 保存する</button>
+  </div>
+
+  <div class="card">
+    <h2>3. 保存した指示文</h2>
+    <div id="history">保存された指示文はありません。</div>
+  </div>
+
+  <div class="card">
+    <h2>使い方</h2>
+    <p style="font-size:0.9rem; color:#555;">
+    ① 上の項目をポチポチ選ぶ<br>
+    ② できあがった指示文を「コピー」<br>
+    ③ AI音楽生成サービスの入力欄に貼り付けて生成<br>
+    ④ 生成された曲を動画・プレゼンで利用<br>
+    <br>
+    ※ AI音楽生成サービスは複数ありますが、手軽さと日本語の歌詞対応で使い分けるとよいです。歌入り重視なら日本語対応が強いサービス、じっくり作り込むなら音質重視のサービスがおすすめです。
+    </p>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const state = { purpose: '', mood: '', style: '', vocal: 'インスト' };
+
+function setupChips(groupId, key, single = true) {
+  const chips = document.querySelectorAll(`#${groupId} .chip`);
+  chips.forEach(chip => {
+    chip.addEventListener('click', () => {
+      if (single) {
+        chips.forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+      } else {
+        chip.classList.toggle('active');
+      }
+      state[key] = chip.classList.contains('active') ? chip.dataset.value : '';
+      updateOutput();
+    });
+  });
+}
+setupChips('purpose-chips', 'purpose');
+setupChips('mood-chips', 'mood');
+setupChips('style-chips', 'style');
+setupChips('vocal-chips', 'vocal');
+
+document.getElementById('length').addEventListener('input', updateOutput);
+document.getElementById('extra').addEventListener('input', updateOutput);
+
+function buildPrompt() {
+  const length = document.getElementById('length').value.trim();
+  const extra = document.getElementById('extra').value.trim();
+  const parts = [];
+  if (state.mood) parts.push(state.mood);
+  if (state.style) parts.push(state.style);
+  if (extra) parts.push(extra);
+  let core = parts.join('で') || '心地よい';
+  let base = `${core}の${state.vocal === 'インスト' ? 'インストゥルメンタルBGM' : '歌入りの曲（日本語歌詞）'}`;
+  if (state.purpose) base = `${state.purpose}で使う、${base}`;
+  if (length) base += `。長さは${length}`;
+  return base + '。';
+}
+
+function getRecommend() {
+  if (state.vocal === '日本語歌詞' || state.purpose === 'お祝いソング') {
+    return '💡 おすすめ: 日本語の歌詞に強い手軽なタイプのAI音楽生成サービスが向いています。';
+  }
+  if (state.purpose === 'YouTube' || state.purpose === '店舗BGM') {
+    return '💡 おすすめ: 音質・雰囲気を重視するタイプ、またはインスト曲を素早く量産できるタイプの両方を試すと◎';
+  }
+  if (state.purpose === '研修動画' || state.purpose === 'マニュアル動画' || state.purpose === 'プレゼン') {
+    return '💡 おすすめ: 短めのインストBGMをサッと出せる手軽なタイプが便利です。';
+  }
+  return '💡 まずは項目を選んで指示文を作ってみましょう。';
+}
+
+function updateOutput() {
+  document.getElementById('output').textContent = buildPrompt();
+  document.getElementById('recommend').textContent = getRecommend();
+}
+
+document.getElementById('copyBtn').addEventListener('click', () => {
+  const text = document.getElementById('output').textContent;
+  navigator.clipboard.writeText(text).then(() => showToast('コピーしました'));
+});
+
+document.getElementById('saveBtn').addEventListener('click', () => {
+  const text = document.getElementById('output').textContent;
+  if (!text || text.startsWith('まずは')) { showToast('先に項目を選んでください'); return; }
+  const list = JSON.parse(localStorage.getItem('bgm_prompts') || '[]');
+  list.unshift({ text, date: new Date().toLocaleString('ja-JP') });
+  localStorage.setItem('bgm_prompts', JSON.stringify(list.slice(0, 20)));
+  renderHistory();
+  showToast('保存しました');
+});
+
+function renderHistory() {
+  const list = JSON.parse(localStorage.getItem('bgm_prompts') || '[]');
+  const box = document.getElementById('history');
+  if (!list.length) { box.innerHTML = '保存された指示文はありません。'; return; }
+  box.innerHTML = list.map((item, i) => `
+    <div class="history-item">
+      <div class="meta">${item.date}</div>
+      <div>${escapeHtml(item.text)}</div>
+      <button class="del" data-i="${i}">削除</button>
+    </div>
+  `).join('');
+  box.querySelectorAll('.del').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const i = parseInt(btn.dataset.i);
+      const list = JSON.parse(localStorage.getItem('bgm_prompts') || '[]');
+      list.splice(i, 1);
+      localStorage.setItem('bgm_prompts', JSON.stringify(list));
+      renderHistory();
+    });
+  });
+}
+
+function escapeHtml(s) {
+  return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 1800);
+}
+
+updateOutput();
+renderHistory();
+</script>
+<!-- hitotsu-cta -->
+<div style="max-width:720px;margin:40px auto 0;padding:24px 20px;border-radius:14px;
+  background:#14141a;color:#c9c9d1;
+  font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic',sans-serif;
+  font-size:14px;line-height:1.9;">
+  <p style="margin:0 0 12px;color:#f0b429;font-weight:bold;font-size:13px;letter-spacing:.08em;">
+    ⚙ この道具のつくられ方
+  </p>
+  <p style="margin:0 0 14px;">
+    昨日の夜、AI社員が勝手に作りました。<br>
+    人間がキーボードを触った時間は、<strong style="color:#fff;">0分</strong>です。
+  </p>
+  <p style="margin:0 0 18px;">
+    「うちの仕事でもこれ、動かせないかな」と思った方へ。<br>
+    受け取り方は3つあります。
+  </p>
+  <p style="margin:0 0 12px;">
+    <a href="https://line.me/R/ti/p/@188jocyd" style="display:inline-block;background:#06c755;color:#fff;
+      text-decoration:none;padding:14px 22px;border-radius:10px;font-weight:bold;">
+      ① 無料でもらう ─ LINEで「AI社員」と送る →
+    </a>
+  </p>
+  <p style="margin:0 0 12px;">
+    <a href="https://hitotsu-company-hp.hitotsucompany.workers.dev/books.html" style="display:inline-block;background:transparent;color:#f0b429;
+      border:1px solid #f0b429;text-decoration:none;padding:13px 22px;border-radius:10px;font-weight:bold;">
+      ② じっくり読む ─ Kindleの本（500円〜）→
+    </a>
+  </p>
+  <p style="margin:0 0 8px;">
+    <a href="https://coconala.com/services/4325740" style="display:inline-block;background:#f0b429;color:#0d0d0f;
+      text-decoration:none;padding:14px 22px;border-radius:10px;font-weight:bold;">
+      ③ つくってもらう ─ ココナラで相談する →
+    </a><br>
+    <span style="font-size:12.5px;color:#8b8b95;">
+      現場のやり方をうかがってから、あなた専用の1本を作ります（10,000円・お届けまで3日）
+    </span>
+  </p>
+  <p style="margin:14px 0 0;font-size:12.5px;color:#71717a;">
+    ほかの道具は<a href="./" style="color:#f0b429;">道具箱</a>に／
+    仕組みの全体像は<a href="https://note.com/hitotsu_ai/n/n493aa3b424cd" style="color:#f0b429;">こちらのnote</a>で公開中<br>
+    hitotsu company
+  </p>
+</div>
+</body>
+</html>
