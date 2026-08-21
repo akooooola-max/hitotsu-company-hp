@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="議事録や日報のメモを、AIに貼るだけの依頼文に一発変換">
+<title>議事録・日報 依頼文メーカー</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, "Hiragino Sans", "Yu Gothic", sans-serif;
+    background: #f4f6f9;
+    color: #222;
+    margin: 0;
+    padding: 16px;
+    line-height: 1.7;
+  }
+  .container {
+    max-width: 760px;
+    margin: 0 auto;
+    background: #fff;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+  }
+  h1 {
+    font-size: 1.4rem;
+    margin: 0 0 8px;
+    color: #1a3d6b;
+  }
+  .lead {
+    font-size: 0.9rem;
+    color: #555;
+    margin-bottom: 20px;
+  }
+  .tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 16px;
+    border-bottom: 2px solid #e0e5ec;
+  }
+  .tab {
+    flex: 1;
+    padding: 10px;
+    background: none;
+    border: none;
+    font-size: 0.95rem;
+    cursor: pointer;
+    color: #666;
+    border-bottom: 3px solid transparent;
+    margin-bottom: -2px;
+  }
+  .tab.active {
+    color: #1a3d6b;
+    border-bottom-color: #1a3d6b;
+    font-weight: bold;
+  }
+  label {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: bold;
+    margin: 14px 0 6px;
+    color: #333;
+  }
+  .hint {
+    font-size: 0.8rem;
+    color: #888;
+    font-weight: normal;
+    margin-left: 6px;
+  }
+  textarea, input[type=text], select {
+    width: 100%;
+    padding: 10px;
+    font-size: 0.95rem;
+    border: 1px solid #cfd6e0;
+    border-radius: 6px;
+    font-family: inherit;
+    background: #fafbfc;
+  }
+  textarea {
+    min-height: 140px;
+    resize: vertical;
+  }
+  .row {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .row > div { flex: 1; min-width: 140px; }
+  .btn {
+    display: inline-block;
+    padding: 12px 20px;
+    background: #1a3d6b;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    cursor: pointer;
+    margin-top: 16px;
+  }
+  .btn:hover { background: #26548f; }
+  .btn.copy {
+    background: #2d9e5f;
+    margin-top: 8px;
+  }
+  .btn.copy:hover { background: #37b970; }
+  .btn.sub {
+    background: #eee;
+    color: #444;
+    padding: 8px 14px;
+    font-size: 0.85rem;
+  }
+  .output {
+    background: #f0f3f7;
+    border: 1px solid #dde3ea;
+    padding: 14px;
+    border-radius: 6px;
+    margin-top: 16px;
+    white-space: pre-wrap;
+    font-size: 0.9rem;
+    min-height: 60px;
+  }
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #333;
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 6px;
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
+    font-size: 0.9rem;
+  }
+  .toast.show { opacity: 1; }
+  .steps {
+    background: #eef4fb;
+    border-left: 3px solid #1a3d6b;
+    padding: 10px 14px;
+    font-size: 0.85rem;
+    margin-bottom: 16px;
+    border-radius: 4px;
+  }
+  .steps ol { margin: 4px 0; padding-left: 20px; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>議事録・日報 依頼文メーカー</h1>
+  <p class="lead">会議メモや作業メモを貼り付けて「作る」を押すだけ。AIに貼るだけで整った文章にしてくれる依頼文ができあがります。</p>
+
+  <div class="steps">
+    <strong>使い方（3ステップ）</strong>
+    <ol>
+      <li>下のタブから「議事録」か「日報」を選ぶ</li>
+      <li>手元のメモを貼り付けて「依頼文を作る」を押す</li>
+      <li>できた依頼文をコピーして、お使いのAIに貼り付ける</li>
+    </ol>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" data-tab="gijiroku">議事録の整理</button>
+    <button class="tab" data-tab="nippou">日報の作成</button>
+  </div>
+
+  <!-- 議事録タブ -->
+  <div id="tab-gijiroku">
+    <label>会議の文字起こし・メモ<span class="hint">（そのまま貼り付けOK）</span></label>
+    <textarea id="gijiroku-text" placeholder="例：本日の営業会議。田中さんから新商品の進捗共有。来週までにパンフレット作成、鈴木さん担当。次回は10月20日..."></textarea>
+
+    <div class="row">
+      <div>
+        <label>まとめるポイント</label>
+        <select id="gijiroku-focus">
+          <option value="決定事項とタスク（担当者・期限つき）">決定事項とタスク（担当・期限つき）</option>
+          <option value="議論の要点と結論">議論の要点と結論</option>
+          <option value="決定事項・宿題・次回予定">決定事項・宿題・次回予定</option>
+        </select>
+      </div>
+      <div>
+        <label>文体</label>
+        <select id="gijiroku-tone">
+          <option value="ですます調">ですます調</option>
+          <option value="である調">である調</option>
+          <option value="箇条書きのみ">箇条書きのみ</option>
+        </select>
+      </div>
+    </div>
+
+    <button class="btn" onclick="makeGijiroku()">依頼文を作る</button>
+  </div>
+
+  <!-- 日報タブ -->
+  <div id="tab-nippou" style="display:none;">
+    <label>今日やった作業メモ<span class="hint">（走り書きでOK）</span></label>
+    <textarea id="nippou-text" placeholder="例：午前中は見積書作成2件、A社訪問、資料修正。午後は社内MTG、来週のプレゼン準備..."></textarea>
+
+    <div class="row">
+      <div>
+        <label>提出先</label>
+        <select id="nippou-target">
+          <option value="上司">上司</option>
+          <option value="チームメンバー">チームメンバー</option>
+          <option value="お客様">お客様</option>
+        </select>
+      </div>
+      <div>
+        <label>文体</label>
+        <select id="nippou-tone">
+          <option value="ですます調">ですます調</option>
+          <option value="である調">である調</option>
+        </select>
+      </div>
+    </div>
+
+    <label>盛り込みたい項目<span class="hint">（不要ならそのまま）</span></label>
+    <div class="row">
+      <div><label style="font-weight:normal;"><input type="checkbox" id="nippou-item1" checked> 本日の業務</label></div>
+      <div><label style="font-weight:normal;"><input type="checkbox" id="nippou-item2" checked> 進捗・成果</label></div>
+      <div><label style="font-weight:normal;"><input type="checkbox" id="nippou-item3" checked> 明日の予定</label></div>
+      <div><label style="font-weight:normal;"><input type="checkbox" id="nippou-item4"> 課題・相談事項</label></div>
+    </div>
+
+    <button class="btn" onclick="makeNippou()">依頼文を作る</button>
+  </div>
+
+  <label style="margin-top:20px;">できあがった依頼文</label>
+  <div class="output" id="output">ここに依頼文が表示されます。</div>
+  <button class="btn copy" onclick="copyOutput()">コピーする</button>
+  <button class="btn sub" onclick="clearAll()">入力をクリア</button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  // タブ切替
+  document.querySelectorAll('.tab').forEach(t => {
+    t.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+      t.classList.add('active');
+      const tab = t.dataset.tab;
+      document.getElementById('tab-gijiroku').style.display = tab === 'gijiroku' ? 'block' : 'none';
+      document.getElementById('tab-nippou').style.display = tab === 'nippou' ? 'block' : 'none';
+    });
+  });
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 1800);
+  }
+
+  function makeGijiroku() {
+    const text = document.getElementById('gijiroku-text').value.trim();
+    if (!text) { showToast('メモを入力してください'); return; }
+    const focus = document.getElementById('gijiroku-focus').value;
+    const tone = document.getElementById('gijiroku-tone').value;
+
+    const prompt =
+`以下の会議メモを、読みやすい議事録に整理してください。
+
+【まとめる観点】
+${focus}
+
+【出力ルール】
+・文体：${tone}
+・見出しを付けて構造化する
+・タスクは「担当者／内容／期限」がわかる形で書く
+・元メモにない情報は勝手に足さない
+・不明な点は「（要確認）」と明記する
+
+【会議メモ】
+${text}`;
+
+    document.getElementById('output').textContent = prompt;
+    saveHistory('gijiroku', text);
+  }
+
+  function makeNippou() {
+    const text = document.getElementById('nippou-text').value.trim();
+    if (!text) { showToast('メモを入力してください'); return; }
+    const target = document.getElementById('nippou-target').value;
+    const tone = document.getElementById('nippou-tone').value;
+    const items = [];
+    if (document.getElementById('nippou-item1').checked) items.push('本日の業務');
+    if (document.getElementById('nippou-item2').checked) items.push('進捗・成果');
+    if (document.getElementById('nippou-item3').checked) items.push('明日の予定');
+    if (document.getElementById('nippou-item4').checked) items.push('課題・相談事項');
+
+    const prompt =
+`以下の作業メモを、${target}に提出する日報に整えてください。
+
+【出力ルール】
+・文体：${tone}
+・以下の項目を見出しにして書く：${items.join(' / ')}
+・各項目は箇条書き（最大3〜5個）
+・元メモにない情報は勝手に足さない
+・簡潔で読みやすくまとめる
+
+【作業メモ】
+${text}`;
+
+    document.getElementById('output').textContent = prompt;
+    saveHistory('nippou', text);
+  }
+
+  function copyOutput() {
+    const text = document.getElementById('output').textContent;
+    if (!text || text.startsWith('ここに')) { showToast('先に依頼文を作ってください'); return; }
+    navigator.clipboard.writeText(text).then(() => {
+      showToast('コピーしました');
+    }).catch(() => {
+      // フォールバック
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      showToast('コピーしました');
+    });
+  }
+
+  function clearAll() {
+    document.getElementById('gijiroku-text').value = '';
+    document.getElementById('nippou-text').value = '';
+    document.getElementById('output').textContent = 'ここに依頼文が表示されます。';
+    showToast('クリアしました');
+  }
+
+  // 直近入力の保存・復元
+  function saveHistory(type, text) {
+    try { localStorage.setItem('last-' + type, text); } catch(e) {}
+  }
+  window.addEventListener('load', () => {
+    try {
+      const g = localStorage.getItem('last-gijiroku');
+      const n = localStorage.getItem('last-nippou');
+      if (g) document.getElementById('gijiroku-text').value = g;
+      if (n) document.getElementById('nippou-text').value = n;
+    } catch(e) {}
+  });
+  // 入力時に自動保存
+  document.getElementById('gijiroku-text').addEventListener('input', e => saveHistory('gijiroku', e.target.value));
+  document.getElementById('nippou-text').addEventListener('input', e => saveHistory('nippou', e.target.value));
+</script>
+<!-- hitotsu-cta -->
+<div style="max-width:720px;margin:40px auto 0;padding:24px 20px;border-radius:14px;
+  background:#14141a;color:#c9c9d1;
+  font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic',sans-serif;
+  font-size:14px;line-height:1.9;">
+  <p style="margin:0 0 12px;color:#f0b429;font-weight:bold;font-size:13px;letter-spacing:.08em;">
+    ⚙ この道具のつくられ方
+  </p>
+  <p style="margin:0 0 14px;">
+    昨日の夜、AI社員が勝手に作りました。<br>
+    人間がキーボードを触った時間は、<strong style="color:#fff;">0分</strong>です。
+  </p>
+  <p style="margin:0 0 18px;">
+    「うちの仕事でもこれ、動かせないかな」と思った方へ。<br>
+    受け取り方は3つあります。
+  </p>
+  <p style="margin:0 0 12px;">
+    <a href="https://line.me/R/ti/p/@188jocyd" style="display:inline-block;background:#06c755;color:#fff;
+      text-decoration:none;padding:14px 22px;border-radius:10px;font-weight:bold;">
+      ① 無料でもらう ─ LINEで「AI社員」と送る →
+    </a>
+  </p>
+  <p style="margin:0 0 12px;">
+    <a href="https://hitotsu-company.com/books.html" style="display:inline-block;background:transparent;color:#f0b429;
+      border:1px solid #f0b429;text-decoration:none;padding:13px 22px;border-radius:10px;font-weight:bold;">
+      ② じっくり読む ─ Kindleの本（500円〜）→
+    </a>
+  </p>
+  <p style="margin:0 0 8px;">
+    <a href="https://coconala.com/services/4325740" style="display:inline-block;background:#f0b429;color:#0d0d0f;
+      text-decoration:none;padding:14px 22px;border-radius:10px;font-weight:bold;">
+      ③ つくってもらう ─ ココナラで相談する →
+    </a><br>
+    <span style="font-size:12.5px;color:#8b8b95;">
+      現場のやり方をうかがってから、あなた専用の1本を作ります（10,000円・お届けまで3日）
+    </span>
+  </p>
+  <p style="margin:14px 0 0;font-size:12.5px;color:#71717a;">
+    ほかの道具は<a href="./" style="color:#f0b429;">道具箱</a>に／
+    仕組みの全体像は<a href="https://note.com/hitotsu_ai/n/n493aa3b424cd" style="color:#f0b429;">こちらのnote</a>で公開中<br>
+    hitotsu company
+  </p>
+</div>
+</body>
+</html>
