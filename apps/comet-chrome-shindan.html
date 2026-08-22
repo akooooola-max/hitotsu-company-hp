@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="AIブラウザと従来ブラウザ。今日の作業でどっち使うか3問で決める">
+<title>ブラウザ使い分け診断</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic",sans-serif;background:#f4f6fa;color:#222;line-height:1.7;padding:20px;min-height:100vh}
+  .wrap{max-width:640px;margin:0 auto}
+  header{text-align:center;padding:24px 16px;margin-bottom:20px}
+  h1{font-size:22px;color:#1a3a6c;margin-bottom:8px}
+  .sub{font-size:14px;color:#666}
+  .card{background:#fff;border-radius:12px;padding:24px 20px;margin-bottom:16px;box-shadow:0 2px 10px rgba(0,0,0,.06)}
+  h2{font-size:16px;color:#1a3a6c;margin-bottom:14px;padding-left:10px;border-left:4px solid #4a7bc9}
+  .q{margin-bottom:20px}
+  .q p{font-weight:600;margin-bottom:10px;font-size:15px}
+  .opts{display:flex;flex-direction:column;gap:8px}
+  .opts label{display:flex;align-items:flex-start;gap:10px;padding:12px 14px;background:#f7f9fc;border:2px solid transparent;border-radius:8px;cursor:pointer;font-size:14px;transition:.15s}
+  .opts label:hover{background:#eef3fa}
+  .opts label.sel{background:#e6efff;border-color:#4a7bc9}
+  .opts input{margin-top:3px;flex-shrink:0}
+  button{width:100%;padding:14px;background:#1a3a6c;color:#fff;border:none;border-radius:8px;font-size:16px;font-weight:600;cursor:pointer;margin-top:8px}
+  button:hover{background:#254e8f}
+  button:disabled{background:#aaa;cursor:not-allowed}
+  .result{display:none}
+  .result.show{display:block}
+  .rec{background:linear-gradient(135deg,#1a3a6c,#4a7bc9);color:#fff;padding:20px;border-radius:10px;margin-bottom:16px;text-align:center}
+  .rec .tag{font-size:12px;opacity:.85;margin-bottom:6px}
+  .rec .name{font-size:26px;font-weight:700;margin-bottom:8px}
+  .rec .why{font-size:14px;opacity:.95}
+  .tip{background:#fff8e6;border-left:4px solid #f0b429;padding:14px;border-radius:6px;margin-bottom:14px;font-size:14px}
+  .tip strong{color:#8a5a00}
+  .prompt{background:#f7f9fc;border:1px dashed #b0bed4;border-radius:8px;padding:14px;font-size:13px;white-space:pre-wrap;margin-top:10px;font-family:"Menlo",monospace}
+  .copybtn{background:#4a7bc9;padding:10px;font-size:14px;margin-top:8px}
+  .again{background:#888;margin-top:12px}
+  .log{margin-top:10px}
+  .log-item{background:#f7f9fc;padding:10px 12px;border-radius:6px;margin-bottom:6px;font-size:13px;display:flex;justify-content:space-between;gap:10px}
+  .log-item .date{color:#888;font-size:11px}
+  .empty{color:#888;font-size:13px;text-align:center;padding:16px}
+  footer{text-align:center;font-size:12px;color:#888;padding:20px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>🧭 ブラウザ使い分け診断</h1>
+    <p class="sub">今日のその作業、どっちで開く？<br>3つの質問で今すぐ決まります</p>
+  </header>
+
+  <div class="card" id="quiz">
+    <h2>今日の作業について教えてください</h2>
+
+    <div class="q">
+      <p>Q1. 今からやろうとしている作業は？</p>
+      <div class="opts" data-q="0">
+        <label><input type="radio" name="q0" value="a"><span>複数サイトを比較して、要点をまとめたい（競合調査、商品比較など）</span></label>
+        <label><input type="radio" name="q0" value="b"><span>いつも使うサイトを開いて、決まった作業をしたい（メール、社内システムなど）</span></label>
+        <label><input type="radio" name="q0" value="c"><span>調べものだが、ざっと1〜2サイト見れば十分</span></label>
+      </div>
+    </div>
+
+    <div class="q">
+      <p>Q2. 求めているアウトプットは？</p>
+      <div class="opts" data-q="1">
+        <label><input type="radio" name="q1" value="a"><span>比較表や要約など、まとまった形で欲しい</span></label>
+        <label><input type="radio" name="q1" value="b"><span>特にまとめは不要。ページを見られればいい</span></label>
+        <label><input type="radio" name="q1" value="c"><span>あとで資料に貼るので、出典URLも一緒にほしい</span></label>
+      </div>
+    </div>
+
+    <div class="q">
+      <p>Q3. 扱う情報の性質は？</p>
+      <div class="opts" data-q="2">
+        <label><input type="radio" name="q2" value="a"><span>公開情報の調査・情報収集</span></label>
+        <label><input type="radio" name="q2" value="b"><span>社内情報・個人情報・機密を含むかも</span></label>
+        <label><input type="radio" name="q2" value="c"><span>ログインが必要な業務システム</span></label>
+      </div>
+    </div>
+
+    <button id="diagnose" disabled>診断する</button>
+  </div>
+
+  <div class="card result" id="result">
+    <div class="rec">
+      <div class="tag">今回のおすすめ</div>
+      <div class="name" id="recName">-</div>
+      <div class="why" id="recWhy">-</div>
+    </div>
+    <div class="tip" id="tip"></div>
+    <div id="promptBox" style="display:none">
+      <h2 style="margin-top:16px">AIへの依頼文（コピペOK）</h2>
+      <p style="font-size:13px;color:#555;margin-top:8px">下の枠内をAIブラウザの入力欄に貼り付けると、そのまま調査してくれます。</p>
+      <div class="prompt" id="promptText"></div>
+      <button class="copybtn" id="copyBtn">📋 依頼文をコピー</button>
+    </div>
+    <button class="again" id="again">もう一度診断する</button>
+  </div>
+
+  <div class="card">
+    <h2>📝 過去の診断メモ</h2>
+    <div class="log" id="log"></div>
+  </div>
+
+  <footer>作業の性質で選ぶ、迷わない使い分け</footer>
+</div>
+
+<script>
+const opts = document.querySelectorAll('.opts');
+const btn = document.getElementById('diagnose');
+const answers = [null, null, null];
+
+opts.forEach(group => {
+  const q = parseInt(group.dataset.q);
+  group.querySelectorAll('label').forEach(lbl => {
+    lbl.addEventListener('click', () => {
+      group.querySelectorAll('label').forEach(l => l.classList.remove('sel'));
+      lbl.classList.add('sel');
+      const inp = lbl.querySelector('input');
+      inp.checked = true;
+      answers[q] = inp.value;
+      btn.disabled = answers.includes(null);
+    });
+  });
+});
+
+btn.addEventListener('click', () => {
+  const [a1, a2, a3] = answers;
+  let rec, why, tip, showPrompt = false, promptText = '';
+
+  // 機密・業務システムは従来ブラウザ推奨
+  if (a3 === 'b' || a3 === 'c') {
+    rec = '従来ブラウザ';
+    why = '機密情報や業務システムは、慣れた従来ブラウザで扱うのが安全です。AIに読み取らせる用途には向きません。';
+    tip = '<strong>ポイント：</strong>ログイン必須のシステムや、社外に出せない情報は、AIブラウザに読ませない運用を基本にしましょう。';
+  } else if (a1 === 'a' || a2 === 'a' || a2 === 'c') {
+    rec = 'AIブラウザ';
+    why = '複数サイトを横断して比較・要約する作業は、AIブラウザに任せると圧倒的に時短できます。';
+    tip = '<strong>使い方のコツ：</strong>「〜と〜を比較して、料金・特徴・向いている人を表にして」のように、欲しい形を具体的に伝えると精度が上がります。';
+    showPrompt = true;
+    promptText = a2 === 'c' 
+      ? '【調査依頼】\n以下について、複数の情報源を比較して回答してください。\n\n■テーマ：（ここに調べたいことを書く。例：東京都内の10名向け貸し会議室）\n■比較したい観点：料金、アクセス、設備、口コミ評価\n■出力形式：表で3〜5件、それぞれ出典URLを併記\n■注意：情報の日付が新しいものを優先'
+      : '【調査依頼】\n以下について、複数の情報源を比較して回答してください。\n\n■テーマ：（ここに調べたいことを書く）\n■比較したい観点：（例：料金／機能／向いている人）\n■出力形式：わかりやすい表で3〜5件\n■注意：情報の日付が新しいものを優先';
+  } else {
+    rec = '従来ブラウザ';
+    why = '軽い調べものや、いつものサイトを開くだけなら、慣れた従来ブラウザのほうが速いです。';
+    tip = '<strong>ポイント：</strong>「ちょっと見るだけ」ならAIを起動する手間のほうが大きい。迷ったら普段のブラウザでOK。';
+  }
+
+  document.getElementById('recName').textContent = rec;
+  document.getElementById('recWhy').textContent = why;
+  document.getElementById('tip').innerHTML = tip;
+  document.getElementById('promptBox').style.display = showPrompt ? 'block' : 'none';
+  document.getElementById('promptText').textContent = promptText;
+
+  document.getElementById('quiz').style.display = 'none';
+  document.getElementById('result').classList.add('show');
+
+  saveLog(rec, why);
+  renderLog();
+});
+
+document.getElementById('again').addEventListener('click', () => {
+  answers[0] = answers[1] = answers[2] = null;
+  document.querySelectorAll('input[type=radio]').forEach(i => i.checked = false);
+  document.querySelectorAll('.opts label').forEach(l => l.classList.remove('sel'));
+  btn.disabled = true;
+  document.getElementById('quiz').style.display = 'block';
+  document.getElementById('result').classList.remove('show');
+  window.scrollTo(0, 0);
+});
+
+document.getElementById('copyBtn').addEventListener('click', () => {
+  const t = document.getElementById('promptText').textContent;
+  navigator.clipboard.writeText(t).then(() => {
+    const b = document.getElementById('copyBtn');
+    const orig = b.textContent;
+    b.textContent = '✓ コピーしました';
+    setTimeout(() => b.textContent = orig, 1500);
+  });
+});
+
+function saveLog(rec, why) {
+  const logs = JSON.parse(localStorage.getItem('browserDiagLog') || '[]');
+  logs.unshift({
+    rec: rec,
+    date: new Date().toLocaleString('ja-JP', {month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'})
+  });
+  localStorage.setItem('browserDiagLog', JSON.stringify(logs.slice(0, 10)));
+}
+
+function renderLog() {
+  const logs = JSON.parse(localStorage.getItem('browserDiagLog') || '[]');
+  const el = document.getElementById('log');
+  if (logs.length === 0) {
+    el.innerHTML = '<div class="empty">まだ診断履歴はありません</div>';
+    return;
+  }
+  el.innerHTML = logs.map(l => 
+    `<div class="log-item"><span>→ ${l.rec}</span><span class="date">${l.date}</span></div>`
+  ).join('');
+}
+
+renderLog();
+</script>
+<!-- hitotsu-cta -->
+<div style="max-width:720px;margin:40px auto 0;padding:24px 20px;border-radius:14px;
+  background:#14141a;color:#c9c9d1;
+  font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic',sans-serif;
+  font-size:14px;line-height:1.9;">
+  <p style="margin:0 0 12px;color:#f0b429;font-weight:bold;font-size:13px;letter-spacing:.08em;">
+    ⚙ この道具のつくられ方
+  </p>
+  <p style="margin:0 0 14px;">
+    昨日の夜、AI社員が勝手に作りました。<br>
+    人間がキーボードを触った時間は、<strong style="color:#fff;">0分</strong>です。
+  </p>
+  <p style="margin:0 0 18px;">
+    「うちの仕事でもこれ、動かせないかな」と思った方へ。<br>
+    受け取り方は3つあります。
+  </p>
+  <p style="margin:0 0 12px;">
+    <a href="https://line.me/R/ti/p/@188jocyd" style="display:inline-block;background:#06c755;color:#fff;
+      text-decoration:none;padding:14px 22px;border-radius:10px;font-weight:bold;">
+      ① 無料でもらう ─ LINEで「AI社員」と送る →
+    </a>
+  </p>
+  <p style="margin:0 0 12px;">
+    <a href="https://hitotsu-company.com/books.html" style="display:inline-block;background:transparent;color:#f0b429;
+      border:1px solid #f0b429;text-decoration:none;padding:13px 22px;border-radius:10px;font-weight:bold;">
+      ② じっくり読む ─ Kindleの本（500円〜）→
+    </a>
+  </p>
+  <p style="margin:0 0 8px;">
+    <a href="https://coconala.com/services/4325740" style="display:inline-block;background:#f0b429;color:#0d0d0f;
+      text-decoration:none;padding:14px 22px;border-radius:10px;font-weight:bold;">
+      ③ つくってもらう ─ ココナラで相談する →
+    </a><br>
+    <span style="font-size:12.5px;color:#8b8b95;">
+      現場のやり方をうかがってから、あなた専用の1本を作ります（10,000円・お届けまで3日）
+    </span>
+  </p>
+  <p style="margin:14px 0 0;font-size:12.5px;color:#71717a;">
+    ほかの道具は<a href="./" style="color:#f0b429;">道具箱</a>に／
+    仕組みの全体像は<a href="https://note.com/hitotsu_ai/n/n493aa3b424cd" style="color:#f0b429;">こちらのnote</a>で公開中<br>
+    hitotsu company
+  </p>
+</div>
+</body>
+</html>
