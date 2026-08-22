@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ToDoリスト</title>
+<style>
+  :root{
+    --bg:#f5f6f8; --card:#ffffff; --text:#1f2430; --muted:#8a90a0;
+    --line:#e8eaf0; --accent:#5b6cff; --accent-soft:#eef0ff;
+    --done:#a8adbd; --carry:#ff8a3d; --carry-soft:#fff1e8; --green:#2fb56b;
+    --shadow:0 1px 3px rgba(20,24,40,.06),0 8px 24px rgba(20,24,40,.05);
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#12141c; --card:#1b1e29; --text:#e9ebf2; --muted:#8a90a5;
+      --line:#2a2e3d; --accent:#7b8bff; --accent-soft:#232744;
+      --done:#5a5f72; --carry:#ff9a55; --carry-soft:#33261c; --green:#3fce7c;
+      --shadow:0 1px 3px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.35);
+    }
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic UI",sans-serif;
+    background:var(--bg);color:var(--text);line-height:1.6;
+    padding:24px 16px 120px;-webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:620px;margin:0 auto}
+  .view[hidden]{display:none}
+  header{margin-bottom:18px}
+  /* 日付行：他ページでも同じ高さを確保してタイトル位置を揃える */
+  .date{font-size:13px;color:var(--muted);font-weight:600;letter-spacing:.02em;min-height:21px}
+  h1{font-size:26px;font-weight:800;letter-spacing:-.01em;margin-top:2px}
+  .sub{font-size:13px;color:var(--muted);margin-top:4px}
+
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;
+        box-shadow:var(--shadow);padding:6px;margin-bottom:18px}
+
+  .addbar{display:flex;gap:8px;padding:8px}
+  .addbar input{flex:1;border:none;background:transparent;color:var(--text);
+        font-size:16px;padding:10px 8px;outline:none}
+  .addbar input::placeholder{color:var(--muted)}
+  .addbtn{border:none;background:var(--accent);color:#fff;font-size:15px;font-weight:700;
+        padding:0 18px;border-radius:10px;cursor:pointer;transition:.15s;white-space:nowrap}
+  .addbtn:active{transform:scale(.96)}
+
+  .prog{display:flex;align-items:center;gap:10px;padding:4px 12px 10px}
+  .bar{flex:1;height:7px;background:var(--line);border-radius:99px;overflow:hidden}
+  .bar > i{display:block;height:100%;width:0;background:var(--green);
+        border-radius:99px;transition:width .3s ease}
+  .prog span{font-size:12px;color:var(--muted);font-weight:700;white-space:nowrap}
+
+  ul{list-style:none}
+  li.task{display:flex;align-items:flex-start;gap:9px;padding:12px 12px;
+        border-top:1px solid var(--line)}
+  li.task .grip{align-self:center;padding:4px 3px}
+  li.task:first-child{border-top:none}
+  .box{flex:none;width:22px;height:22px;border:2px solid var(--line);border-radius:7px;
+        margin-top:1px;cursor:pointer;display:grid;place-items:center;transition:.15s}
+  .box:hover{border-color:var(--accent)}
+  .box.on{background:var(--green);border-color:var(--green)}
+  .box.on::after{content:"";width:6px;height:11px;border:solid #fff;border-width:0 2.5px 2.5px 0;
+        transform:rotate(45deg);margin-top:-2px}
+  .txt{flex:1;font-size:16px;word-break:break-word}
+  .task.done .txt{color:var(--done);text-decoration:line-through}
+  .carry-dot{display:inline-block;width:8px;height:8px;border-radius:50%;
+        background:var(--carry);margin-left:8px;vertical-align:1px}
+  /* 今日のタスク：タップで編集 */
+  .ttxt{outline:none;border-radius:7px;padding:1px 5px;margin-left:-5px;transition:.12s}
+  .ttxt:focus{background:var(--accent-soft)}
+  .del{flex:none;align-self:center;border:none;background:transparent;color:var(--muted);cursor:pointer;
+        font-size:20px;line-height:1;padding:4px 8px;opacity:0;transition:.15s}
+  li.task:hover .del{opacity:.6}
+  .del:hover{opacity:1!important;color:#e5484d}
+  /* 他のリストへ移動 */
+  .move-btn{flex:none;align-self:center;border:none;background:transparent;color:var(--muted);cursor:pointer;
+        font-size:17px;line-height:1;padding:4px 4px;opacity:0;transition:.15s}
+  li.task:hover .move-btn{opacity:.6}
+  .move-btn:hover{opacity:1!important;color:var(--accent)}
+  /* タッチ端末（スマホ・タブレット）ではホバーが無いので常時表示 */
+  @media (hover:none){ .del{opacity:.45} .move-btn{opacity:.45} }
+
+  /* 移動先の選択 */
+  .move-btns{display:flex;flex-direction:column;gap:8px;margin-bottom:10px}
+  .mvbtn{border:1px solid var(--line);background:transparent;color:var(--text);
+        border-radius:10px;padding:12px;font-size:14px;font-weight:800;
+        cursor:pointer;transition:.12s;text-align:center}
+  .mvbtn:hover{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+  #moveCancel{width:100%}
+
+  /* トースト（移動しました） */
+  .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:96px;z-index:60;
+        background:var(--text);color:var(--bg);font-size:13px;font-weight:800;
+        padding:10px 18px;border-radius:99px;box-shadow:var(--shadow);pointer-events:none}
+  .toast[hidden]{display:none}
+
+  .empty{padding:26px 14px;text-align:center;color:var(--muted);font-size:14px}
+
+  /* 毎日のタスクを今日に入れるボタン */
+  .insert-daily{display:block;margin:2px 8px 8px;padding:11px;width:auto;
+        border:1.5px dashed var(--line);background:transparent;color:var(--accent);
+        font-size:14px;font-weight:800;border-radius:11px;cursor:pointer;transition:.15s}
+  .insert-daily:hover{background:var(--accent-soft);border-color:var(--accent)}
+  .insert-daily:active{transform:scale(.99)}
+  .insert-daily[hidden]{display:none}
+
+  /* 毎日すること（テンプレート編集） */
+  ul#dailyList{margin:0}
+  .ditem{display:flex;align-items:center;gap:10px;padding:12px 12px;border-top:1px solid var(--line)}
+  .ditem:first-child{border-top:none}
+  /* 入力欄が上にある場合は1件目との間に区切り線を入れる */
+  .addbar + .notelist .ditem:first-child{border-top:1px solid var(--line)}
+  .dtxt{flex:1;font-size:15px;outline:none;padding:3px 6px;border-radius:7px;transition:.12s}
+  .dtxt:focus{background:var(--accent-soft)}
+  .ditem:hover .del{opacity:.6}
+  .ditem:hover .to-today{opacity:.6}
+  .daily-empty{padding:16px 8px;color:var(--muted);font-size:13px;text-align:center}
+  /* アイデア・いつか → 今日へ戻す */
+  .to-today{flex:none;align-self:center;border:none;background:transparent;color:var(--muted);cursor:pointer;
+        font-size:17px;line-height:1;padding:4px 4px;opacity:0;transition:.12s}
+  .to-today:hover{opacity:1!important;color:var(--accent)}
+  @media (hover:none){ .to-today{opacity:.45} }
+  /* 期日（いつかやる） */
+  .due-wrap{flex:none;align-self:center;display:inline-flex;align-items:center;gap:3px}
+  .due{position:relative;display:inline-flex;align-items:center;
+        border:1px solid var(--line);background:transparent;color:var(--muted);cursor:pointer;
+        font-size:11.5px;font-weight:800;padding:3px 8px;border-radius:99px;white-space:nowrap;transition:.12s}
+  .due:hover{border-color:var(--accent);color:var(--accent)}
+  .due.set{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+  .due.soon{border-color:var(--carry);color:var(--carry);background:var(--carry-soft)}
+  .due.over{border-color:#e5484d;color:#e5484d;background:transparent}
+  /* 透明の日付入力をピル全体に重ねてタップで開く（iOS対応） */
+  .due input[type=date]{position:absolute;inset:0;width:100%;height:100%;
+        opacity:0;margin:0;padding:0;border:0;background:transparent;color:transparent;
+        cursor:pointer;-webkit-appearance:none;appearance:none}
+  .due-clear{flex:none;border:none;background:transparent;color:var(--muted);cursor:pointer;
+        font-size:16px;font-weight:900;line-height:1;padding:2px 4px;opacity:.6;transition:.12s}
+  .due-clear:hover{opacity:1;color:#e5484d}
+  /* 並び替え（長押し＋スライド） */
+  .grip{flex:none;color:var(--muted);font-size:18px;line-height:1;padding:4px 6px;
+        cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none;opacity:.5;transition:.12s}
+  .grip:hover{opacity:1;color:var(--accent)}
+  .grip:active{cursor:grabbing}
+  .ditem{transition:background .12s}
+  .grabbing{background:var(--accent-soft);border-radius:10px;box-shadow:var(--shadow);
+        position:relative;z-index:5}
+  .notelist.dragging{touch-action:none}
+  .notelist.dragging .dtxt,
+  .notelist.dragging .ttxt{pointer-events:none}
+
+  /* 確認モーダル */
+  .modal{position:fixed;inset:0;z-index:50;background:rgba(20,24,40,.45);
+        display:flex;align-items:center;justify-content:center;padding:24px}
+  .modal[hidden]{display:none}
+  .sheet{background:var(--card);border:1px solid var(--line);border-radius:16px;
+        box-shadow:var(--shadow);width:100%;max-width:320px;padding:20px}
+  .sheet-msg{font-size:15px;font-weight:700;text-align:center;margin-bottom:16px;
+        line-height:1.6;word-break:break-word}
+  .sheet-btns{display:flex;gap:8px}
+  .mbtn{flex:1;border:none;border-radius:10px;padding:11px;font-size:14px;font-weight:800;
+        cursor:pointer;transition:.12s}
+  .mbtn:active{transform:scale(.97)}
+  .mbtn.cancel{background:var(--accent-soft);color:var(--text)}
+  .mbtn.danger{background:#e5484d;color:#fff}
+
+  /* 記録 */
+  details.day{background:var(--card);border:1px solid var(--line);border-radius:14px;
+        margin-bottom:10px;overflow:hidden}
+  details.day > summary{list-style:none;cursor:pointer;padding:12px 16px;display:flex;
+        align-items:center;gap:10px;user-select:none}
+  details.day > summary::-webkit-details-marker{display:none}
+  .day-date{font-size:14px;font-weight:800}
+  .day-count{font-size:12px;color:var(--muted);font-weight:800;margin-left:auto}
+  details.day[open] > summary{border-bottom:1px solid var(--line)}
+  .rec{padding:6px 16px 12px}
+  .rec div{font-size:14px;color:var(--text);padding:6px 0;padding-left:22px;position:relative}
+  .rec div::before{content:"✓";position:absolute;left:0;color:var(--green);font-weight:800}
+  .clear-record{display:block;margin:10px auto 0;border:none;background:transparent;
+        color:var(--muted);font-size:12.5px;font-weight:700;cursor:pointer;
+        padding:8px 14px;border-radius:9px;transition:.12s}
+  .clear-record:hover{color:#e5484d;background:var(--carry-soft)}
+  .clear-record[hidden]{display:none}
+
+  /* 下タブバー */
+  .tabbar{position:fixed;left:0;right:0;bottom:0;z-index:30;
+        display:flex;justify-content:center;gap:6px;
+        background:var(--card);border-top:1px solid var(--line);
+        padding:6px 10px calc(22px + env(safe-area-inset-bottom,0px));
+        box-shadow:0 -2px 14px rgba(20,24,40,.05)}
+  .tabbar button{flex:1;max-width:110px;border:none;background:transparent;cursor:pointer;
+        display:flex;flex-direction:column;align-items:center;gap:1px;
+        padding:6px 2px;border-radius:12px;color:var(--muted);
+        font-size:11px;font-weight:800;transition:.12s}
+  .tabbar button .ic{font-size:20px;line-height:1.1}
+  .tabbar button:hover{color:var(--text)}
+  .tabbar button.active{color:var(--accent);background:var(--accent-soft)}
+
+  /* スマホ向け微調整 */
+  @media (max-width:480px){
+    body{padding:16px 12px 120px}
+    h1{font-size:23px}
+    .sub{font-size:12px}
+    .txt{font-size:15.5px}
+    .addbar input{font-size:16px} /* iOSの自動ズーム防止に16px維持 */
+    .addbtn{padding:0 14px}
+    .tabbar{gap:2px;padding:6px 4px calc(22px + env(safe-area-inset-bottom,0px))}
+    .tabbar button{font-size:10px;padding:6px 1px}
+    .tabbar button .ic{font-size:18px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ===== 今日 ===== -->
+  <section class="view" id="view-today">
+    <header>
+      <div class="date" id="today"></div>
+      <h1>今日のToDo</h1>
+      <div class="sub">未完了は翌日へ自動で持ち越しされます</div>
+    </header>
+    <div class="card">
+      <div class="addbar">
+        <input id="input" type="text" placeholder="やることを入力してEnter" autocomplete="off">
+        <button class="addbtn" id="add">追加</button>
+      </div>
+      <button class="insert-daily" id="insertDaily" hidden></button>
+      <div class="prog">
+        <div class="bar"><i id="fill"></i></div>
+        <span id="count">0 / 0</span>
+      </div>
+      <ul id="list" class="notelist"></ul>
+    </div>
+  </section>
+
+  <!-- ===== 毎日 ===== -->
+  <section class="view" id="view-daily" hidden>
+    <header>
+      <div class="date"></div>
+      <h1>毎日すること</h1>
+      <div class="sub">今日ページのボタンでまとめて追加できます</div>
+    </header>
+    <div class="card">
+      <div class="addbar">
+        <input id="dailyInput" type="text" placeholder="毎日やることを入力してEnter" autocomplete="off">
+        <button class="addbtn" id="dailyAdd">追加</button>
+      </div>
+      <ul id="dailyList" class="notelist"></ul>
+    </div>
+  </section>
+
+  <!-- ===== アイデア ===== -->
+  <section class="view" id="view-ideas" hidden>
+    <header>
+      <div class="date"></div>
+      <h1>アイデア</h1>
+      <div class="sub">思いついたことを気軽にメモ</div>
+    </header>
+    <div class="card">
+      <div class="addbar">
+        <input id="ideaInput" type="text" placeholder="アイデアを入力してEnter" autocomplete="off">
+        <button class="addbtn" id="ideaAdd">追加</button>
+      </div>
+      <ul id="ideaList" class="notelist"></ul>
+    </div>
+  </section>
+
+  <!-- ===== いつかやる ===== -->
+  <section class="view" id="view-someday" hidden>
+    <header>
+      <div class="date"></div>
+      <h1>いつかやる</h1>
+      <div class="sub">今すぐじゃないけど、いつかやりたいこと</div>
+    </header>
+    <div class="card">
+      <div class="addbar">
+        <input id="somedayInput" type="text" placeholder="いつかやることを入力してEnter" autocomplete="off">
+        <button class="addbtn" id="somedayAdd">追加</button>
+      </div>
+      <ul id="somedayList" class="notelist"></ul>
+    </div>
+  </section>
+
+  <!-- ===== 記録 ===== -->
+  <section class="view" id="view-record" hidden>
+    <header>
+      <div class="date"></div>
+      <h1>これまでの記録</h1>
+      <div class="sub">完了したタスクが日ごとに残ります</div>
+    </header>
+    <div id="history"></div>
+    <button class="clear-record" id="clearRecord" hidden>記録をすべて消す</button>
+  </section>
+
+</div>
+
+<nav class="tabbar">
+  <button data-view="today"><span class="ic">📋</span>今日</button>
+  <button data-view="daily"><span class="ic">🔁</span>毎日</button>
+  <button data-view="ideas"><span class="ic">💡</span>アイデア</button>
+  <button data-view="someday"><span class="ic">⏳</span>いつか</button>
+  <button data-view="record"><span class="ic">📚</span>記録</button>
+</nav>
+
+<div class="toast" id="toast" hidden></div>
+
+<div class="modal" id="moveModal" hidden>
+  <div class="sheet">
+    <div class="sheet-msg" id="moveMsg"></div>
+    <div class="move-btns">
+      <button class="mvbtn" data-dest="today">📋 今日のToDo</button>
+      <button class="mvbtn" data-dest="daily">🔁 毎日</button>
+      <button class="mvbtn" data-dest="ideas">💡 アイデア</button>
+      <button class="mvbtn" data-dest="someday">⏳ いつか</button>
+    </div>
+    <button class="mbtn cancel" id="moveCancel">キャンセル</button>
+  </div>
+</div>
+
+<div class="modal" id="modal" hidden>
+  <div class="sheet">
+    <div class="sheet-msg" id="modalMsg"></div>
+    <div class="sheet-btns">
+      <button class="mbtn cancel" id="modalCancel">キャンセル</button>
+      <button class="mbtn danger" id="modalOk">削除する</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const KEY = "todo_app_v1";
+const $ = s => document.querySelector(s);
+
+const todayStr = () => {
+  const d = new Date();
+  return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+};
+const fmtDate = s => {
+  const [y,m,d] = s.split("-").map(Number);
+  const w = ["日","月","火","水","木","金","土"][new Date(y,m-1,d).getDay()];
+  return `${y}年${m}月${d}日（${w}）`;
+};
+const fmtDateShort = s => {
+  const [y,m,d] = s.split("-").map(Number);
+  const w = ["日","月","火","水","木","金","土"][new Date(y,m-1,d).getDay()];
+  return `${m}/${d}（${w}）`;
+};
+
+let tasks = load();
+function load(){ try{ return JSON.parse(localStorage.getItem(KEY)) || []; }catch(e){ return []; } }
+function save(){ localStorage.setItem(KEY, JSON.stringify(tasks)); }
+
+function addTask(text){
+  text = text.trim();
+  if(!text) return;
+  tasks.unshift({ id:Date.now()+"_"+Math.random().toString(36).slice(2,6),
+               text, done:false, created:todayStr(), doneAt:null, doneDate:null });
+  save(); render();
+}
+function toggle(id){
+  const t = tasks.find(x=>x.id===id);
+  if(!t) return;
+  if(t.done){ t.done=false; t.doneAt=null; t.doneDate=null; }
+  else { t.done=true; t.doneAt=new Date().toISOString(); t.doneDate=todayStr(); }
+  save(); render();
+}
+async function del(id){
+  const t = tasks.find(x=>x.id===id);
+  if(!t) return;
+  if(!await askConfirm(`「${t.text}」を消しますか？`)) return;
+  tasks = tasks.filter(x=>x.id!==id); save(); render();
+}
+
+/* ===== 確認モーダル（native confirm の代わり） ===== */
+function askConfirm(msg){
+  return new Promise(res=>{
+    const modal=$("#modal"), ok=$("#modalOk"), cancel=$("#modalCancel");
+    $("#modalMsg").textContent = msg;
+    modal.hidden = false;
+    const close=v=>{
+      modal.hidden = true;
+      ok.removeEventListener("click",onOk);
+      cancel.removeEventListener("click",onCancel);
+      modal.removeEventListener("click",onBg);
+      res(v);
+    };
+    const onOk=()=>close(true), onCancel=()=>close(false);
+    const onBg=e=>{ if(e.target===modal) close(false); };
+    ok.addEventListener("click",onOk);
+    cancel.addEventListener("click",onCancel);
+    modal.addEventListener("click",onBg);
+  });
+}
+
+function render(){
+  const today = todayStr();
+  $("#today").textContent = fmtDate(today);
+
+  // ---- 今日のリスト：未完了(全部) ＋ 今日完了した分 ----
+  // 今日入力したものを上、持ち越しを下に（各グループ内の順番は維持）
+  const active = tasks.filter(t=>!t.done)
+    .sort((a,b)=> (a.created!==today?1:0) - (b.created!==today?1:0));
+  const doneToday = tasks.filter(t=>t.done && (t.doneDate||(t.doneAt||"").slice(0,10))===today);
+  const list = $("#list");
+  list.innerHTML = "";
+
+  if(active.length===0 && doneToday.length===0){
+    list.innerHTML = '<div class="empty">今日のやることはまだありません 🌱<br>上の欄から追加しましょう</div>';
+  }
+  active.forEach(t=>list.appendChild(row(t, today)));
+  doneToday.forEach(t=>list.appendChild(row(t, today)));
+
+  // 進捗（今日ぶん）
+  const totalToday = active.length + doneToday.length;
+  const pct = totalToday ? Math.round(doneToday.length/totalToday*100) : 0;
+  $("#fill").style.width = pct+"%";
+  $("#count").textContent = `${doneToday.length} / ${totalToday} 完了`;
+
+  renderHistory(today);
+}
+
+function row(t, today){
+  const li = document.createElement("li");
+  li.className = "task" + (t.done ? " done" : "");
+  li.dataset.id = t.id;
+  const carried = !t.done && t.created !== today;
+
+  const box = document.createElement("div");
+  box.className = "box" + (t.done ? " on" : "");
+  box.onclick = ()=>toggle(t.id);
+
+  const wrap = document.createElement("div");
+  wrap.className = "txt";
+  const span = document.createElement("span");
+  span.className = "ttxt";
+  span.contentEditable = "true"; span.spellcheck = false;
+  span.textContent = t.text;
+  span.addEventListener("blur", ()=>{
+    const v = span.textContent.trim();
+    if(!v){ span.textContent = t.text; return; }   // 空にしたら元に戻す
+    if(v !== t.text){ t.text = v; save(); renderHistory(todayStr()); }
+  });
+  span.addEventListener("keydown", e=>{ if(e.key==="Enter"){ e.preventDefault(); span.blur(); } });
+  wrap.appendChild(span);
+  if(carried){
+    const b = document.createElement("span");
+    b.className = "carry-dot"; b.title = "持ち越し";
+    wrap.appendChild(b);
+  }
+
+  const x = document.createElement("button");
+  x.className = "del"; x.textContent = "×"; x.title = "削除";
+  x.onclick = ()=>del(t.id);
+
+  if(!t.done){
+    const mv = document.createElement("button");
+    mv.className = "move-btn"; mv.textContent = "→"; mv.title = "他のリストへ移動";
+    mv.onclick = ()=>moveTask(t.id);
+    const grip = document.createElement("span");
+    grip.className = "grip"; grip.textContent = "≡"; grip.title = "長押し＆スライドで並び替え";
+    li.append(box, wrap, mv, grip, x);
+  } else {
+    li.append(box, wrap, x);
+  }
+  return li;
+}
+
+function renderHistory(today){
+  // 完了タスクを日付ごとに（今日を含む＝その日の記録）
+  const byDay = {};
+  tasks.filter(t=>t.done && t.doneAt).forEach(t=>{
+    const d = t.doneDate || t.doneAt.slice(0,10);
+    (byDay[d] ||= []).push(t);
+  });
+  const days = Object.keys(byDay).sort().reverse();
+  const box = $("#history");
+  box.innerHTML = "";
+  $("#clearRecord").hidden = (days.length===0);
+  if(days.length===0){
+    box.innerHTML = '<div class="empty">完了したタスクがここに日ごとにたまります 📚</div>';
+    return;
+  }
+  days.forEach((d,i)=>{
+    const items = byDay[d].sort((a,b)=>a.doneAt.localeCompare(b.doneAt));
+    const det = document.createElement("details");
+    det.className = "day";
+    if(i===0) det.open = true;
+    const label = d===today ? "今日 " : "";
+    det.innerHTML =
+      `<summary><span class="day-date">${label}${fmtDateShort(d)}</span>`+
+      `<span class="day-count">${items.length}件 完了</span></summary>`+
+      `<div class="rec">`+
+      items.map(t=>`<div>${esc(t.text)}</div>`).join("")+
+      `</div>`;
+    box.appendChild(det);
+  });
+}
+function esc(s){ return s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+
+$("#add").onclick = ()=>{ addTask($("#input").value); $("#input").value=""; $("#input").focus(); };
+$("#input").addEventListener("keydown", e=>{ if(e.key==="Enter"){ addTask($("#input").value); $("#input").value=""; } });
+
+/* ===== 今日のタスクを他のリストへ移動 ===== */
+let ideaList = null, somedayList = null;
+let toastTimer = null;
+function toast(msg){
+  const el = $("#toast");
+  el.textContent = msg; el.hidden = false;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>{ el.hidden = true; }, 1600);
+}
+// 移動先を選択（allowed で表示する候補を指定）
+function askMove(text, allowed){
+  allowed = allowed || ["daily","ideas","someday"];
+  return new Promise(res=>{
+    const modal = $("#moveModal"), cancel = $("#moveCancel");
+    $("#moveMsg").textContent = `「${text}」をどこへ移動しますか？`;
+    const btns = [...modal.querySelectorAll(".mvbtn")];
+    btns.forEach(b=>{ b.hidden = !allowed.includes(b.dataset.dest); });
+    modal.hidden = false;
+    const close = v=>{
+      modal.hidden = true;
+      btns.forEach(b=>b.removeEventListener("click", b._h));
+      cancel.removeEventListener("click", onCancel);
+      modal.removeEventListener("click", onBg);
+      res(v);
+    };
+    const onCancel = ()=>close(null);
+    const onBg = e=>{ if(e.target===modal) close(null); };
+    btns.forEach(b=>{ b._h = ()=>close(b.dataset.dest); b.addEventListener("click", b._h); });
+    cancel.addEventListener("click", onCancel);
+    modal.addEventListener("click", onBg);
+  });
+}
+// テキストを指定リストへ入れる（重複はしない）。表示名を返す
+function insertInto(dest, text){
+  if(dest==="today"){
+    const today = todayStr();
+    const present = new Set(tasks.filter(t=>!t.done || (t.doneDate||(t.doneAt||"").slice(0,10))===today).map(t=>t.text));
+    if(!present.has(text)){
+      tasks.unshift({ id:Date.now()+"_"+Math.random().toString(36).slice(2,6),
+                      text, done:false, created:today, doneAt:null, doneDate:null });
+      save();
+    }
+    render();
+    return "今日のToDo";
+  }
+  if(dest==="daily"){ if(!dailies.some(d=>d.text===text)) addDaily(text); return "毎日"; }
+  if(dest==="ideas"){ if(ideaList && !ideaList.has(text)) ideaList.add(text); return "アイデア"; }
+  if(dest==="someday"){ if(somedayList && !somedayList.has(text)) somedayList.add(text); return "いつか"; }
+  return "";
+}
+async function moveTask(id){
+  const t = tasks.find(x=>x.id===id);
+  if(!t) return;
+  const dest = await askMove(t.text, ["daily","ideas","someday"]);
+  if(!dest) return;
+  const label = insertInto(dest, t.text);
+  tasks = tasks.filter(x=>x.id!==id);
+  save(); render();
+  toast(`${label}に移動しました`);
+}
+
+$("#clearRecord").onclick = async ()=>{
+  if(!await askConfirm("これまでの完了記録をすべて消しますか？（元に戻せません）")) return;
+  tasks = tasks.filter(t=>!t.done);
+  save(); render();
+};
+
+/* ===== 毎日すること（テンプレート） ===== */
+const DKEY = "todo_daily_v1";
+let dailies = loadDaily();
+function loadDaily(){ try{ return JSON.parse(localStorage.getItem(DKEY)) || []; }catch(e){ return []; } }
+function saveDaily(){ localStorage.setItem(DKEY, JSON.stringify(dailies)); }
+
+function addDaily(text){
+  text = text.trim();
+  if(!text) return;
+  dailies.push({ id:"d"+Date.now()+Math.random().toString(36).slice(2,5), text });
+  saveDaily(); renderDaily();
+}
+function editDaily(id, text){
+  const d = dailies.find(x=>x.id===id);
+  if(!d) return;
+  text = text.trim();
+  if(!text){ removeDaily(id); return; }   // 空にしたら確認なしで削除
+  d.text = text; saveDaily();
+}
+function removeDaily(id){ dailies = dailies.filter(x=>x.id!==id); saveDaily(); renderDaily(); }
+async function delDaily(id){
+  const d = dailies.find(x=>x.id===id);
+  if(!d) return;
+  if(!await askConfirm(`毎日リストから「${d.text}」を消しますか？`)) return;
+  removeDaily(id);
+}
+/* 並び替え（汎用）：グリップを押す or 行を長押し → スライドで上下移動 */
+let drag = null;
+function activateDrag(clientY){
+  if(!drag) return;
+  drag.active = true; drag.startY = clientY;
+  const ae = document.activeElement; if(ae && ae.blur) ae.blur();
+  try{ window.getSelection().removeAllRanges(); }catch(_){}
+  drag.li.classList.add("grabbing");
+  drag.listEl.classList.add("dragging");
+  try{ drag.li.setPointerCapture(drag.pointerId); }catch(_){}
+  if(navigator.vibrate) navigator.vibrate(15);
+}
+function endDrag(){
+  if(!drag) return;
+  clearTimeout(drag.longTimer);
+  if(drag.active){
+    drag.li.classList.remove("grabbing");
+    drag.listEl.classList.remove("dragging");
+    const ids = [...drag.listEl.querySelectorAll("li[data-id]")].map(li=>li.dataset.id);
+    drag.commit(ids);
+  }
+  drag = null;
+}
+function attachListDrag(listEl, commit){
+  listEl.addEventListener("pointerdown", e=>{
+    const li = e.target.closest("li[data-id]");
+    if(!li || e.target.closest(".del") || e.target.closest(".due-wrap") || e.target.closest(".to-today")) return;
+    const onGrip = !!e.target.closest(".grip");
+    drag = { li, listEl, commit, pointerId:e.pointerId, active:false, startY:e.clientY, longTimer:null };
+    if(onGrip){ e.preventDefault(); activateDrag(e.clientY); }
+    else { drag.longTimer = setTimeout(()=>activateDrag(e.clientY), 350); }
+  });
+}
+window.addEventListener("pointermove", e=>{
+  if(!drag) return;
+  if(!drag.active){
+    if(Math.abs(e.clientY - drag.startY) > 10){ clearTimeout(drag.longTimer); drag = null; }
+    return;
+  }
+  e.preventDefault();
+  const li = drag.li, listEl = drag.listEl;
+  const others = [...listEl.querySelectorAll("li[data-id]")].filter(el=>el!==li);
+  let placed = false;
+  for(const s of others){
+    const r = s.getBoundingClientRect();
+    if(e.clientY < r.top + r.height/2){ listEl.insertBefore(li, s); placed = true; break; }
+  }
+  if(!placed) listEl.appendChild(li);
+}, { passive:false });
+window.addEventListener("pointerup", endDrag);
+window.addEventListener("pointercancel", endDrag);
+
+function commitTasks(ids){
+  const shown = ids.map(id=>tasks.find(t=>t.id===id)).filter(Boolean);
+  const rest = tasks.filter(t=>!ids.includes(t.id));   // 過去の完了分など画面外のものは末尾へ
+  tasks = [...shown, ...rest];
+  save(); render();
+}
+function commitDaily(ids){
+  dailies = ids.map(id=>dailies.find(d=>d.id===id)).filter(Boolean);
+  saveDaily(); renderDaily();
+}
+
+/* アイデア／いつかやる：シンプルな編集可能リスト（汎用、withDue で期日対応） */
+function dueInfo(dstr){
+  const [y,m,dd] = dstr.split("-").map(Number);
+  const wk = ["日","月","火","水","木","金","土"][new Date(y,m-1,dd).getDay()];
+  const t0 = new Date(todayStr()+"T00:00:00"), t1 = new Date(dstr+"T00:00:00");
+  const days = Math.round((t1 - t0)/86400000);
+  let cls = "set";
+  if(days < 0) cls = "over";
+  else if(days <= 3) cls = "soon";
+  return { label:`${m}/${dd}（${wk}）`, cls };
+}
+function createNoteList(storeKey, listEl, inputEl, addBtn, emptyText, withDue, selfDest){
+  let arr = loadArr();
+  function loadArr(){ try{ return JSON.parse(localStorage.getItem(storeKey)) || []; }catch(e){ return []; } }
+  function persist(){ localStorage.setItem(storeKey, JSON.stringify(arr)); }
+  function add(text){
+    text = text.trim(); if(!text) return;
+    arr.push({ id:"n"+Date.now()+Math.random().toString(36).slice(2,5), text });
+    persist(); render();
+  }
+  function editItem(id, text){
+    const it = arr.find(x=>x.id===id); if(!it) return;
+    text = text.trim();
+    if(!text){ remove(id); return; }
+    it.text = text; persist();
+  }
+  function setDue(id, val){
+    const it = arr.find(x=>x.id===id); if(!it) return;
+    if(val) it.due = val; else delete it.due;
+    persist(); render();
+  }
+  function remove(id){ arr = arr.filter(x=>x.id!==id); persist(); render(); }
+  async function delItem(id){
+    const it = arr.find(x=>x.id===id); if(!it) return;
+    if(!await askConfirm(`「${it.text}」を消しますか？`)) return;
+    remove(id);
+  }
+  async function moveNoteItem(id){
+    const it = arr.find(x=>x.id===id); if(!it) return;
+    const allowed = ["today","daily","ideas","someday"].filter(k=>k!==selfDest);
+    const dest = await askMove(it.text, allowed);
+    if(!dest) return;
+    const label = insertInto(dest, it.text);
+    remove(id);
+    toast(`${label}に移動しました`);
+  }
+  function makeDue(d){
+    const wrap = document.createElement("span");
+    wrap.className = "due-wrap";
+    const due = document.createElement("label");   // labelにして透明inputをタップで開く
+    due.className = "due";
+    const lbl = document.createElement("span");
+    if(d.due){ const i = dueInfo(d.due); lbl.textContent = i.label; due.classList.add(i.cls); }
+    else { lbl.textContent = "📅 期日"; }
+    due.appendChild(lbl);
+    const input = document.createElement("input");
+    input.type = "date"; input.value = d.due || "";
+    input.addEventListener("change", ()=>setDue(d.id, input.value));
+    due.appendChild(input);
+    wrap.appendChild(due);
+    if(d.due){
+      const clr = document.createElement("button");
+      clr.type = "button"; clr.className = "due-clear"; clr.textContent = "×"; clr.title = "期日を消す";
+      clr.addEventListener("click", e=>{ e.preventDefault(); e.stopPropagation(); setDue(d.id, ""); });
+      wrap.appendChild(clr);
+    }
+    return wrap;
+  }
+  function render(){
+    listEl.innerHTML = "";
+    if(arr.length===0){ listEl.innerHTML = `<div class="daily-empty">${emptyText}</div>`; }
+    arr.forEach(d=>{
+      const li = document.createElement("li");
+      li.className = "ditem"; li.dataset.id = d.id;
+      const tx = document.createElement("span");
+      tx.className = "dtxt"; tx.contentEditable = "true"; tx.spellcheck = false; tx.textContent = d.text;
+      tx.addEventListener("blur", ()=>editItem(d.id, tx.textContent));
+      tx.addEventListener("keydown", e=>{ if(e.key==="Enter"){ e.preventDefault(); tx.blur(); } });
+      const grip = document.createElement("span");
+      grip.className = "grip"; grip.textContent = "≡"; grip.title = "長押し＆スライドで並び替え";
+      const x = document.createElement("button");
+      x.className = "del"; x.textContent = "×"; x.title = "削除";
+      x.onclick = ()=>delItem(d.id);
+      let mv = null;
+      if(selfDest){
+        mv = document.createElement("button");
+        mv.className = "to-today"; mv.textContent = "→"; mv.title = "他のリストへ移動";
+        mv.onclick = ()=>moveNoteItem(d.id);
+      }
+      const parts = [tx];
+      if(withDue) parts.push(makeDue(d));
+      if(mv) parts.push(mv);
+      parts.push(grip, x);
+      li.append(...parts);
+      listEl.appendChild(li);
+    });
+  }
+  addBtn.onclick = ()=>{ add(inputEl.value); inputEl.value=""; inputEl.focus(); };
+  inputEl.addEventListener("keydown", e=>{ if(e.key==="Enter"){ add(inputEl.value); inputEl.value=""; } });
+  attachListDrag(listEl, ids=>{ arr = ids.map(id=>arr.find(x=>x.id===id)).filter(Boolean); persist(); render(); });
+  render();
+  return { add, has: text=>arr.some(x=>x.text===text) };
+}
+
+// ボタン：毎日のタスクを今日のリストへ（同じ内容は重複させない）
+function insertDailies(){
+  const today = todayStr();
+  const present = new Set(
+    tasks.filter(t=>!t.done || (t.doneDate||(t.doneAt||"").slice(0,10))===today).map(t=>t.text)
+  );
+  let added = 0;
+  dailies.forEach(d=>{
+    if(!present.has(d.text)){
+      tasks.push({ id:Date.now()+"_"+Math.random().toString(36).slice(2,6),
+                   text:d.text, done:false, created:today, doneAt:null, doneDate:null });
+      present.add(d.text); added++;
+    }
+  });
+  if(added){ save(); render(); }
+  const btn = $("#insertDaily");
+  btn.textContent = "✓ " + (added ? `${added}件を追加しました` : "すべて追加済みです");
+  setTimeout(()=>renderDaily(), 1400);
+}
+
+function renderDaily(){
+  const list = $("#dailyList");
+  list.innerHTML = "";
+  if(dailies.length===0){
+    list.innerHTML = '<div class="daily-empty">下の欄から「毎日やること」を登録しましょう ☕</div>';
+  }
+  dailies.forEach(d=>{
+    const li = document.createElement("li");
+    li.className = "ditem"; li.dataset.id = d.id;
+    const tx = document.createElement("span");
+    tx.className = "dtxt"; tx.contentEditable = "true"; tx.spellcheck = false; tx.textContent = d.text;
+    tx.addEventListener("blur", ()=>editDaily(d.id, tx.textContent));
+    tx.addEventListener("keydown", e=>{ if(e.key==="Enter"){ e.preventDefault(); tx.blur(); } });
+    const grip = document.createElement("span");
+    grip.className = "grip"; grip.textContent = "≡"; grip.title = "長押し＆スライドで並び替え";
+    const x = document.createElement("button");
+    x.className = "del"; x.textContent = "×"; x.title = "削除";
+    x.onclick = ()=>delDaily(d.id);
+    li.append(tx, grip, x);
+    list.appendChild(li);
+  });
+  const btn = $("#insertDaily");
+  if(dailies.length){
+    btn.hidden = false;
+    btn.textContent = `🔁 毎日のタスクを今日に追加（${dailies.length}件）`;
+  } else {
+    btn.hidden = true;
+  }
+}
+
+$("#dailyAdd").onclick = ()=>{ addDaily($("#dailyInput").value); $("#dailyInput").value=""; $("#dailyInput").focus(); };
+$("#dailyInput").addEventListener("keydown", e=>{ if(e.key==="Enter"){ addDaily($("#dailyInput").value); $("#dailyInput").value=""; } });
+$("#insertDaily").onclick = insertDailies;
+
+/* ===== ページ切替（下タブ） ===== */
+const TABKEY = "todo_tab_v1";
+const VIEWS = ["today","daily","ideas","someday","record"];
+function showView(name){
+  if(!VIEWS.includes(name)) name = "today";
+  VIEWS.forEach(n=>{ $("#view-"+n).hidden = (n!==name); });
+  document.querySelectorAll(".tabbar button").forEach(b=>b.classList.toggle("active", b.dataset.view===name));
+  localStorage.setItem(TABKEY, name);
+  window.scrollTo(0,0);
+}
+document.querySelectorAll(".tabbar button").forEach(b=>{ b.onclick = ()=>showView(b.dataset.view); });
+
+render();
+renderDaily();
+attachListDrag($("#list"), commitTasks);
+attachListDrag($("#dailyList"), commitDaily);
+ideaList = createNoteList("todo_ideas_v1", $("#ideaList"), $("#ideaInput"), $("#ideaAdd"), "思いついたアイデアをここに追加しましょう 💡", false, "ideas");
+somedayList = createNoteList("todo_someday_v1", $("#somedayList"), $("#somedayInput"), $("#somedayAdd"), "いつかやりたいことをここに追加しましょう ⏳", true, "someday");
+showView(localStorage.getItem(TABKEY) || "today");
+
+/* ===== 作者のほかの道具（こえ日誌への導線） ===== */
+(function(){
+  const f = document.createElement("div");
+  f.style.cssText = "max-width:560px;margin:28px auto 96px;padding:16px;border:1.5px dashed #ccc;border-radius:14px;font-size:13px;line-height:1.8;color:#555;";
+  f.innerHTML = '📢 このアプリの作者は、福祉・保育の現場向けに<b>「話すだけで記録が終わる」アプリ こえ日誌</b>も作っています。帰り道の30秒で日誌・連絡帳が完成します。<br><a href="https://note.com/hitotsu_ai/n/n863ee3f79cd2" target="_blank" style="color:#e8734a;font-weight:bold;">→ こえ日誌をみてみる</a>';
+  document.body.appendChild(f);
+})();
+</script>
+</body>
+</html>

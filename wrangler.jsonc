@@ -1,6 +1,5 @@
 {
   "name": "hitotsu-company-hp",
-  "main": "src/gate.js",
   "compatibility_date": "2026-08-01",
   "workers_dev": true,
   "routes": [
@@ -8,8 +7,6 @@
     { "pattern": "www.hitotsu-company.com", "custom_domain": true }
   ],
   "assets": {
-    "directory": ".",
-    "binding": "ASSETS",
-    "run_worker_first": ["/apps/box-9f4a7c2e", "/apps/box-9f4a7c2e/*"]
+    "directory": "."
   }
 }
