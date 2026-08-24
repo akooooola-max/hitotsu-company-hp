@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="請求書の宛先一括作成。CSV貼るだけで20件分を数分で">
+<title>請求書 一括作成ツール</title>
+<style>
+* { box-sizing: border-box; }
+body {
+  font-family: -apple-system, "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
+  margin: 0; padding: 16px; background: #f5f7fa; color: #333; line-height: 1.6;
+}
+h1 { font-size: 20px; margin: 0 0 8px; color: #2c3e50; }
+.lead { font-size: 13px; color: #666; margin-bottom: 20px; }
+.container { max-width: 900px; margin: 0 auto; }
+.card { background: #fff; border-radius: 8px; padding: 16px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+.card h2 { font-size: 15px; margin: 0 0 12px; color: #2c3e50; border-left: 4px solid #4a90e2; padding-left: 8px; }
+label { display: block; font-size: 13px; margin-bottom: 4px; color: #555; }
+input[type=text], input[type=number], input[type=date], textarea {
+  width: 100%; padding: 8px; border: 1px solid #ccd; border-radius: 4px; font-size: 14px; font-family: inherit;
+}
+textarea { min-height: 120px; resize: vertical; }
+.row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 10px; }
+@media (max-width: 600px) { .row { grid-template-columns: 1fr; } }
+button {
+  background: #4a90e2; color: #fff; border: 0; padding: 10px 16px; border-radius: 4px;
+  font-size: 14px; cursor: pointer; margin: 4px 4px 4px 0;
+}
+button:hover { background: #357ab8; }
+button.sub { background: #7a8794; }
+button.sub:hover { background: #5c6873; }
+.hint { font-size: 12px; color: #888; margin-top: 4px; }
+.preview { display: none; margin-top: 12px; }
+.invoice {
+  background: #fff; border: 1px solid #ddd; padding: 24px; margin-bottom: 16px;
+  font-size: 13px; page-break-after: always;
+}
+.invoice h3 { text-align: center; font-size: 20px; margin: 0 0 20px; letter-spacing: 8px; }
+.invoice .top { display: flex; justify-content: space-between; margin-bottom: 20px; flex-wrap: wrap; gap: 12px; }
+.invoice .to { flex: 1; min-width: 200px; }
+.invoice .to .name { font-size: 16px; border-bottom: 2px solid #333; padding-bottom: 4px; margin-bottom: 8px; }
+.invoice .from { text-align: right; font-size: 12px; min-width: 200px; }
+.invoice .amount-box { border: 2px solid #333; padding: 8px 16px; margin: 16px 0; text-align: center; font-size: 18px; font-weight: bold; }
+.invoice table { width: 100%; border-collapse: collapse; margin: 16px 0; }
+.invoice th, .invoice td { border: 1px solid #999; padding: 6px 8px; font-size: 12px; }
+.invoice th { background: #eef2f7; }
+.invoice .right { text-align: right; }
+.tabs { display: flex; gap: 4px; margin-bottom: 12px; flex-wrap: wrap; }
+.tab { background: #e0e6ec; padding: 6px 12px; border-radius: 4px 4px 0 0; font-size: 12px; cursor: pointer; }
+.tab.active { background: #4a90e2; color: #fff; }
+.status { padding: 8px; border-radius: 4px; font-size: 13px; margin: 8px 0; display: none; }
+.status.ok { background: #e8f5e9; color: #2e7d32; display: block; }
+.status.err { background: #ffebee; color: #c62828; display: block; }
+@media print {
+  body { background: #fff; padding: 0; }
+  .no-print { display: none !important; }
+  .card { box-shadow: none; padding: 0; margin: 0; }
+  .invoice { border: 0; padding: 20px; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>📄 請求書 一括作成ツール</h1>
+  <p class="lead">宛先リストを貼るだけで、複数社の請求書をまとめて作成・印刷できます。手作業で1時間かかる仕事を数分で。</p>
+
+  <div class="card no-print">
+    <h2>1. 自分（請求元）の情報</h2>
+    <div class="row">
+      <div><label>会社名 / 屋号</label><input type="text" id="myName" placeholder="例: 山田商店"></div>
+      <div><label>担当者名</label><input type="text" id="myPerson" placeholder="例: 山田 太郎"></div>
+    </div>
+    <div class="row">
+      <div><label>住所</label><input type="text" id="myAddr" placeholder="例: 東京都千代田区…"></div>
+      <div><label>電話 / メール</label><input type="text" id="myContact" placeholder="例: 03-xxxx-xxxx"></div>
+    </div>
+    <div class="row">
+      <div><label>振込先</label><input type="text" id="myBank" placeholder="例: 〇〇銀行 △△支店 普通1234567"></div>
+      <div><label>登録番号（インボイス）</label><input type="text" id="myTaxId" placeholder="例: T1234567890123"></div>
+    </div>
+  </div>
+
+  <div class="card no-print">
+    <h2>2. 請求内容の共通設定</h2>
+    <div class="row">
+      <div><label>発行日</label><input type="date" id="issueDate"></div>
+      <div><label>支払期限</label><input type="date" id="dueDate"></div>
+    </div>
+    <div class="row">
+      <div><label>消費税率 (%)</label><input type="number" id="taxRate" value="10" min="0" max="30"></div>
+      <div><label>備考（全請求書共通）</label><input type="text" id="note" placeholder="例: 振込手数料はご負担ください"></div>
+    </div>
+  </div>
+
+  <div class="card no-print">
+    <h2>3. 宛先リストを入力</h2>
+    <div class="tabs">
+      <div class="tab active" data-tab="csv">CSVを貼り付け</div>
+      <div class="tab" data-tab="form">フォームで入力</div>
+    </div>
+
+    <div id="tabCsv">
+      <label>CSV形式（1行目にヘッダー：会社名,担当者,品目,数量,単価）</label>
+      <textarea id="csv" placeholder="会社名,担当者,品目,数量,単価
+株式会社サンプル,鈴木様,ホームページ制作,1,150000
+テスト商事,田中様,月額保守,3,20000
+テスト商事,田中様,追加ページ作成,2,15000"></textarea>
+      <p class="hint">同じ会社名の行は1枚の請求書にまとめられます。カンマ区切り、金額は数字のみ。</p>
+    </div>
+
+    <div id="tabForm" style="display:none">
+      <div id="formRows"></div>
+      <button class="sub" onclick="addFormRow()">＋ 行を追加</button>
+    </div>
+
+    <div id="status" class="status"></div>
+
+    <button onclick="generate()">請求書を作成する</button>
+    <button class="sub" onclick="saveData()">入力を保存</button>
+    <button class="sub" onclick="clearAll()">クリア</button>
+  </div>
+
+  <div id="preview" class="preview">
+    <div class="card no-print">
+      <h2>4. プレビュー・印刷</h2>
+      <p class="hint">ブラウザの印刷機能で、PDF保存もできます。（Ctrl/Cmd + P）</p>
+      <button onclick="window.print()">🖨 印刷 / PDF保存</button>
+    </div>
+    <div id="invoices"></div>
+  </div>
+</div>
+
+<script>
+// タブ切り替え
+document.querySelectorAll('.tab').forEach(t => {
+  t.onclick = () => {
+    document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+    t.classList.add('active');
+    document.getElementById('tabCsv').style.display = t.dataset.tab === 'csv' ? '' : 'none';
+    document.getElementById('tabForm').style.display = t.dataset.tab === 'form' ? '' : 'none';
+  };
+});
+
+// フォーム行追加
+function addFormRow(data) {
+  data = data || {};
+  const div = document.createElement('div');
+  div.className = 'row';
+  div.style.marginBottom = '6px';
+  div.innerHTML = `
+    <input type="text" placeholder="会社名" value="${data.company||''}" data-k="company">
+    <input type="text" placeholder="担当者" value="${data.person||''}" data-k="person">
+    <input type="text" placeholder="品目" value="${data.item||''}" data-k="item">
+    <div style="display:flex;gap:6px">
+      <input type="number" placeholder="数量" value="${data.qty||1}" data-k="qty" style="flex:1">
+      <input type="number" placeholder="単価" value="${data.price||''}" data-k="price" style="flex:2">
+      <button class="sub" onclick="this.parentElement.parentElement.remove()" style="padding:6px 10px">削除</button>
+    </div>
+  `;
+  document.getElementById('formRows').appendChild(div);
+}
+
+// CSV解析
+function parseCsv(text) {
+  const lines = text.trim().split(/\r?\n/).filter(l => l.trim());
+  if (lines.length < 2) return [];
+  const rows = [];
+  for (let i = 1; i < lines.length; i++) {
+    const cols = lines[i].split(',').map(c => c.trim());
+    if (cols.length < 5) continue;
+    rows.push({
+      company: cols[0], person: cols[1], item: cols[2],
+      qty: parseFloat(cols[3]) || 0, price: parseFloat(cols[4]) || 0
+    });
+  }
+  return rows;
+}
+
+// フォームから取得
+function getFormRows() {
+  const rows = [];
+  document.querySelectorAll('#formRows > .row').forEach(r => {
+    const d = {};
+    r.querySelectorAll('[data-k]').forEach(i => d[i.dataset.k] = i.value);
+    d.qty = parseFloat(d.qty) || 0;
+    d.price = parseFloat(d.price) || 0;
+    if (d.company) rows.push(d);
+  });
+  return rows;
+}
+
+// ステータス表示
+function showStatus(msg, ok) {
+  const s = document.getElementById('status');
+  s.textContent = msg;
+  s.className = 'status ' + (ok ? 'ok' : 'err');
+  setTimeout(() => { s.className = 'status'; }, 4000);
+}
+
+// 生成
+function generate() {
+  const activeTab = document.querySelector('.tab.active').dataset.tab;
+  let rows = activeTab === 'csv' ? parseCsv(document.getElementById('csv').value) : getFormRows();
+
+  if (rows.length === 0) {
+    showStatus('宛先データが読み取れませんでした。入力を確認してください。', false);
+    return;
+  }
+
+  // 会社ごとにグループ化
+  const groups = {};
+  rows.forEach(r => {
+    const key = r.company + '|' + (r.person || '');
+    if (!groups[key]) groups[key] = { company: r.company, person: r.person, items: [] };
+    groups[key].items.push({ item: r.item, qty: r.qty, price: r.price });
+  });
+
+  const my = {
+    name: document.getElementById('myName').value || '（御社名）',
+    person: document.getElementById('myPerson').value,
+    addr: document.getElementById('myAddr').value,
+    contact: document.getElementById('myContact').value,
+    bank: document.getElementById('myBank').value,
+    taxId: document.getElementById('myTaxId').value
+  };
+  const issue = document.getElementById('issueDate').value;
+  const due = document.getElementById('dueDate').value;
+  const taxRate = parseFloat(document.getElementById('taxRate').value) || 0;
+  const note = document.getElementById('note').value;
+
+  const container = document.getElementById('invoices');
+  container.innerHTML = '';
+  let invNo = 1;
+  const dateStr = (issue || new Date().toISOString().slice(0,10)).replace(/-/g,'');
+
+  Object.values(groups).forEach(g => {
+    const subtotal = g.items.reduce((s, i) => s + i.qty * i.price, 0);
+    const tax = Math.floor(subtotal * taxRate / 100);
+    const total = subtotal + tax;
+    const no = dateStr + '-' + String(invNo).padStart(3,'0');
+    invNo++;
+
+    const itemRows = g.items.map(i => `
+      <tr>
+        <td>${escape(i.item)}</td>
+        <td class="right">${i.qty}</td>
+        <td class="right">¥${i.price.toLocaleString()}</td>
+        <td class="right">¥${(i.qty*i.price).toLocaleString()}</td>
+      </tr>
+    `).join('');
+
+    const html = `
+      <div class="invoice">
+        <h3>請 求 書</h3>
+        <div class="top">
+          <div class="to">
+            <div class="name">${escape(g.company)} 御中</div>
+            ${g.person ? '<div>'+escape(g.person)+'</div>' : ''}
+            <div style="margin-top:8px;font-size:12px">請求書番号: ${no}</div>
+            ${issue ? '<div style="font-size:12px">発行日: '+issue+'</div>' : ''}
+            ${due ? '<div style="font-size:12px">お支払期限: '+due+'</div>' : ''}
+          </div>
+          <div class="from">
+            <div style="font-weight:bold;font-size:14px">${escape(my.name)}</div>
+            ${my.person ? '<div>'+escape(my.person)+'</div>' : ''}
+            ${my.addr ? '<div>'+escape(my.addr)+'</div>' : ''}
+            ${my.contact ? '<div>'+escape(my.contact)+'</div>' : ''}
+            ${my.taxId ? '<div>登録番号: '+escape(my.taxId)+'</div>' : ''}
+          </div>
+        </div>
+        <div>下記の通りご請求申し上げます。</div>
+        <div class="amount-box">ご請求金額　¥${total.toLocaleString()}</div>
+        <table>
+          <thead><tr><th>品目</th><th style="width:60px">数量</th><th style="width:100px">単価</th><th style="width:110px">金額</th></tr></thead>
+          <tbody>
+            ${itemRows}
+            <tr><td colspan="3" class="right">小計</td><td class="right">¥${subtotal.toLocaleString()}</td></tr>
+            <tr><td colspan="3" class="right">消費税 (${taxRate}%)</td><td class="right">¥${tax.toLocaleString()}</td></tr>
+            <tr><td colspan="3" class="right" style="font-weight:bold">合計</td><td class="right" style="font-weight:bold">¥${total.toLocaleString()}</td></tr>
+          </tbody>
+        </table>
+        ${my.bank ? '<div style="margin-top:12px;font-size:12px"><b>お振込先:</b> '+escape(my.bank)+'</div>' : ''}
+        ${note ? '<div style="margin-top:8px;font-size:12px"><b>備考:</b> '+escape(note)+'</div>' : ''}
+      </div>
+    `;
+    container.insertAdjacentHTML('beforeend', html);
+  });
+
+  document.getElementById('preview').style.display = 'block';
+  showStatus(Object.keys(groups).length + ' 件の請求書を作成しました。', true);
+  document.getElementById('preview').scrollIntoView({ behavior: 'smooth' });
+}
+
+function escape(s) {
+  return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+// 保存/読込
+function saveData() {
+  const data = {
+    myName: v('myName'), myPerson: v('myPerson'), myAddr: v('myAddr'),
+    myContact: v('myContact'), myBank: v('myBank'), myTaxId: v('myTaxId'),
+    issueDate: v('issueDate'), dueDate: v('dueDate'),
+    taxRate: v('taxRate'), note: v('note'), csv: v('csv')
+  };
+  localStorage.setItem('invoiceData', JSON.stringify(data));
+  showStatus('入力内容を保存しました。次回開いた時に自動で読み込まれます。', true);
+}
+function v(id) { return document.getElementById(id).value; }
+function loadData() {
+  const s = localStorage.getItem('invoiceData');
+  if (!s) return;
+  try {
+    const d = JSON.parse(s);
+    Object.keys(d).forEach(k => { if (document.getElementById(k)) document.getElementById(k).value = d[k]; });
+  } catch(e) {}
+}
+function clearAll() {
+  if (!confirm('入力内容をすべてクリアしますか？（保存データも削除されます）')) return;
+  localStorage.removeItem('invoiceData');
+  document.querySelectorAll('input, textarea').forEach(i => { if (i.type !== 'button') i.value = ''; });
+  document.getElementById('taxRate').value = 10;
+  document.getElementById('preview').style.display = 'none';
+  document.getElementById('invoices').innerHTML = '';
+  showStatus('クリアしました。', true);
+}
+
+// 初期化
+loadData();
+if (!document.getElementById('issueDate').value) {
+  document.getElementById('issueDate').value = new Date().toISOString().slice(0,10);
+}
+addFormRow();
+</script>
+<!-- hitotsu-cta -->
+<div style="max-width:720px;margin:40px auto 0;padding:24px 20px;border-radius:14px;
+  background:#14141a;color:#c9c9d1;
+  font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic',sans-serif;
+  font-size:14px;line-height:1.9;">
+  <p style="margin:0 0 12px;color:#f0b429;font-weight:bold;font-size:13px;letter-spacing:.08em;">
+    ⚙ この道具のつくられ方
+  </p>
+  <p style="margin:0 0 14px;">
+    昨日の夜、AI社員が勝手に作りました。<br>
+    人間がキーボードを触った時間は、<strong style="color:#fff;">0分</strong>です。
+  </p>
+  <p style="margin:0 0 18px;">
+    「うちの仕事でもこれ、動かせないかな」と思った方へ。<br>
+    受け取り方は3つあります。
+  </p>
+  <p style="margin:0 0 12px;">
+    <a href="https://line.me/R/ti/p/@188jocyd" style="display:inline-block;background:#06c755;color:#fff;
+      text-decoration:none;padding:14px 22px;border-radius:10px;font-weight:bold;">
+      ① 無料でもらう ─ LINEで「AI社員」と送る →
+    </a>
+  </p>
+  <p style="margin:0 0 12px;">
+    <a href="https://hitotsu-company.com/books.html" style="display:inline-block;background:transparent;color:#f0b429;
+      border:1px solid #f0b429;text-decoration:none;padding:13px 22px;border-radius:10px;font-weight:bold;">
+      ② じっくり読む ─ Kindleの本（500円〜）→
+    </a>
+  </p>
+  <p style="margin:0 0 8px;">
+    <a href="https://coconala.com/services/4325740" style="display:inline-block;background:#f0b429;color:#0d0d0f;
+      text-decoration:none;padding:14px 22px;border-radius:10px;font-weight:bold;">
+      ③ つくってもらう ─ ココナラで相談する →
+    </a><br>
+    <span style="font-size:12.5px;color:#8b8b95;">
+      現場のやり方をうかがってから、あなた専用の1本を作ります（10,000円・お届けまで3日）
+    </span>
+  </p>
+  <p style="margin:14px 0 0;font-size:12.5px;color:#71717a;">
+    ほかの道具は<a href="./" style="color:#f0b429;">道具箱</a>に／
+    仕組みの全体像は<a href="https://note.com/hitotsu_ai/n/n493aa3b424cd" style="color:#f0b429;">こちらのnote</a>で公開中<br>
+    hitotsu company
+  </p>
+</div>
+</body>
+</html>
