@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="デザイン初心者。AI画像の指示文で迷わず最初の1枚へ">
+<title>はじめての1枚メーカー | AI画像・文章の指示文づくり</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic", sans-serif;
+    background: linear-gradient(135deg, #f5f7fa 0%, #e8eef5 100%);
+    color: #333;
+    line-height: 1.7;
+    padding: 20px;
+    min-height: 100vh;
+  }
+  .container { max-width: 780px; margin: 0 auto; }
+  header {
+    text-align: center;
+    padding: 24px 16px;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    margin-bottom: 20px;
+  }
+  h1 { font-size: 22px; color: #2c5282; margin-bottom: 8px; }
+  header p { font-size: 14px; color: #666; }
+
+  .tabs { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+  .tab {
+    flex: 1; min-width: 100px;
+    padding: 12px 8px;
+    background: #fff;
+    border: 2px solid transparent;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    color: #666;
+    transition: all 0.2s;
+  }
+  .tab.active { border-color: #4a90e2; color: #2c5282; background: #eff6ff; }
+
+  .card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 24px 20px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    margin-bottom: 16px;
+  }
+  .step {
+    display: inline-block;
+    background: #4a90e2;
+    color: #fff;
+    font-size: 12px;
+    padding: 3px 10px;
+    border-radius: 12px;
+    margin-bottom: 10px;
+  }
+  label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    margin: 14px 0 6px;
+    color: #444;
+  }
+  .hint { font-size: 12px; color: #888; font-weight: normal; margin-left: 6px; }
+  input, select, textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1.5px solid #d5dde5;
+    border-radius: 8px;
+    font-size: 15px;
+    font-family: inherit;
+    background: #fafbfc;
+  }
+  input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: #4a90e2;
+    background: #fff;
+  }
+  textarea { min-height: 70px; resize: vertical; }
+
+  .btn {
+    display: inline-block;
+    padding: 12px 20px;
+    background: #4a90e2;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 16px;
+    width: 100%;
+  }
+  .btn:hover { background: #3a7fd5; }
+  .btn-sub {
+    background: #edf2f7;
+    color: #444;
+    padding: 8px 14px;
+    font-size: 13px;
+    width: auto;
+    margin-top: 8px;
+    margin-right: 6px;
+  }
+  .btn-sub:hover { background: #e0e6ee; }
+
+  .result {
+    background: #f8fafc;
+    border-left: 4px solid #4a90e2;
+    padding: 16px;
+    margin-top: 16px;
+    border-radius: 6px;
+    font-size: 14px;
+    white-space: pre-wrap;
+    word-break: break-word;
+    display: none;
+  }
+  .result.show { display: block; }
+
+  .checklist { list-style: none; }
+  .checklist li {
+    padding: 10px 12px;
+    background: #f8fafc;
+    margin-bottom: 6px;
+    border-radius: 6px;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    cursor: pointer;
+    font-size: 14px;
+  }
+  .checklist li.done {
+    background: #e6f4ea;
+    color: #999;
+    text-decoration: line-through;
+  }
+  .checklist input[type="checkbox"] { margin-top: 4px; flex-shrink: 0; }
+
+  .tag-group { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+  .tag {
+    padding: 5px 10px;
+    background: #eff6ff;
+    color: #2c5282;
+    border-radius: 14px;
+    font-size: 12px;
+    cursor: pointer;
+    border: 1px solid #d0e0f5;
+  }
+  .tag:hover { background: #dceafd; }
+
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  .note {
+    font-size: 12px;
+    color: #888;
+    background: #fffbea;
+    padding: 10px 12px;
+    border-radius: 6px;
+    margin-top: 12px;
+    border-left: 3px solid #f5c542;
+  }
+
+  footer {
+    text-align: center;
+    font-size: 12px;
+    color: #999;
+    padding: 20px 0 10px;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>🎨 はじめての1枚メーカー</h1>
+    <p>AIに画像や文章を作ってもらうときの「指示文」を、穴埋めで組み立てます</p>
+  </header>
+
+  <div class="tabs">
+    <button class="tab active" data-tab="image">画像の指示文</button>
+    <button class="tab" data-tab="text">投稿文の指示文</button>
+    <button class="tab" data-tab="checklist">はじめの手順</button>
+  </div>
+
+  <!-- 画像の指示文 -->
+  <div class="tab-content active" id="tab-image">
+    <div class="card">
+      <span class="step">STEP 1</span>
+      <h2 style="font-size:17px;margin-bottom:4px;">画像の中身を穴埋めするだけ</h2>
+      <p style="font-size:13px;color:#666;">思いつかない項目は空欄でもOK。埋めるほど狙い通りの絵になります。</p>
+
+      <label>被写体（何を描く？） <span class="hint">例：カフェで読書する女性</span></label>
+      <input type="text" id="subject" placeholder="夕焼けのカフェで読書する女性">
+
+      <label>場所・シーン <span class="hint">例：森の中、オフィス</span></label>
+      <input type="text" id="scene" placeholder="窓際の席、夕方">
+
+      <label>雰囲気・気分</label>
+      <div class="tag-group" id="moodTags">
+        <span class="tag" data-target="mood" data-val="やわらかい">やわらかい</span>
+        <span class="tag" data-target="mood" data-val="明るい">明るい</span>
+        <span class="tag" data-target="mood" data-val="落ち着いた">落ち着いた</span>
+        <span class="tag" data-target="mood" data-val="ポップな">ポップな</span>
+        <span class="tag" data-target="mood" data-val="ナチュラルな">ナチュラルな</span>
+        <span class="tag" data-target="mood" data-val="高級感のある">高級感のある</span>
+      </div>
+      <input type="text" id="mood" placeholder="やわらかい 落ち着いた" style="margin-top:8px;">
+
+      <label>タッチ・画風</label>
+      <select id="style">
+        <option value="">選んでください</option>
+        <option value="水彩画風">水彩画風</option>
+        <option value="写真風（リアル）">写真風（リアル）</option>
+        <option value="イラスト風">イラスト風</option>
+        <option value="手描き風">手描き風</option>
+        <option value="ミニマルなデザイン">ミニマルなデザイン</option>
+        <option value="レトロ・昭和風">レトロ・昭和風</option>
+      </select>
+
+      <label>用途 <span class="hint">仕上がりサイズの目安になります</span></label>
+      <select id="use">
+        <option value="">選んでください</option>
+        <option value="Instagram投稿（正方形）">Instagram投稿（正方形）</option>
+        <option value="ブログのアイキャッチ（横長）">ブログのアイキャッチ（横長）</option>
+        <option value="プレゼン資料の表紙">プレゼン資料の表紙</option>
+        <option value="チラシの背景">チラシの背景</option>
+        <option value="ストーリーズ用（縦長）">ストーリーズ用（縦長）</option>
+      </select>
+
+      <button class="btn" id="genImage">✨ 指示文を組み立てる</button>
+      <div class="result" id="imageResult"></div>
+      <div id="imageActions" style="display:none;">
+        <button class="btn btn-sub" id="copyImage">📋 コピー</button>
+        <button class="btn btn-sub" id="saveImage">💾 保存</button>
+      </div>
+
+      <div class="note">💡 コツ：「何を・どこで・どんな雰囲気で・どんな絵柄で」の4つが揃うと、狙い通りの絵になりやすいです。</div>
+    </div>
+
+    <div class="card" id="savedImageCard" style="display:none;">
+      <h3 style="font-size:15px;margin-bottom:10px;">保存した指示文</h3>
+      <div id="savedImageList"></div>
+    </div>
+  </div>
+
+  <!-- 投稿文の指示文 -->
+  <div class="tab-content" id="tab-text">
+    <div class="card">
+      <span class="step">STEP 1</span>
+      <h2 style="font-size:17px;margin-bottom:4px;">文章の指示文を作る</h2>
+      <p style="font-size:13px;color:#666;">SNS投稿文・キャッチコピー・資料タイトルなどに。</p>
+
+      <label>何を書いてほしい？</label>
+      <select id="textType">
+        <option value="Instagramの投稿文">Instagramの投稿文</option>
+        <option value="Xのポスト（140字以内）">Xのポスト（140字以内）</option>
+        <option value="ブログ記事のタイトル案">ブログ記事のタイトル案</option>
+        <option value="キャッチコピー">キャッチコピー</option>
+        <option value="プレゼン資料のタイトル">プレゼン資料のタイトル</option>
+      </select>
+
+      <label>テーマ・題材 <span class="hint">例：新商品の化粧水、社内研修の資料</span></label>
+      <input type="text" id="textTopic" placeholder="新商品の化粧水">
+
+      <label>読んでほしい相手</label>
+      <input type="text" id="textTarget" placeholder="30代の働く女性">
+
+      <label>案の数</label>
+      <select id="textCount">
+        <option value="3案">3案</option>
+        <option value="5案">5案</option>
+        <option value="10案">10案</option>
+      </select>
+
+      <label>トーン</label>
+      <select id="textTone">
+        <option value="やさしい・親しみやすい">やさしい・親しみやすい</option>
+        <option value="丁寧・きちんとした">丁寧・きちんとした</option>
+        <option value="元気・明るい">元気・明るい</option>
+        <option value="落ち着いた・大人っぽい">落ち着いた・大人っぽい</option>
+      </select>
+
+      <button class="btn" id="genText">✨ 指示文を組み立てる</button>
+      <div class="result" id="textResult"></div>
+      <div id="textActions" style="display:none;">
+        <button class="btn btn-sub" id="copyText">📋 コピー</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- チェックリスト -->
+  <div class="tab-content" id="tab-checklist">
+    <div class="card">
+      <span class="step">STEP 0</span>
+      <h2 style="font-size:17px;margin-bottom:4px;">最初の1枚まで、迷わない手順</h2>
+      <p style="font-size:13px;color:#666;">終わったものをタップすると消せます。</p>
+      <ul class="checklist" id="checklist"></ul>
+      <button class="btn btn-sub" id="resetCheck" style="margin-top:14px;">リセット</button>
+    </div>
+  </div>
+
+  <footer>指示文はブラウザ内に保存されます（他の人には見えません）</footer>
+</div>
+
+<script>
+  // タブ切り替え
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      tab.classList.add('active');
+      document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+    });
+  });
+
+  // タグクリック
+  document.querySelectorAll('.tag').forEach(tag => {
+    tag.addEventListener('click', () => {
+      const target = document.getElementById(tag.dataset.target);
+      const cur = target.value.trim();
+      const val = tag.dataset.val;
+      if (cur.includes(val)) {
+        target.value = cur.replace(val, '').replace(/\s+/g, ' ').trim();
+      } else {
+        target.value = (cur + ' ' + val).trim();
+      }
+    });
+  });
+
+  // 画像指示文生成
+  document.getElementById('genImage').addEventListener('click', () => {
+    const subject = document.getElementById('subject').value.trim();
+    const scene = document.getElementById('scene').value.trim();
+    const mood = document.getElementById('mood').value.trim();
+    const style = document.getElementById('style').value;
+    const use = document.getElementById('use').value;
+
+    if (!subject) {
+      alert('「被写体」だけは入れてください');
+      return;
+    }
+
+    let text = '以下の条件で画像を1枚作ってください。\n\n';
+    text += '【被写体】' + subject + '\n';
+    if (scene) text += '【場所・シーン】' + scene + '\n';
+    if (mood) text += '【雰囲気】' + mood + '\n';
+    if (style) text += '【画風】' + style + '\n';
+    if (use) text += '【用途】' + use + '\n';
+    text += '\n※文字は入れないでください。';
+
+    const result = document.getElementById('imageResult');
+    result.textContent = text;
+    result.classList.add('show');
+    document.getElementById('imageActions').style.display = 'block';
+  });
+
+  // コピー
+  document.getElementById('copyImage').addEventListener('click', () => {
+    const text = document.getElementById('imageResult').textContent;
+    copyText(text, '指示文をコピーしました！');
+  });
+
+  // 保存
+  document.getElementById('saveImage').addEventListener('click', () => {
+    const text = document.getElementById('imageResult').textContent;
+    if (!text) return;
+    const saved = JSON.parse(localStorage.getItem('savedPrompts') || '[]');
+    saved.unshift({ text: text, date: new Date().toLocaleString('ja-JP') });
+    if (saved.length > 10) saved.pop();
+    localStorage.setItem('savedPrompts', JSON.stringify(saved));
+    renderSaved();
+    alert('保存しました');
+  });
+
+  function renderSaved() {
+    const saved = JSON.parse(localStorage.getItem('savedPrompts') || '[]');
+    const card = document.getElementById('savedImageCard');
+    const list = document.getElementById('savedImageList');
+    if (saved.length === 0) {
+      card.style.display = 'none';
+      return;
+    }
+    card.style.display = 'block';
+    list.innerHTML = '';
+    saved.forEach((item, i) => {
+      const div = document.createElement('div');
+      div.style.cssText = 'background:#f8fafc;padding:12px;border-radius:6px;margin-bottom:8px;font-size:13px;';
+      div.innerHTML = '<div style="color:#888;font-size:11px;margin-bottom:4px;">' + item.date + '</div>' +
+        '<div style="white-space:pre-wrap;word-break:break-word;">' + escapeHtml(item.text) + '</div>' +
+        '<button class="btn btn-sub" style="margin-top:8px;" data-i="' + i + '">コピー</button>' +
+        '<button class="btn btn-sub" style="margin-top:8px;background:#fde2e2;" data-del="' + i + '">削除</button>';
+      list.appendChild(div);
+    });
+    list.querySelectorAll('button[data-i]').forEach(b => {
+      b.addEventListener('click', () => {
+        copyText(saved[b.dataset.i].text, 'コピーしました');
+      });
+    });
+    list.querySelectorAll('button[data-del]').forEach(b => {
+      b.addEventListener('click', () => {
+        saved.splice(b.dataset.del, 1);
+        localStorage.setItem('savedPrompts', JSON.stringify(saved));
+        renderSaved();
+      });
+    });
+  }
+
+  function escapeHtml(s) {
+    return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);
+  }
+
+  function copyText(text, msg) {
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(text).then(() => alert(msg));
+    } else {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      alert(msg);
+    }
+  }
+
+  // 文章指示文
+  document.getElementById('genText').addEventListener('click', () => {
+    const type = document.getElementById('textType').value;
+    const topic = document.getElementById('textTopic').value.trim();
+    const target = document.getElementById('textTarget').value.trim();
+    const count = document.getElementById('textCount').value;
+    const tone = document.getElementById('textTone').value;
+
+    if (!topic) {
+      alert('「テーマ・題材」は入れてください');
+      return;
+    }
+
+    let text = type + 'を' + count + '考えてください。\n\n';
+    text += '【題材】' + topic + '\n';
+    if (target) text += '【読んでほしい相手】' + target + '\n';
+    text += '【トーン】' + tone + '\n\n';
+    text += '※そのままコピペして使える形でお願いします。';
+
+    const result = document.getElementById('textResult');
+    result.textContent = text;
+    result.classList.add('show');
+    document.getElementById('textActions').style.display = 'block';
+  });
+
+  document.getElementById('copyText').addEventListener('click', () => {
+    copyText(document.getElementById('textResult').textContent, '指示文をコピーしました！');
+  });
+
+  // チェックリスト
+  const steps = [
+    'メールアドレスを1つ用意する',
+    'ブラウザでデザインツールのサイトを開く',
+    '「無料で登録」からアカウントを作る',
+    '作りたいものの種類を選ぶ（SNS投稿・チラシなど）',
+    '「はじめての1枚メーカー」で指示文を作る',
+    'AI画像生成の入力欄に指示文を貼る',
+    '出てきた候補から気に入った1枚を選ぶ',
+    '文字を入れる・色を変えるなど少し編集する',
+    'ダウンロードして保存する'
+  ];
+
+  function renderChecklist() {
+    const done = JSON.parse(localStorage.getItem('checklistDone') || '[]');
+    const ul = document.getElementById('checklist');
+    ul.innerHTML = '';
+    steps.forEach((s, i) => {
+      const li = document.createElement('li');
+      const isDone = done.includes(i);
+      if (isDone) li.classList.add('done');
+      li.innerHTML = '<input type="checkbox" ' + (isDone ? 'checked' : '') + '><span>' + (i+1) + '. ' + s + '</span>';
+      li.addEventListener('click', (e) => {
+        if (e.target.tagName !== 'INPUT') {
+          li.querySelector('input').checked = !li.querySelector('input').checked;
+        }
+        const cur = JSON.parse(localStorage.getItem('checklistDone') || '[]');
+        const idx = cur.indexOf(i);
+        if (li.querySelector('input').checked) {
+          if (idx === -1) cur.push(i);
+          li.classList.add('done');
+        } else {
+          if (idx !== -1) cur.splice(idx, 1);
+          li.classList.remove('done');
+        }
+        localStorage.setItem('checklistDone', JSON.stringify(cur));
+      });
+      ul.appendChild(li);
+    });
+  }
+
+  document.getElementById('resetCheck').addEventListener('click', () => {
+    if (confirm('チェックをすべて外しますか？')) {
+      localStorage.removeItem('checklistDone');
+      renderChecklist();
+    }
+  });
+
+  renderChecklist();
+  renderSaved();
+</script>
+<!-- hitotsu-cta -->
+<div style="max-width:720px;margin:40px auto 0;padding:24px 20px;border-radius:14px;
+  background:#14141a;color:#c9c9d1;
+  font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Yu Gothic',sans-serif;
+  font-size:14px;line-height:1.9;">
+  <p style="margin:0 0 12px;color:#f0b429;font-weight:bold;font-size:13px;letter-spacing:.08em;">
+    ⚙ この道具のつくられ方
+  </p>
+  <p style="margin:0 0 14px;">
+    昨日の夜、AI社員が勝手に作りました。<br>
+    人間がキーボードを触った時間は、<strong style="color:#fff;">0分</strong>です。
+  </p>
+  <p style="margin:0 0 18px;">
+    「うちの仕事でもこれ、動かせないかな」と思った方へ。<br>
+    受け取り方は3つあります。
+  </p>
+  <p style="margin:0 0 12px;">
+    <a href="https://line.me/R/ti/p/@188jocyd" style="display:inline-block;background:#06c755;color:#fff;
+      text-decoration:none;padding:14px 22px;border-radius:10px;font-weight:bold;">
+      ① 無料でもらう ─ LINEで「AI社員」と送る →
+    </a>
+  </p>
+  <p style="margin:0 0 12px;">
+    <a href="https://hitotsu-company.com/books.html" style="display:inline-block;background:transparent;color:#f0b429;
+      border:1px solid #f0b429;text-decoration:none;padding:13px 22px;border-radius:10px;font-weight:bold;">
+      ② じっくり読む ─ Kindleの本（500円〜）→
+    </a>
+  </p>
+  <p style="margin:0 0 8px;">
+    <a href="https://coconala.com/services/4325740" style="display:inline-block;background:#f0b429;color:#0d0d0f;
+      text-decoration:none;padding:14px 22px;border-radius:10px;font-weight:bold;">
+      ③ つくってもらう ─ ココナラで相談する →
+    </a><br>
+    <span style="font-size:12.5px;color:#8b8b95;">
+      現場のやり方をうかがってから、あなた専用の1本を作ります（10,000円・お届けまで3日）
+    </span>
+  </p>
+  <p style="margin:14px 0 0;font-size:12.5px;color:#71717a;">
+    ほかの道具は<a href="./" style="color:#f0b429;">道具箱</a>に／
+    仕組みの全体像は<a href="https://note.com/hitotsu_ai/n/n493aa3b424cd" style="color:#f0b429;">こちらのnote</a>で公開中<br>
+    hitotsu company
+  </p>
+</div>
+</body>
+</html>
