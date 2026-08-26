@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="AIの回答がズレる会社員へ。頼み方を整えて一発で欲しい答えを引き出す">
+<title>依頼文ととのえツール</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic", sans-serif;
+    margin: 0;
+    padding: 16px;
+    background: #f5f7fa;
+    color: #222;
+    line-height: 1.6;
+  }
+  .container { max-width: 780px; margin: 0 auto; }
+  h1 { font-size: 1.4rem; margin: 0 0 8px; }
+  .lead { color: #555; font-size: 0.9rem; margin-bottom: 20px; }
+  .card {
+    background: #fff;
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 16px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  }
+  label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 6px;
+    font-size: 0.9rem;
+  }
+  .hint {
+    font-size: 0.78rem;
+    color: #777;
+    margin: -4px 0 8px;
+  }
+  input[type="text"], textarea, select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #d0d5dc;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    font-family: inherit;
+    margin-bottom: 14px;
+    background: #fff;
+  }
+  textarea { resize: vertical; min-height: 70px; }
+  button {
+    background: #2b6cb0;
+    color: #fff;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 6px;
+    font-size: 1rem;
+    cursor: pointer;
+    font-weight: 600;
+  }
+  button:hover { background: #234e7d; }
+  button.sub {
+    background: #e2e8f0;
+    color: #333;
+    padding: 8px 14px;
+    font-size: 0.85rem;
+  }
+  button.sub:hover { background: #cbd5e0; }
+  .output {
+    background: #f8fafc;
+    border: 1px solid #cbd5e0;
+    border-radius: 6px;
+    padding: 14px;
+    white-space: pre-wrap;
+    font-size: 0.9rem;
+    margin-bottom: 12px;
+    min-height: 60px;
+  }
+  .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 10px; }
+  .row button { flex-shrink: 0; }
+  .templates {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+  }
+  .templates button {
+    background: #edf2f7;
+    color: #2b6cb0;
+    padding: 6px 12px;
+    font-size: 0.82rem;
+    border: 1px solid #cbd5e0;
+  }
+  .checklist {
+    font-size: 0.85rem;
+    background: #fffbea;
+    border-left: 3px solid #f0c000;
+    padding: 10px 14px;
+    border-radius: 4px;
+    margin-bottom: 14px;
+  }
+  .checklist ul { margin: 6px 0 0; padding-left: 20px; }
+  .toast {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #333;
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 20px;
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
+    font-size: 0.85rem;
+  }
+  .toast.show { opacity: 1; }
+  details { margin-bottom: 10px; }
+  summary { cursor: pointer; font-size: 0.9rem; color: #2b6cb0; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>🎯 AIへの依頼文ととのえツール</h1>
+  <p class="lead">「答えがズレる」「カタコトになる」を防ぐため、依頼文の空欄を埋めるだけでキレイな指示文を作ります。作った文はコピーして、お使いのAIチャットにそのまま貼ってください。</p>
+
+  <div class="card">
+    <label>① よく使う型を選ぶ（任意）</label>
+    <div class="templates" id="templates"></div>
+
+    <label for="role">② AIにどんな役割になってほしい？</label>
+    <div class="hint">例：丁寧なビジネス文書を書くベテラン秘書 / 20代女性向けSNS運用の専門家</div>
+    <input type="text" id="role" placeholder="丁寧なビジネス文書を書くベテラン秘書">
+
+    <label for="task">③ してほしいことは？（一番大事）</label>
+    <div class="hint">動詞で書く。例：〜を書いて / 〜を要約して / 〜を提案して</div>
+    <textarea id="task" placeholder="取引先へのお詫びメールを書いてください"></textarea>
+
+    <label for="context">④ 前提・背景の情報</label>
+    <div class="hint">相手は誰？何があった？知っておいてほしいことをすべて書く</div>
+    <textarea id="context" placeholder="納品が2日遅れそう。相手は長年の取引先の課長。関係を悪くしたくない"></textarea>
+
+    <label for="format">⑤ 出力の形は？</label>
+    <div class="hint">例：メール本文 / 箇条書き3つ / 表 / 300字以内</div>
+    <input type="text" id="format" placeholder="メール本文（件名込み）、300字程度">
+
+    <label for="tone">⑥ 文体・トーン</label>
+    <input type="text" id="tone" placeholder="丁寧、かしこまりすぎない、日本語で自然に">
+
+    <label for="ng">⑦ 避けたいこと・NG事項（任意）</label>
+    <input type="text" id="ng" placeholder="言い訳がましくならない、専門用語を使わない">
+  </div>
+
+  <div class="card">
+    <label>📝 完成した依頼文</label>
+    <div class="output" id="output">上の欄を埋めると、ここに依頼文が組み立てられます。</div>
+    <div class="row">
+      <button onclick="build()">依頼文をつくる</button>
+      <button class="sub" onclick="copyText()">コピー</button>
+      <button class="sub" onclick="clearAll()">全部消す</button>
+      <button class="sub" onclick="saveDraft()">下書き保存</button>
+      <button class="sub" onclick="loadDraft()">下書き読み込み</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="checklist">
+      <strong>💡 回答がズレたときの直し方</strong>
+      <ul>
+        <li>「もう少し丁寧に」「半分の長さで」など追加でお願いする</li>
+        <li>「日本語として自然な表現に直して」と伝える</li>
+        <li>役割（②）を具体的にすると精度が上がる</li>
+        <li>背景（④）を足すと的外れが減る</li>
+        <li>それでもズレるなら、新しいチャットで最初からやり直す</li>
+      </ul>
+    </div>
+    <details>
+      <summary>画像を作りたいときのコツ</summary>
+      <p style="font-size:0.85rem; margin-top:8px;">「何が」「どこで」「何をしている」「どんな雰囲気」の4点を入れる。例：<br>
+      「白い柴犬が、木目調のカフェで、コーヒーカップを前足で持って笑っている、水彩画風のイラスト」</p>
+    </details>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  const templates = [
+    {
+      name: "お詫びメール",
+      role: "丁寧なビジネス文書を書くベテラン秘書",
+      task: "取引先へのお詫びメールを書いてください",
+      context: "",
+      format: "件名込みのメール本文、300字程度",
+      tone: "誠実で丁寧、言い訳がましくない",
+      ng: "過度に卑屈にならない"
+    },
+    {
+      name: "長文の要約",
+      role: "要点を的確に整理する編集者",
+      task: "以下の文章を要約してください（本文は次のメッセージで送ります）",
+      context: "会議で共有するため、忙しい人が10秒で把握できるようにしたい",
+      format: "箇条書き3点、各30字以内",
+      tone: "簡潔、事実ベース",
+      ng: "推測を混ぜない"
+    },
+    {
+      name: "アイデア出し",
+      role: "発想力豊かな企画コンサルタント",
+      task: "アイデアを10個出してください",
+      context: "テーマ：（ここに具体的なテーマを書く）",
+      format: "箇条書き10個、各1行で",
+      tone: "自由で幅広く、ありきたりでないもの",
+      ng: "似たアイデアの重複"
+    },
+    {
+      name: "議事録の整理",
+      role: "議事録作成が得意なアシスタント",
+      task: "以下のメモを議事録に整えてください（メモは次に送ります）",
+      context: "社内会議、参加者は5名、共有先は上司",
+      format: "決定事項／宿題事項／その他 の3項目に分類",
+      tone: "です・ます調、簡潔",
+      ng: "冗長な言い回し"
+    },
+    {
+      name: "画像を作る指示",
+      role: "",
+      task: "次のイラストを作ってください",
+      context: "何が：\nどこで：\n何をしている：\n雰囲気・画風：",
+      format: "1枚のイラスト",
+      tone: "",
+      ng: ""
+    }
+  ];
+
+  const tplContainer = document.getElementById('templates');
+  templates.forEach((t, i) => {
+    const b = document.createElement('button');
+    b.textContent = t.name;
+    b.onclick = () => applyTemplate(i);
+    tplContainer.appendChild(b);
+  });
+
+  function applyTemplate(i) {
+    const t = templates[i];
+    document.getElementById('role').value = t.role;
+    document.getElementById('task').value = t.task;
+    document.getElementById('context').value = t.context;
+    document.getElementById('format').value = t.format;
+    document.getElementById('tone').value = t.tone;
+    document.getElementById('ng').value = t.ng;
+    build();
+  }
+
+  function build() {
+    const role = document.getElementById('role').value.trim();
+    const task = document.getElementById('task').value.trim();
+    const context = document.getElementById('context').value.trim();
+    const format = document.getElementById('format').value.trim();
+    const tone = document.getElementById('tone').value.trim();
+    const ng = document.getElementById('ng').value.trim();
+
+    if (!task) {
+      showToast('③「してほしいこと」は必ず入力してください');
+      return;
+    }
+
+    let out = "";
+    if (role) out += `【あなたの役割】\n${role}\n\n`;
+    out += `【お願いしたいこと】\n${task}\n\n`;
+    if (context) out += `【前提・背景】\n${context}\n\n`;
+    if (format) out += `【出力の形式】\n${format}\n\n`;
+    if (tone) out += `【文体・トーン】\n${tone}\n\n`;
+    if (ng) out += `【避けてほしいこと】\n${ng}\n\n`;
+    out += `以上の条件で、日本語として自然な表現でお願いします。不明な点があれば質問してください。`;
+
+    document.getElementById('output').textContent = out;
+  }
+
+  function copyText() {
+    const text = document.getElementById('output').textContent;
+    if (!text || text.startsWith('上の欄')) {
+      showToast('先に「依頼文をつくる」を押してください');
+      return;
+    }
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    try {
+      document.execCommand('copy');
+      showToast('コピーしました！AIチャットに貼り付けてください');
+    } catch(e) {
+      showToast('コピーに失敗しました');
+    }
+    document.body.removeChild(ta);
+  }
+
+  function clearAll() {
+    if (!confirm('入力内容を全部消しますか？')) return;
+    ['role','task','context','format','tone','ng'].forEach(id => {
+      document.getElementById(id).value = '';
+    });
+    document.getElementById('output').textContent = '上の欄を埋めると、ここに依頼文が組み立てられます。';
+  }
+
+  function saveDraft() {
+    const data = {};
+    ['role','task','context','format','tone','ng'].forEach(id => {
+      data[id] = document.getElementById(id).value;
+    });
+    localStorage.setItem('promptTunerDraft', JSON.stringify(data));
+    showToast('下書きを保存しました');
+  }
+
+  function loadDraft() {
+    const raw = localStorage.getItem('promptTunerDraft');
+    if (!raw) { showToast('保存された下書きがありません'); return; }
+    try {
+      const data = JSON.parse(raw);
+      Object.keys(data).forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.value = data[id];
+      });
+      build();
+      showToast('下書きを読み込みました');
+    } catch(e) {
+      showToast('読み込みに失敗しました');
+    }
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2200);
+  }
+
+  // 自動保存（入力のたびに軽く）
+  ['role','task','context','format','tone','ng'].forEach(id => {
+    document.getElementById(id).addEventListener('input', () => {
+      const data = {};
+      ['role','task','context','format','tone','ng'].forEach(k => {
+        data[k] = document.getElementById(k).value;
+      });
+      localStorage.setItem('promptTunerAuto', JSON.stringify(data));
+    });
+  });
+
+  // 起動時に自動保存を復元
+  window.addEventListener('load', () => {
+    const raw = localStorage.getItem('promptTunerAuto');
+    if (raw) {
+      try {
+        const data = JSON.parse(raw);
+        Object.keys(data).forEach(id => {
+          const el = document.getElementById(id);
+          if (el && data[id]) el.value = data[id];
+        });
+      } catch(e){}
+    }
+  });
+</script>
+</body>
+</html>

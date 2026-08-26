@@ -2,10 +2,10 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0b1020">
 <title>AIコンサルタント ひとつ｜メニューと料金</title>
-<meta name="description" content="AIコンサルタント（Hitotsu Company）のメニューと料金。単発相談・アプリ作成・WEBサイト制作・AI顧問。実データはお預かりしない安心設計です。">
+<meta name="description" content="AIコンサルタント（Hitotsu Company）のメニューと料金。単発相談・アプリ作成・AI社員作り・ホームページ制作・AI組織作り。実データはお預かりしない安心設計です。">
 <meta property="og:type" content="website">
 <meta property="og:title" content="AIコンサルタント ひとつ｜メニューと料金">
-<meta property="og:description" content="単発相談・アプリ作成・WEBサイト制作・AI顧問。メニューと料金の一覧です。">
+<meta property="og:description" content="単発相談・アプリ作成・AI社員作り・ホームページ制作・AI組織作り。メニューと料金の一覧です。">
 <meta property="og:site_name" content="Hitotsu Company">
 <style>
 :root{--bg:#0b1020;--bg2:#101833;--panel:#131d3c;--ink:#f0f4ff;--muted:#95a3c6;
@@ -87,6 +87,14 @@ p{margin:14px 0}
 .mi.flash{animation:flash 1.5s ease 2}
 @keyframes flash{0%,100%{box-shadow:none}35%{box-shadow:0 0 0 3px var(--acc),0 14px 40px rgba(255,176,32,.35)}}
 
+.morelink{display:block;margin-top:12px;color:var(--acc);font-weight:800;text-decoration:none;font-size:14.5px}
+.paybtn{display:none;margin-top:12px;align-items:center;justify-content:center;
+ background:linear-gradient(135deg,var(--acc),var(--acc2));color:#2a1500;
+ border-radius:12px;padding:14px 20px;font-size:15px;font-weight:900;text-decoration:none;
+ box-shadow:0 8px 22px rgba(255,138,0,.28)}
+.paybtn.on{display:flex}
+.paybtn:active{transform:scale(.98)}
+
 .safe{display:flex;gap:13px;background:var(--bg2);border:1px solid var(--line);border-radius:14px;
  padding:16px 18px;font-size:15px;margin-top:14px}
 .safe span{color:var(--green);font-weight:900;flex-shrink:0}
@@ -114,9 +122,9 @@ footer{padding:36px 0 46px;border-top:1px solid var(--line);text-align:center}
 </style></head><body>
 
 <header class="hero"><div class="wrap">
-  <div class="badges"><span class="bd">鹿児島</span><span class="bd">個人・小さな会社むけ</span><span class="bd">まずは相談から</span></div>
+  <div class="badges"><span class="bd">鹿児島</span><span class="bd">事業者の方むけ</span><span class="bd">まずは相談から</span></div>
   <h1><span class="nb">面倒な仕事は、</span><br><span class="y">AIにやらせましょう。</span></h1>
-  <p class="lead"><span class="nb">AIコンサルタントの「ひとつ」です。</span><span class="nb">日々の事務作業の自動化から、</span><span class="nb">アプリ・WEBサイトの制作まで。</span><span class="nb">あなたの仕事に合わせて、</span><span class="nb">AIが働く仕組みをつくります。</span></p>
+  <p class="lead"><span class="nb">AIコンサルタントの「ひとつ」です。</span><span class="nb">日々の事務作業の自動化から、</span><span class="nb">アプリ・ホームページの制作まで。</span><span class="nb">あなたの仕事に合わせて、</span><span class="nb">AIが働く仕組みをつくります。</span></p>
   <div class="term" aria-label="AI受付のごあいさつ">
     <div class="bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span></div>
     <div class="body" id="termBody"><span class="cur"></span></div>
@@ -157,24 +165,32 @@ footer{padding:36px 0 46px;border-top:1px solid var(--line);text-align:center}
       <h3>単発相談（60分）</h3>
       <div class="price">5,000<small>円</small></div>
       <p><span class="nb">「うちの仕事、AIで何ができる？」に</span><span class="nb">その場でお答えします。</span><span class="nb">対面でもZoomでも。</span><span class="nb">1回きりでもOKです。</span></p>
+      <a class="morelink" href="https://timerex.net/s/a.koooool.a_1933/c8e21ca2">空き日程を見て予約する →</a>
+      <a class="paybtn" data-pay="soudan" href="#">カード決済で申し込む</a>
     </div>
 
     <div class="mi" id="m-app">
       <h3>アプリ作成</h3>
       <div class="price">10,000<small>円</small></div>
       <p><span class="nb">予約受付・記録づけ・スタンプカードなど、</span><span class="nb">あなたの仕事専用の道具を1本作ります。</span><span class="nb">（1つの機能・修正2回まで。追加は別途）</span></p>
+      <a class="morelink" href="/apps/box-9f4a7c2e/">制作例の道具箱を見る →</a>
+      <a class="paybtn" data-pay="app" href="#">カード決済で申し込む</a>
     </div>
 
     <div class="mi" id="m-shain">
       <h3>AI社員作り</h3>
       <div class="price">30,000<small>円</small></div>
       <p><span class="nb">あなたの仕事のやり方を覚えたAI社員を</span><span class="nb">1人作ります。</span><span class="nb">毎回おなじ説明をしなくても、</span><span class="nb">最後まで仕事をやってくれます。</span></p>
+      <a class="morelink" href="/card">Hitotsu Companyの名刺を見る →</a>
+      <a class="paybtn" data-pay="shain" href="#">カード決済で申し込む</a>
     </div>
 
     <div class="mi" id="m-web">
-      <h3>WEBサイト制作</h3>
+      <h3>ホームページ制作</h3>
       <div class="price">50,000<small>円</small></div>
       <p><span class="nb">お店・サービスの紹介ページを1枚から。</span><span class="nb">スマホ対応・QRコード付きで納品します。</span></p>
+      <a class="morelink" href="/hp/">プランのくわしい説明を見る →</a>
+      <a class="paybtn" data-pay="web" href="#">カード決済で申し込む</a>
     </div>
 
     <div class="mi hot" id="m-soshiki">
@@ -182,9 +198,12 @@ footer{padding:36px 0 46px;border-top:1px solid var(--line);text-align:center}
       <h3>AI組織作り</h3>
       <div class="price">100,000<small>円</small></div>
       <p><span class="nb">AI社員を役割ごとにチームで揃えて、</span><span class="nb">あなたの会社の中に「AIの部署」を作ります。</span><span class="nb">事務・発信・書類づくりを</span><span class="nb">まとめて任せられる状態で納品します。</span></p>
+      <a class="morelink" href="/#org">当社のAI社員の組織図を見る →</a>
+      <a class="paybtn" data-pay="soshiki" href="#">カード決済で申し込む</a>
     </div>
 
   </div>
+  <p class="tiny muted" style="margin-top:18px;text-align:center"><span class="nb">カード決済（Stripe）のほか、</span><span class="nb">銀行振込・PayPay・対面での現金にも対応。</span><span class="nb">ご相談してからのお申し込みでもOKです。</span></p>
 </div></section>
 
 <section class="ex"><div class="wrap">
@@ -218,6 +237,7 @@ footer{padding:36px 0 46px;border-top:1px solid var(--line);text-align:center}
 
 <footer><div class="wrap">
   <p class="tiny muted">Hitotsu Company　AIコンサルタント ひとつ</p>
+  <p class="tiny"><a href="/tokusho" style="color:var(--muted)">特定商取引法に基づく表記</a></p>
 </div></footer>
 
 <script>
@@ -231,29 +251,10 @@ footer{padding:36px 0 46px;border-top:1px solid var(--line);text-align:center}
     es.forEach(function(e){
       if(!e.isIntersecting)return;
       e.target.classList.add('in');
-      var p=e.target.querySelector('.price');
-      if(p&&!p.dataset.done){p.dataset.done=1;count(p)}
       io.unobserve(e.target);
     });
   },{threshold:.2});
   targets.forEach(function(el){io.observe(el)});
-
-  // 料金の数字カウントアップ
-  function count(p){
-    var t=p.firstChild;                     // 「5,000」などのテキストノード
-    if(!t||t.nodeType!==3)return;
-    var goal=parseInt(t.nodeValue.replace(/[^0-9]/g,''),10);
-    if(!goal)return;
-    var start=null,dur=900;
-    function tick(ts){
-      if(!start)start=ts;
-      var k=Math.min((ts-start)/dur,1);
-      k=1-Math.pow(1-k,3);                  // ease-out
-      t.nodeValue=Math.round(goal*k).toLocaleString('ja-JP');
-      if(k<1)requestAnimationFrame(tick);
-    }
-    requestAnimationFrame(tick);
-  }
 })();
 </script>
 <script>
@@ -285,7 +286,7 @@ footer{padding:36px 0 46px;border-top:1px solid var(--line);text-align:center}
   var MAP={
     soudan:['m-soudan','単発相談（60分）','5,000円','まずは1時間、話すのが近道です。'],
     app:['m-app','アプリ作成','10,000円','毎日の面倒は、道具にして片付けましょう。'],
-    web:['m-web','WEBサイト制作','50,000円','このページのようなサイトを、あなたのお店にも。'],
+    web:['m-web','ホームページ制作','50,000円','このページのようなサイトを、あなたのお店にも。'],
     shain:['m-shain','AI社員作り','30,000円','あなたの仕事を覚えたAIを、まず1人。'],
     soshiki:['m-soshiki','AI組織作り','100,000円','毎日使っているなら、次はチームで任せる番です。']
   };
@@ -310,6 +311,22 @@ footer{padding:36px 0 46px;border-top:1px solid var(--line);text-align:center}
       card.classList.remove('flash');void card.offsetWidth;card.classList.add('flash');
     },600);
   }});
+})();
+</script>
+<script>
+// Stripe決済リンク。URLを入れたメニューだけ決済ボタンが表示される
+(function(){
+  var PAY={
+    soudan:'',
+    app:'',
+    shain:'',
+    web:'',
+    soshiki:''
+  };
+  document.querySelectorAll('.paybtn').forEach(function(b){
+    var url=PAY[b.dataset.pay];
+    if(url){b.href=url;b.classList.add('on')}
+  });
 })();
 </script>
 </body></html>
