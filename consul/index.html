@@ -317,11 +317,11 @@ footer{padding:36px 0 46px;border-top:1px solid var(--line);text-align:center}
 // Stripe決済リンク。URLを入れたメニューだけ決済ボタンが表示される
 (function(){
   var PAY={
-    soudan:'',
-    app:'',
-    shain:'',
-    web:'',
-    soshiki:''
+    soudan:'https://buy.stripe.com/00wcN4as94SnaQIga66EU00',
+    app:'https://buy.stripe.com/eVq3cu8k12Kf4sk3nk6EU01',
+    shain:'https://buy.stripe.com/00w9AScAhbgL3og3nk6EU02',
+    web:'https://buy.stripe.com/dRm4gy6bT1Gb9MEbTQ6EU03',
+    soshiki:'https://buy.stripe.com/9B6bJ0dEl70vgb27DA6EU04'
   };
   document.querySelectorAll('.paybtn').forEach(function(b){
     var url=PAY[b.dataset.pay];

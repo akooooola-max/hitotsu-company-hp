@@ -1,0 +1,539 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hitotsu AI研修</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&family=Noto+Sans+JP:wght@400;500;700;900&display=swap">
+<style>
+  :root{
+    --cream:#F7F0DE;
+    --cream-deep:#EFE5CC;
+    --ink:#4A3B2E;
+    --maroon:#A8324A;
+    --maroon-deep:#8C2740;
+    --matcha:#6B7A2E;
+    --orange:#E08A2F;
+    --mustard:#DFAE3A;
+    --blue:#3E7CA8;
+    --white:#FFFDF7;
+    --radius:18px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  @media (prefers-reduced-motion: reduce){
+    html{scroll-behavior:auto}
+    *,*::before,*::after{animation:none!important;transition:none!important}
+  }
+  body{
+    background:var(--cream);
+    color:var(--ink);
+    font-family:"Noto Sans JP",-apple-system,"Hiragino Sans",sans-serif;
+    font-size:16px;
+    line-height:1.9;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,.disp{font-family:"Zen Maru Gothic","Noto Sans JP",sans-serif}
+  img{max-width:100%}
+  a{color:inherit}
+
+  /* ===== モザイク帯（紙吹雪） ===== */
+  .confetti{
+    height:18px;
+    background-image:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="180" height="18" viewBox="0 0 180 18"><rect x="2" y="3" width="12" height="12" rx="2" transform="rotate(12 8 9)" fill="%23A8324A"/><rect x="20" y="1" width="11" height="11" rx="2" transform="rotate(-18 25 6)" fill="%23DFAE3A"/><rect x="38" y="5" width="12" height="12" rx="2" transform="rotate(30 44 11)" fill="%236B7A2E"/><rect x="57" y="2" width="10" height="10" rx="2" transform="rotate(-8 62 7)" fill="%233E7CA8"/><rect x="74" y="4" width="12" height="12" rx="2" transform="rotate(20 80 10)" fill="%23E08A2F"/><rect x="93" y="1" width="11" height="11" rx="2" transform="rotate(-25 98 6)" fill="%23A8324A"/><rect x="111" y="5" width="11" height="11" rx="2" transform="rotate(10 116 10)" fill="%236B7A2E"/><rect x="129" y="2" width="12" height="12" rx="2" transform="rotate(-15 135 8)" fill="%23DFAE3A"/><rect x="148" y="4" width="11" height="11" rx="2" transform="rotate(24 153 9)" fill="%233E7CA8"/><rect x="165" y="2" width="11" height="11" rx="2" transform="rotate(-10 170 7)" fill="%23E08A2F"/></svg>');
+    background-repeat:repeat-x;
+    background-size:180px 18px;
+  }
+
+  /* ===== ヘッダー ===== */
+  header{
+    position:sticky;top:0;z-index:50;
+    background:var(--cream);
+    box-shadow:0 1px 0 rgba(74,59,46,.08);
+  }
+  .header-in{
+    max-width:1100px;margin:0 auto;
+    display:flex;align-items:center;gap:14px;
+    padding:12px 20px;
+  }
+  .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+  .logo-mark{
+    width:44px;height:44px;border-radius:50%;
+    background:var(--maroon);color:var(--white);
+    display:grid;place-items:center;
+    font-family:"Zen Maru Gothic",sans-serif;font-weight:900;font-size:19px;
+    flex:none;
+  }
+  .logo-text{line-height:1.3}
+  .logo-text small{display:block;font-size:10px;letter-spacing:.14em;color:var(--maroon)}
+  .logo-text strong{font-family:"Zen Maru Gothic",sans-serif;font-size:17px;font-weight:900}
+  .logo-badge{
+    border:2px dashed var(--maroon);color:var(--maroon);
+    border-radius:10px;padding:2px 8px;
+    font-family:"Zen Maru Gothic",sans-serif;font-weight:900;font-size:12px;
+    line-height:1.4;text-align:center;flex:none;
+  }
+  nav{margin-left:auto;display:flex;align-items:center;gap:4px}
+  nav a{
+    text-decoration:none;font-weight:700;font-size:13px;
+    padding:8px 10px;border-radius:10px;letter-spacing:.06em;
+  }
+  nav a:hover{background:var(--cream-deep)}
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    text-decoration:none;font-weight:900;
+    font-family:"Zen Maru Gothic",sans-serif;
+    border-radius:999px;transition:transform .15s ease, box-shadow .15s ease;
+  }
+  .btn:hover{transform:translateY(-2px)}
+  .btn:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+  .btn-entry{background:var(--maroon);color:var(--white);padding:10px 20px;font-size:14px}
+  .btn-contact{background:var(--mustard);color:var(--ink);padding:10px 20px;font-size:14px}
+  @media (max-width:900px){
+    nav a{display:none}
+    nav .btn{display:inline-flex}
+  }
+
+  /* ===== ヒーロー ===== */
+  .hero{
+    position:relative;
+    padding:96px 20px 120px;
+    text-align:center;
+    overflow:hidden;
+  }
+  .hero::before{
+    content:"";position:absolute;inset:0;
+    background:
+      radial-gradient(circle 220px at 12% 20%, rgba(223,174,58,.16), transparent 70%),
+      radial-gradient(circle 260px at 88% 70%, rgba(107,122,46,.14), transparent 70%),
+      radial-gradient(circle 200px at 80% 12%, rgba(168,50,74,.10), transparent 70%);
+  }
+  .hero-in{position:relative;max-width:820px;margin:0 auto}
+  .hero-eyebrow{
+    display:inline-block;
+    background:var(--white);border:2px solid var(--matcha);color:var(--matcha);
+    border-radius:999px;padding:4px 18px;
+    font-weight:900;font-family:"Zen Maru Gothic",sans-serif;font-size:14px;
+    margin-bottom:26px;letter-spacing:.08em;
+  }
+  .hero h1{
+    font-size:clamp(30px,5.6vw,54px);
+    font-weight:900;line-height:1.55;
+    letter-spacing:.04em;
+    text-wrap:balance;
+    text-shadow:0 2px 0 rgba(255,253,247,.8);
+  }
+  .hero h1 .c-red{color:var(--maroon)}
+  .hero h1 .c-green{color:var(--matcha)}
+  .hero h1 .c-orange{color:var(--orange)}
+  .hero p{
+    margin-top:24px;font-size:clamp(14px,2vw,17px);font-weight:500;
+    max-width:34em;margin-left:auto;margin-right:auto;
+  }
+  .hero-cta{margin-top:36px;display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+  .hero-cta .btn{padding:14px 34px;font-size:16px;box-shadow:0 4px 0 rgba(74,59,46,.18)}
+
+  /* 波の切り替え */
+  .wave{display:block;width:100%;height:36px;margin-bottom:-1px}
+
+  /* ===== 共通セクション ===== */
+  section{padding:76px 20px}
+  .in{max-width:1000px;margin:0 auto}
+  .sec-title{
+    text-align:center;
+    font-size:clamp(26px,4.4vw,40px);
+    font-weight:900;letter-spacing:.05em;line-height:1.5;
+    margin-bottom:16px;text-wrap:balance;
+  }
+  .sec-title .c-red{color:var(--maroon)}
+  .sec-lead{text-align:center;max-width:38em;margin:0 auto 44px;font-weight:500}
+
+  /* ===== ココがスゴイ ===== */
+  .points{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+  @media (max-width:820px){.points{grid-template-columns:1fr;max-width:460px;margin:0 auto}}
+  .point{
+    background:var(--white);border-radius:var(--radius);
+    padding:56px 24px 28px;position:relative;text-align:center;
+    box-shadow:0 6px 18px rgba(74,59,46,.08);
+  }
+  .point-badge{
+    position:absolute;top:-22px;left:50%;transform:translateX(-50%);
+    width:64px;height:64px;border-radius:50%;
+    color:var(--white);display:grid;place-items:center;
+    font-family:"Zen Maru Gothic",sans-serif;font-weight:900;
+    line-height:1.1;box-shadow:0 3px 0 rgba(74,59,46,.15);
+  }
+  .point-badge small{font-size:10px}
+  .point-badge b{font-size:24px}
+  .p1 .point-badge{background:var(--maroon)}
+  .p2 .point-badge{background:var(--matcha)}
+  .p3 .point-badge{background:var(--orange)}
+  .point h3{font-size:19px;font-weight:900;line-height:1.6;margin-bottom:10px}
+  .p1 h3 em{color:var(--maroon);font-style:normal}
+  .p2 h3 em{color:var(--matcha);font-style:normal}
+  .p3 h3 em{color:var(--orange);font-style:normal}
+  .point p{font-size:14px;text-align:left}
+  .point-icon{font-size:40px;margin-bottom:8px;line-height:1}
+
+  /* ===== 研修の流れ ===== */
+  .flow{background:var(--cream-deep)}
+  .steps{display:grid;gap:16px;max-width:720px;margin:0 auto}
+  .step{
+    display:flex;gap:18px;align-items:flex-start;
+    background:var(--white);border-radius:var(--radius);
+    padding:22px 24px;box-shadow:0 4px 14px rgba(74,59,46,.07);
+  }
+  .step-no{
+    flex:none;width:52px;height:52px;border-radius:50%;
+    background:var(--cream);border:3px solid var(--maroon);color:var(--maroon);
+    display:grid;place-items:center;
+    font-family:"Zen Maru Gothic",sans-serif;font-weight:900;font-size:20px;
+  }
+  .step h3{font-size:17px;font-weight:900;margin-bottom:4px}
+  .step p{font-size:14px}
+  .step small{color:var(--matcha);font-weight:700}
+
+  /* ===== 受講者の声 ===== */
+  .voices{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+  @media (max-width:820px){.voices{grid-template-columns:1fr;max-width:460px;margin:0 auto}}
+  .voice{
+    background:var(--white);border-radius:var(--radius);
+    padding:26px 24px;box-shadow:0 6px 18px rgba(74,59,46,.08);
+    display:flex;flex-direction:column;gap:12px;
+  }
+  .voice-head{display:flex;align-items:center;gap:12px}
+  .voice-face{
+    width:48px;height:48px;border-radius:50%;flex:none;
+    display:grid;place-items:center;font-size:24px;
+  }
+  .v1 .voice-face{background:#F3D9DE}
+  .v2 .voice-face{background:#E2E8CB}
+  .v3 .voice-face{background:#F6E3C8}
+  .voice-head strong{font-size:14px;display:block;line-height:1.4}
+  .voice-head small{font-size:12px;color:#8a7a68}
+  .voice p{font-size:14px;background:var(--cream);border-radius:12px;padding:14px 16px;position:relative}
+  .voice p::before{
+    content:"";position:absolute;top:-8px;left:22px;
+    border:8px solid transparent;border-bottom-color:var(--cream);border-top:none;
+  }
+
+  /* ===== 研修プラン ===== */
+  .plans{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;align-items:stretch}
+  @media (max-width:820px){.plans{grid-template-columns:1fr;max-width:460px;margin:0 auto}}
+  .plan{
+    background:var(--white);border-radius:var(--radius);overflow:hidden;
+    box-shadow:0 6px 18px rgba(74,59,46,.08);
+    display:flex;flex-direction:column;
+  }
+  .plan-head{color:var(--white);text-align:center;padding:14px;font-family:"Zen Maru Gothic",sans-serif;font-weight:900;font-size:17px;letter-spacing:.06em}
+  .pl1 .plan-head{background:var(--mustard);color:var(--ink)}
+  .pl2 .plan-head{background:var(--maroon)}
+  .pl3 .plan-head{background:var(--matcha)}
+  .plan-body{padding:24px;display:flex;flex-direction:column;gap:14px;flex:1}
+  .plan-price{text-align:center;font-family:"Zen Maru Gothic",sans-serif}
+  .plan-price b{font-size:32px;font-weight:900}
+  .plan-price span{font-size:13px;font-weight:700}
+  .pl2 .plan-price b{color:var(--maroon)}
+  .plan ul{list-style:none;font-size:14px;display:grid;gap:8px}
+  .plan li{padding-left:24px;position:relative}
+  .plan li::before{content:"✔";position:absolute;left:2px;color:var(--matcha);font-weight:900}
+  .plan-note{font-size:12px;color:#8a7a68;text-align:center;margin-top:auto}
+  .plan-tag{
+    align-self:center;background:var(--maroon);color:var(--white);
+    font-size:11px;font-weight:900;border-radius:999px;padding:2px 12px;
+    letter-spacing:.1em;
+  }
+
+  /* ===== Q&A ===== */
+  .qa{background:var(--cream-deep)}
+  .qa-list{max-width:720px;margin:0 auto;display:grid;gap:14px}
+  .qa-item{
+    background:var(--white);border-radius:var(--radius);
+    box-shadow:0 4px 14px rgba(74,59,46,.07);overflow:hidden;
+  }
+  .qa-item summary{
+    list-style:none;cursor:pointer;
+    display:flex;align-items:center;gap:14px;
+    padding:18px 22px;font-weight:900;font-size:15px;
+    font-family:"Zen Maru Gothic",sans-serif;
+  }
+  .qa-item summary::-webkit-details-marker{display:none}
+  .qa-item summary:focus-visible{outline:3px solid var(--blue);outline-offset:-3px}
+  .qa-q{
+    flex:none;width:34px;height:34px;border-radius:50%;
+    background:var(--matcha);color:var(--white);
+    display:grid;place-items:center;font-size:15px;
+  }
+  .qa-arrow{margin-left:auto;color:var(--maroon);transition:transform .2s;font-size:13px}
+  .qa-item[open] .qa-arrow{transform:rotate(180deg)}
+  .qa-a{
+    padding:0 22px 20px 70px;font-size:14px;
+  }
+
+  /* ===== エントリーCTA ===== */
+  .entry{text-align:center}
+  .entry-sub{
+    display:inline-block;font-weight:900;font-family:"Zen Maru Gothic",sans-serif;
+    margin-bottom:26px;position:relative;padding:0 34px;
+  }
+  .entry-sub::before,.entry-sub::after{
+    content:"";position:absolute;top:50%;width:22px;height:2px;background:var(--ink);
+  }
+  .entry-sub::before{left:0;transform:rotate(55deg)}
+  .entry-sub::after{right:0;transform:rotate(-55deg)}
+  .btn-big{
+    background:var(--maroon);color:var(--white);
+    padding:22px 70px;font-size:20px;letter-spacing:.08em;
+    box-shadow:0 5px 0 var(--maroon-deep);
+  }
+  .btn-big:hover{box-shadow:0 7px 0 var(--maroon-deep)}
+  .entry-subbtns{margin-top:30px;display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+  .entry-subbtns .btn{padding:13px 26px;font-size:14px;box-shadow:0 3px 0 rgba(74,59,46,.18)}
+  .sb1{background:var(--mustard);color:var(--ink)}
+  .sb2{background:#8a6d4f;color:var(--white)}
+  .sb3{background:var(--matcha);color:var(--white)}
+
+  /* ===== フッター ===== */
+  footer{background:var(--cream-deep);text-align:center;padding:44px 20px 36px}
+  .foot-logo{display:flex;justify-content:center;align-items:center;gap:12px;margin-bottom:18px}
+  footer p{font-size:13px}
+  footer .copy{margin-top:18px;font-size:12px;color:#8a7a68}
+</style>
+
+<header>
+  <div class="header-in">
+    <a class="logo" href="#top" aria-label="Hitotsu Company AI研修 ホーム">
+      <span class="logo-mark">ひ</span>
+      <span class="logo-text">
+        <small>HITOTSU COMPANY</small>
+        <strong>ひとつAI研修</strong>
+      </span>
+    </a>
+    <span class="logo-badge">研修<br>サイト</span>
+    <nav aria-label="メイン">
+      <a href="#about">研修について</a>
+      <a href="#flow">研修の流れ</a>
+      <a href="#voice">受講者の声</a>
+      <a href="#plan">研修プラン</a>
+      <a href="#qa">Q&amp;A</a>
+      <a class="btn btn-entry" href="#entry">申し込み</a>
+      <a class="btn btn-contact" href="#entry">お問い合わせ</a>
+    </nav>
+  </div>
+</header>
+
+<div class="confetti" aria-hidden="true"></div>
+
+<main id="top">
+
+  <div class="hero">
+    <div class="hero-in">
+      <span class="hero-eyebrow">パソコンが苦手でも大丈夫</span>
+      <h1>
+        <span class="c-red">AI</span>と一緒に、<br>
+        <span class="c-green">仕事</span>も<span class="c-orange">毎日</span>も楽しくなる！
+      </h1>
+      <p>
+        むずかしい専門用語は使いません。現場のお仕事にそのまま使える形で、
+        AIの「雇い方」を半日で持ち帰る、少人数ハンズオン研修です。
+      </p>
+      <div class="hero-cta">
+        <a class="btn btn-entry btn-big" href="#entry" style="padding:16px 44px;font-size:17px">研修に申し込む</a>
+      </div>
+    </div>
+  </div>
+
+  <section id="about">
+    <div class="in">
+      <h2 class="sec-title">この研修の<span class="c-red">ココがスゴイ</span>！</h2>
+      <p class="sec-lead">「AIって何から始めればいいの？」その一歩目を、実際に手を動かしながら一緒に越える研修です。</p>
+      <div class="points">
+        <article class="point p1">
+          <span class="point-badge"><span><small>Point</small><br><b>1</b></span></span>
+          <div class="point-icon" aria-hidden="true">🙌</div>
+          <h3><em>全員が手を動かす</em><br>少人数ハンズオン</h3>
+          <p>聞くだけのセミナーではありません。1人1台、その場でAIに仕事を頼み、研修中に「自分の業務がひとつ楽になる」体験まで到達します。</p>
+        </article>
+        <article class="point p2">
+          <span class="point-badge"><span><small>Point</small><br><b>2</b></span></span>
+          <div class="point-icon" aria-hidden="true">🏢</div>
+          <h3><em>現場の実例</em>で学ぶ<br>だから明日から使える</h3>
+          <p>書類作成・お知らせ文・記録の整理など、実際の現場業務を題材にします。研修で作ったものは、そのまま職場に持ち帰って使えます。</p>
+        </article>
+        <article class="point p3">
+          <span class="point-badge"><span><small>Point</small><br><b>3</b></span></span>
+          <div class="point-icon" aria-hidden="true">🤝</div>
+          <h3>研修後も安心の<br><em>アフターフォロー</em></h3>
+          <p>「帰ってからつまずいた」に備えて、研修後1ヶ月間は質問し放題。続けて伴走してほしい方向けの顧問プランもご用意しています。</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="flow" id="flow">
+    <div class="in">
+      <h2 class="sec-title">研修の<span class="c-red">流れ</span></h2>
+      <p class="sec-lead">半日（約3時間）で、体験から実践までを一気に駆け抜けます。</p>
+      <div class="steps">
+        <div class="step">
+          <span class="step-no">1</span>
+          <div>
+            <h3>AIと友だちになる <small>（30分）</small></h3>
+            <p>まずは触ってみるところから。AIへの「頼み方」のコツを、クイズ形式で楽しく身につけます。</p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-no">2</span>
+          <div>
+            <h3>自分の仕事を頼んでみる <small>（60分）</small></h3>
+            <p>お知らせ文・議事録・企画のたたき台など、ご自身の実際の業務をAIに任せてみます。</p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-no">3</span>
+          <div>
+            <h3>「AI社員」を雇ってみる <small>（60分）</small></h3>
+            <p>毎回同じ指示をしなくても動いてくれる、あなた専属の「AI社員」を一緒に作ります。</p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-no">4</span>
+          <div>
+            <h3>明日からの作戦会議 <small>（30分）</small></h3>
+            <p>職場に戻ってから何を任せるかを整理して、持ち帰りプランを完成させます。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="voice">
+    <div class="in">
+      <h2 class="sec-title">受講者の<span class="c-red">声</span></h2>
+      <p class="sec-lead">パソコンが得意ではない方こそ、変化を実感されています。</p>
+      <div class="voices">
+        <article class="voice v1">
+          <div class="voice-head">
+            <span class="voice-face" aria-hidden="true">😊</span>
+            <span><strong>福祉施設・管理者</strong><small>50代</small></span>
+          </div>
+          <p>半年分たまっていた記録業務が、研修で習った方法で数日で片付きました。「もっと早く知りたかった」の一言です。</p>
+        </article>
+        <article class="voice v2">
+          <div class="voice-head">
+            <span class="voice-face" aria-hidden="true">🧑‍💼</span>
+            <span><strong>個人事業主</strong><small>40代</small></span>
+          </div>
+          <p>お知らせ文やSNSの投稿づくりをAIに任せられるようになり、お客様と向き合う時間が増えました。</p>
+        </article>
+        <article class="voice v3">
+          <div class="voice-head">
+            <span class="voice-face" aria-hidden="true">👩</span>
+            <span><strong>事務職</strong><small>30代</small></span>
+          </div>
+          <p>正直「私には無理」と思っていましたが、頼み方のコツさえ分かれば本当に簡単。翌日から職場で使っています。</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section id="plan">
+    <div class="in">
+      <h2 class="sec-title">研修<span class="c-red">プラン</span></h2>
+      <p class="sec-lead">まずは体験から。チームまるごとの導入までご一緒できます。</p>
+      <div class="plans">
+        <article class="plan pl1">
+          <h3 class="plan-head">体験セミナー</h3>
+          <div class="plan-body">
+            <p class="plan-price"><b>5,000</b><span>円／人（90分）</span></p>
+            <ul>
+              <li>AIの基本と「頼み方」のコツ</li>
+              <li>その場で1つ業務を時短体験</li>
+              <li>オンライン開催もOK</li>
+            </ul>
+            <p class="plan-note">「まず雰囲気を知りたい」方に</p>
+          </div>
+        </article>
+        <article class="plan pl2">
+          <h3 class="plan-head">半日ハンズオン研修</h3>
+          <div class="plan-body">
+            <span class="plan-tag">いちばん人気</span>
+            <p class="plan-price"><b>30,000</b><span>円／人（3時間）</span></p>
+            <ul>
+              <li>実際の業務を題材に実践</li>
+              <li>専属「AI社員」を作って持ち帰り</li>
+              <li>研修後1ヶ月の質問サポート付き</li>
+            </ul>
+            <p class="plan-note">少人数制・1人1台で実施します</p>
+          </div>
+        </article>
+        <article class="plan pl3">
+          <h3 class="plan-head">法人・チーム研修</h3>
+          <div class="plan-body">
+            <p class="plan-price"><b>150,000</b><span>円〜（内容応相談）</span></p>
+            <ul>
+              <li>貴社の業務に合わせた完全オーダー</li>
+              <li>チームの「型づくり」まで伴走</li>
+              <li>顧問プラン（月額）への接続も可能</li>
+            </ul>
+            <p class="plan-note">出張研修に対応します</p>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="qa" id="qa">
+    <div class="in">
+      <h2 class="sec-title">よくある<span class="c-red">質問</span></h2>
+      <div class="qa-list">
+        <details class="qa-item">
+          <summary><span class="qa-q">Q</span>パソコンが苦手でも参加できますか？<span class="qa-arrow">▼</span></summary>
+          <p class="qa-a">はい、大丈夫です。文字入力ができれば十分です。むしろ「苦手な方ほど効果が大きい」のがAI研修です。スタッフが横についてサポートします。</p>
+        </details>
+        <details class="qa-item">
+          <summary><span class="qa-q">Q</span>何を持っていけばいいですか？<span class="qa-arrow">▼</span></summary>
+          <p class="qa-a">ノートパソコン（またはタブレット）と、「楽にしたい業務」をひとつ思い浮かべてお越しください。AIのアカウント作成は当日一緒に行います。</p>
+        </details>
+        <details class="qa-item">
+          <summary><span class="qa-q">Q</span>職場の情報を入力しても大丈夫？<span class="qa-arrow">▼</span></summary>
+          <p class="qa-a">研修では個人情報・機密情報を使わずに練習する方法からお伝えします。安全に使うためのルールづくりも研修内容に含まれています。</p>
+        </details>
+        <details class="qa-item">
+          <summary><span class="qa-q">Q</span>オンラインでも受講できますか？<span class="qa-arrow">▼</span></summary>
+          <p class="qa-a">体験セミナーはオンライン対応しています。ハンズオン研修は、しっかり手を動かしていただくため対面開催を基本としています。</p>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <section class="entry" id="entry">
+    <div class="in">
+      <h2 class="sec-title">申し込み・<span class="c-red">お問い合わせ</span></h2>
+      <p class="entry-sub">次回開催の日程はこちらから</p>
+      <div>
+        <a class="btn btn-big" href="https://line.me/R/ti/p/@188jocyd">✉ 公式LINEで申し込む</a>
+      </div>
+      <div class="entry-subbtns">
+        <a class="btn sb1" href="https://line.me/R/ti/p/@188jocyd">お問い合わせ ›</a>
+        <a class="btn sb2" href="#plan">研修プラン ›</a>
+        <a class="btn sb3" href="#qa">よくある質問 ›</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<div class="confetti" aria-hidden="true"></div>
+
+<footer>
+  <div class="foot-logo">
+    <span class="logo-mark" aria-hidden="true">ひ</span>
+    <span class="logo-text" style="text-align:left">
+      <small>HITOTSU COMPANY</small>
+      <strong class="disp" style="font-weight:900">ひとつAI研修</strong>
+    </span>
+  </div>
+  <p>Hitotsu Company（鹿児島）</p>
+  <p>研修のご依頼・ご相談は公式LINEからお気軽にどうぞ</p>
+  <p style="margin-top:10px;font-size:12px"><a href="/consul/">AIコンサルタントのメニュー一覧はこちら</a>　<a href="/tokusho">特定商取引法に基づく表記</a></p>
+  <p class="copy">© 2026 Hitotsu Company</p>
+</footer>

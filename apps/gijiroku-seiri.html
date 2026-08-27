@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="打ち合わせメモ。走り書きを議事録・ToDo・共有メールへ一直線">
+<title>議事録整理ツール</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic", sans-serif;
+  background: #f5f7fa;
+  color: #333;
+  line-height: 1.6;
+  padding: 16px;
+}
+.container { max-width: 900px; margin: 0 auto; }
+h1 { font-size: 1.4rem; margin-bottom: 8px; color: #2c3e50; }
+.lead { color: #666; margin-bottom: 20px; font-size: 0.9rem; }
+.card {
+  background: #fff;
+  border-radius: 10px;
+  padding: 20px;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+h2 { font-size: 1.05rem; margin-bottom: 12px; color: #2c3e50; border-left: 4px solid #4a90e2; padding-left: 10px; }
+label { display: block; font-size: 0.85rem; color: #555; margin-bottom: 6px; font-weight: bold; }
+input[type="text"], textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  font-family: inherit;
+}
+textarea { resize: vertical; min-height: 180px; }
+.row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+@media (max-width: 600px) { .row { grid-template-columns: 1fr; } }
+button {
+  background: #4a90e2;
+  color: #fff;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  margin: 4px 4px 4px 0;
+}
+button:hover { background: #357abd; }
+button.sub { background: #6c757d; }
+button.sub:hover { background: #545b62; }
+button.danger { background: #e74c3c; }
+button.copy { background: #27ae60; padding: 6px 12px; font-size: 0.85rem; }
+.output {
+  background: #f8f9fa;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  padding: 12px;
+  white-space: pre-wrap;
+  font-size: 0.9rem;
+  min-height: 80px;
+  margin-top: 8px;
+  font-family: inherit;
+}
+.tabs { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 12px; border-bottom: 2px solid #e0e0e0; }
+.tab {
+  padding: 8px 14px;
+  background: #eee;
+  border: none;
+  border-radius: 6px 6px 0 0;
+  cursor: pointer;
+  font-size: 0.85rem;
+  color: #555;
+  margin: 0;
+}
+.tab.active { background: #4a90e2; color: #fff; }
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+.hint { font-size: 0.8rem; color: #888; margin-top: 4px; }
+.step { background: #fff8e1; padding: 12px; border-radius: 6px; margin-bottom: 12px; font-size: 0.9rem; }
+.step b { color: #f57c00; }
+.todo-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  border-bottom: 1px solid #eee;
+}
+.topic-block { margin-bottom: 10px; padding: 8px; background: #f0f4f8; border-radius: 6px; }
+.topic-block h3 { font-size: 0.95rem; color: #2c3e50; margin-bottom: 4px; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>📝 議事録・打ち合わせメモ 整理ツール</h1>
+  <p class="lead">走り書きメモや文字起こしを貼るだけ。議題別要約・決定事項・ToDo・共有メール文面を一気に作成します。</p>
+
+  <div class="card">
+    <h2>1. 会議情報を入力</h2>
+    <div class="row">
+      <div>
+        <label>会議名</label>
+        <input type="text" id="meetingTitle" placeholder="例: 週次進捗ミーティング">
+      </div>
+      <div>
+        <label>日付</label>
+        <input type="text" id="meetingDate" placeholder="例: 2024年1月15日">
+      </div>
+    </div>
+    <div class="row">
+      <div>
+        <label>参加者（カンマ区切り）</label>
+        <input type="text" id="attendees" placeholder="例: 田中, 佐藤, 鈴木">
+      </div>
+      <div>
+        <label>宛先（メール送付先の呼び方）</label>
+        <input type="text" id="mailTo" placeholder="例: 関係者各位">
+      </div>
+    </div>
+    <label>メモ・文字起こし本文</label>
+    <textarea id="rawMemo" placeholder="ここに走り書きメモや録音の文字起こしをそのまま貼り付けてください。&#10;&#10;例:&#10;・A案件の見積もり、来週水曜までに田中さんが提出&#10;・新人研修は2月から開始で決定&#10;・広告予算については次回持ち越し..."></textarea>
+    <p class="hint">改行や箇条書き、話し言葉のままでOKです。</p>
+    <div style="margin-top: 12px;">
+      <button onclick="organize()">整える</button>
+      <button class="sub" onclick="loadSample()">サンプルを入れる</button>
+      <button class="sub" onclick="saveDraft()">下書き保存</button>
+      <button class="danger" onclick="clearAll()">全消去</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>2. 整えた結果</h2>
+    <div class="tabs">
+      <button class="tab active" onclick="showTab('summary', this)">📋 議題別要約</button>
+      <button class="tab" onclick="showTab('decisions', this)">✅ 決定事項</button>
+      <button class="tab" onclick="showTab('todos', this)">📌 ToDo一覧</button>
+      <button class="tab" onclick="showTab('mail', this)">✉️ 共有メール</button>
+      <button class="tab" onclick="showTab('prompt', this)">🤖 AI依頼文</button>
+    </div>
+
+    <div id="summary" class="tab-content active">
+      <button class="copy" onclick="copyOutput('summaryOut')">コピー</button>
+      <div class="output" id="summaryOut">「整える」を押すと、ここに議題別の要約が表示されます。</div>
+    </div>
+    <div id="decisions" class="tab-content">
+      <button class="copy" onclick="copyOutput('decisionsOut')">コピー</button>
+      <div class="output" id="decisionsOut">決定事項がここに表示されます。</div>
+    </div>
+    <div id="todos" class="tab-content">
+      <button class="copy" onclick="copyOutput('todosOut')">コピー</button>
+      <div class="output" id="todosOut">ToDoがここに表示されます。</div>
+    </div>
+    <div id="mail" class="tab-content">
+      <button class="copy" onclick="copyOutput('mailOut')">コピー</button>
+      <div class="output" id="mailOut">共有メール文面がここに表示されます。</div>
+    </div>
+    <div id="prompt" class="tab-content">
+      <p class="hint" style="margin-bottom: 8px;">より高精度に仕上げたい時は、以下の依頼文をAIチャットに貼るだけで整形してもらえます。</p>
+      <button class="copy" onclick="copyOutput('promptOut')">コピー</button>
+      <div class="output" id="promptOut">AIへの依頼文がここに表示されます。</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>使い方のコツ</h2>
+    <div class="step"><b>STEP 1</b> 会議情報を入力し、メモ本文を貼り付けます。</div>
+    <div class="step"><b>STEP 2</b> 「整える」を押すと、キーワード（決定・ToDo・宿題など）を自動で検出して分類します。</div>
+    <div class="step"><b>STEP 3</b> 各タブの内容をコピーして、社内共有やメール送信に使えます。</div>
+    <div class="step"><b>STEP 4</b> さらに精度を上げたい時は「AI依頼文」タブの文章をコピーして、お使いのAIチャットに貼るだけです。</div>
+  </div>
+</div>
+
+<script>
+function showTab(id, btn) {
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+}
+
+function loadSample() {
+  document.getElementById('meetingTitle').value = '週次進捗ミーティング';
+  document.getElementById('meetingDate').value = '2024年1月15日';
+  document.getElementById('attendees').value = '田中, 佐藤, 鈴木, 山田';
+  document.getElementById('mailTo').value = '関係者各位';
+  document.getElementById('rawMemo').value = `A案件の見積もりについて話し合った。
+田中さんが来週水曜までに見積書を提出することで決定。
+金額感は先方予算内でおさまりそう。
+
+新人研修の日程
+2月開始で確定。担当は佐藤さん。
+研修資料は1月末までに準備する必要あり。
+
+広告予算の件
+次回に持ち越し。鈴木さんが競合調査の資料を用意する。
+
+その他
+オフィス移転の候補地について雑談。
+山田さんから、社内報のネタ募集のお知らせ。`;
+}
+
+function organize() {
+  const memo = document.getElementById('rawMemo').value.trim();
+  if (!memo) { alert('メモ本文を入力してください'); return; }
+
+  const title = document.getElementById('meetingTitle').value || '打ち合わせ';
+  const date = document.getElementById('meetingDate').value || '';
+  const attendees = document.getElementById('attendees').value || '';
+  const mailTo = document.getElementById('mailTo').value || '関係者各位';
+
+  // 議題別に分割（空行で区切る）
+  const blocks = memo.split(/\n\s*\n/).filter(b => b.trim());
+  let summary = `【${title}】${date ? ' ' + date : ''}\n参加者: ${attendees}\n\n■ 議題別まとめ\n\n`;
+  const topics = [];
+  blocks.forEach((block, i) => {
+    const lines = block.split('\n').filter(l => l.trim());
+    const topic = lines[0].replace(/^[・\-\*●○◆■]/, '').trim();
+    const body = lines.slice(1).map(l => '  ' + l.trim()).join('\n');
+    topics.push({ topic, body: body || '  （詳細記載なし）', full: block });
+    summary += `${i+1}. ${topic}\n${body || '  （詳細記載なし）'}\n\n`;
+  });
+
+  // 決定事項抽出
+  const decisionKeys = ['決定', '確定', 'ことにな', 'で決ま', 'で行く', 'とする', 'に決ま'];
+  const decisions = [];
+  memo.split(/\n/).forEach(line => {
+    const t = line.trim();
+    if (!t) return;
+    if (decisionKeys.some(k => t.includes(k))) decisions.push(t.replace(/^[・\-\*●○◆■]/, '').trim());
+  });
+  const decisionsOut = '■ 決定事項\n\n' + (decisions.length ? decisions.map((d,i) => `${i+1}. ${d}`).join('\n') : '（自動検出できませんでした。メモに「決定」「確定」等のキーワードを含めると検出できます）');
+
+  // ToDo抽出
+  const todoKeys = ['まで', '提出', '準備', '用意', '作成', '調査', '対応', '連絡', '確認', '手配', '送付'];
+  const todos = [];
+  memo.split(/\n/).forEach(line => {
+    const t = line.trim();
+    if (!t) return;
+    if (todoKeys.some(k => t.includes(k)) && !decisionKeys.some(k => t.includes(k))) {
+      todos.push(t.replace(/^[・\-\*●○◆■]/, '').trim());
+    }
+  });
+  const todosOut = '■ ToDo一覧\n\n' + (todos.length ? todos.map(t => `□ ${t}`).join('\n') : '（自動検出できませんでした）');
+
+  // メール文面
+  let mail = `件名: 【議事録】${title}${date ? ' ('+date+')' : ''}\n\n`;
+  mail += `${mailTo}\n\nお疲れさまです。\n${date ? date + 'に' : ''}実施しました「${title}」の議事録を共有いたします。\n\n`;
+  mail += `───────────────\n参加者: ${attendees}\n───────────────\n\n【議題】\n`;
+  topics.forEach((t, i) => { mail += `${i+1}. ${t.topic}\n`; });
+  mail += `\n【決定事項】\n${decisions.length ? decisions.map((d,i) => `${i+1}. ${d}`).join('\n') : '（なし）'}\n\n`;
+  mail += `【ToDo】\n${todos.length ? todos.map(t => `・${t}`).join('\n') : '（なし）'}\n\n`;
+  mail += `ご不明点や補足事項がございましたら、ご返信ください。\nよろしくお願いいたします。`;
+
+  // AI依頼文
+  const prompt = `以下の会議メモを整理してください。
+
+# 出力してほしいもの
+1. 議題別の要約（見出しつき）
+2. 決定事項リスト
+3. ToDo一覧（担当者と期限があれば併記）
+4. 関係者への共有メール文面
+
+# 会議情報
+- 会議名: ${title}
+- 日付: ${date}
+- 参加者: ${attendees}
+
+# 会議メモ
+${memo}`;
+
+  document.getElementById('summaryOut').textContent = summary;
+  document.getElementById('decisionsOut').textContent = decisionsOut;
+  document.getElementById('todosOut').textContent = todosOut;
+  document.getElementById('mailOut').textContent = mail;
+  document.getElementById('promptOut').textContent = prompt;
+
+  saveDraft();
+}
+
+function copyOutput(id) {
+  const text = document.getElementById(id).textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    alert('コピーしました');
+  }).catch(() => {
+    // フォールバック
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    alert('コピーしました');
+  });
+}
+
+function saveDraft() {
+  const data = {
+    title: document.getElementById('meetingTitle').value,
+    date: document.getElementById('meetingDate').value,
+    attendees: document.getElementById('attendees').value,
+    mailTo: document.getElementById('mailTo').value,
+    memo: document.getElementById('rawMemo').value
+  };
+  localStorage.setItem('gijirokuDraft', JSON.stringify(data));
+}
+
+function loadDraft() {
+  const raw = localStorage.getItem('gijirokuDraft');
+  if (!raw) return;
+  try {
+    const d = JSON.parse(raw);
+    document.getElementById('meetingTitle').value = d.title || '';
+    document.getElementById('meetingDate').value = d.date || '';
+    document.getElementById('attendees').value = d.attendees || '';
+    document.getElementById('mailTo').value = d.mailTo || '';
+    document.getElementById('rawMemo').value = d.memo || '';
+  } catch(e) {}
+}
+
+function clearAll() {
+  if (!confirm('入力内容をすべて消去します。よろしいですか？')) return;
+  ['meetingTitle','meetingDate','attendees','mailTo','rawMemo'].forEach(id => document.getElementById(id).value = '');
+  localStorage.removeItem('gijirokuDraft');
+  ['summaryOut','decisionsOut','todosOut','mailOut','promptOut'].forEach(id => {
+    document.getElementById(id).textContent = '「整える」を押すと結果が表示されます。';
+  });
+}
+
+loadDraft();
+</script>
+</body>
+</html>

@@ -201,7 +201,7 @@
   .step small{display:block;margin-top:8px;color:var(--teal);font-weight:700;font-size:12px}
 
   /* ===== 料金 ===== */
-  .prices{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;align-items:stretch}
+  .prices{display:grid;grid-template-columns:repeat(2,1fr);gap:22px;align-items:stretch;max-width:760px;margin:0 auto}
   @media (max-width:860px){.prices{grid-template-columns:1fr;max-width:480px;margin:0 auto}}
   .price{
     background:#fff;border-radius:var(--radius);overflow:hidden;
@@ -209,7 +209,6 @@
     display:flex;flex-direction:column;
   }
   .price-head{text-align:center;padding:14px;color:#fff;font-family:"Zen Kaku Gothic New",sans-serif;font-weight:900;font-size:16px;letter-spacing:.06em}
-  .pr1 .price-head{background:var(--sun);color:var(--ink)}
   .pr2 .price-head{background:var(--teal)}
   .pr3 .price-head{background:var(--navy)}
   .price-body{padding:24px;display:flex;flex-direction:column;gap:14px;flex:1}
@@ -406,18 +405,6 @@
       <h2 class="sec-title">料金プラン</h2>
       <p class="sec-lead">追加料金なしの、わかりやすい料金です。お見積りは無料です。</p>
       <div class="prices">
-        <article class="price pr1">
-          <h3 class="price-head">1ページプラン</h3>
-          <div class="price-body">
-            <p class="price-num"><b>30,000</b><span>円（税込）</span></p>
-            <ul>
-              <li>スマホ対応の1ページHP</li>
-              <li>お問い合わせ導線つき</li>
-              <li>デザイン案2パターン</li>
-            </ul>
-            <p class="price-note">まず1枚持ちたい方に</p>
-          </div>
-        </article>
         <article class="price pr2">
           <h3 class="price-head">しっかりプラン</h3>
           <div class="price-body">
