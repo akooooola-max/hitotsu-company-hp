@@ -215,6 +215,17 @@
     border:8px solid transparent;border-bottom-color:var(--cream);border-top:none;
   }
 
+  /* 決済ボタン（URLが入ったプランだけ表示） */
+  .paybtn{display:none;margin-top:14px;align-items:center;justify-content:center;
+    background:var(--maroon);color:#fff;border-radius:999px;padding:14px 20px;
+    font-family:"Zen Maru Gothic",sans-serif;font-weight:900;font-size:15px;
+    text-decoration:none;box-shadow:0 3px 0 rgba(0,0,0,.18);transition:transform .15s ease}
+  .paybtn.on{display:flex}
+  .paybtn:hover{transform:translateY(-2px)}
+  .paybtn:active{transform:scale(.98)}
+  .paybtn.ghost{background:#fff;color:var(--maroon);border:2px solid var(--maroon);box-shadow:none}
+  .pay-note{margin-top:22px;font-size:12.5px;color:#7d7668;text-align:center;line-height:1.9}
+
   /* ===== 研修プラン ===== */
   .plans{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;align-items:stretch}
   @media (max-width:820px){.plans{grid-template-columns:1fr;max-width:460px;margin:0 auto}}
@@ -326,14 +337,14 @@
 
   <div class="hero">
     <div class="hero-in">
-      <span class="hero-eyebrow">パソコンが苦手でも大丈夫</span>
+      <span class="hero-eyebrow">鹿児島・対面開催／パソコンが苦手でも大丈夫</span>
       <h1>
         <span class="c-red">AI</span>と一緒に、<br>
         <span class="c-green">仕事</span>も<span class="c-orange">毎日</span>も楽しくなる！
       </h1>
       <p>
         むずかしい専門用語は使いません。現場のお仕事にそのまま使える形で、
-        AIの「雇い方」を半日で持ち帰る、少人数ハンズオン研修です。
+        AIの「雇い方」を半日で持ち帰る、鹿児島の少人数ハンズオン研修です。
       </p>
       <div class="hero-cta">
         <a class="btn btn-entry btn-big" href="#entry" style="padding:16px 44px;font-size:17px">研修に申し込む</a>
@@ -447,9 +458,10 @@
             <ul>
               <li>AIの基本と「頼み方」のコツ</li>
               <li>その場で1つ業務を時短体験</li>
-              <li>オンライン開催もOK</li>
+              <li>鹿児島で対面開催（少人数制）</li>
             </ul>
             <p class="plan-note">「まず雰囲気を知りたい」方に</p>
+            <a class="paybtn" data-pay="taiken" href="#">カード決済で申し込む</a>
           </div>
         </article>
         <article class="plan pl2">
@@ -463,6 +475,7 @@
               <li>研修後1ヶ月の質問サポート付き</li>
             </ul>
             <p class="plan-note">少人数制・1人1台で実施します</p>
+            <a class="paybtn" data-pay="handson" href="#">カード決済で申し込む</a>
           </div>
         </article>
         <article class="plan pl3">
@@ -475,9 +488,11 @@
               <li>顧問プラン（月額）への接続も可能</li>
             </ul>
             <p class="plan-note">出張研修に対応します</p>
+            <a class="paybtn ghost on" href="https://line.me/R/ti/p/@188jocyd">お見積りを相談する</a>
           </div>
         </article>
       </div>
+      <p class="pay-note">お支払いはカード決済（Stripe）・銀行振込・PayPay・当日現金に対応しています。<br>お申し込み後、日程はこちらからご連絡します。</p>
     </div>
   </section>
 
@@ -498,8 +513,8 @@
           <p class="qa-a">研修では個人情報・機密情報を使わずに練習する方法からお伝えします。安全に使うためのルールづくりも研修内容に含まれています。</p>
         </details>
         <details class="qa-item">
-          <summary><span class="qa-q">Q</span>オンラインでも受講できますか？<span class="qa-arrow">▼</span></summary>
-          <p class="qa-a">体験セミナーはオンライン対応しています。ハンズオン研修は、しっかり手を動かしていただくため対面開催を基本としています。</p>
+          <summary><span class="qa-q">Q</span>どこで開催していますか？<span class="qa-arrow">▼</span></summary>
+          <p class="qa-a">鹿児島県内での対面開催です。実際に手を動かして「その日に持ち帰る」研修のため、オンラインでは行っていません。会場は お申し込み後にご案内します。法人・チーム研修は貴社までうかがう出張開催に対応しています。</p>
         </details>
       </div>
     </div>
@@ -537,3 +552,17 @@
   <p style="margin-top:10px;font-size:12px"><a href="/consul/">AIコンサルタントのメニュー一覧はこちら</a>　<a href="/tokusho">特定商取引法に基づく表記</a></p>
   <p class="copy">© 2026 Hitotsu Company</p>
 </footer>
+
+<script>
+// Stripe決済リンク。URLを入れたプランだけ決済ボタンが表示される
+(function(){
+  var PAY={
+    taiken:'https://buy.stripe.com/fZu14m2ZHgB54ske1Y6EU05',
+    handson:'https://buy.stripe.com/fZufZgfMtesXcYQf626EU06'
+  };
+  document.querySelectorAll('.paybtn[data-pay]').forEach(function(b){
+    var url=PAY[b.dataset.pay];
+    if(url){b.href=url;b.classList.add('on')}
+  });
+})();
+</script>

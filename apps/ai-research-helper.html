@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="毎日のリサーチ。要約や比較の依頼文を、貼るだけで作れる">
+<title>リサーチ依頼文メーカー</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic", sans-serif;
+  background: #f5f7fa;
+  color: #2c3e50;
+  line-height: 1.7;
+  padding: 16px;
+}
+.container { max-width: 800px; margin: 0 auto; }
+header {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  padding: 24px 20px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+}
+h1 { font-size: 20px; margin-bottom: 6px; }
+header p { font-size: 13px; opacity: 0.95; }
+.tabs {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 16px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+.tab {
+  flex-shrink: 0;
+  padding: 10px 14px;
+  background: white;
+  border: 2px solid #e0e6ed;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  color: #64748b;
+  white-space: nowrap;
+}
+.tab.active {
+  background: #667eea;
+  color: white;
+  border-color: #667eea;
+}
+.panel {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+.panel h2 { font-size: 16px; margin-bottom: 12px; color: #334155; }
+label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  margin-top: 12px;
+  color: #475569;
+}
+input, textarea, select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 2px solid #e0e6ed;
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: inherit;
+  background: #fafbfc;
+}
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  border-color: #667eea;
+  background: white;
+}
+textarea { resize: vertical; min-height: 70px; }
+.btn {
+  background: #667eea;
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 14px;
+  width: 100%;
+}
+.btn:hover { background: #5568d3; }
+.btn.secondary {
+  background: #e2e8f0;
+  color: #475569;
+}
+.btn.secondary:hover { background: #cbd5e1; }
+.output-box {
+  margin-top: 16px;
+  background: #f8fafc;
+  border: 2px dashed #cbd5e1;
+  border-radius: 8px;
+  padding: 14px;
+  white-space: pre-wrap;
+  font-size: 13px;
+  min-height: 80px;
+  color: #1e293b;
+}
+.hint {
+  background: #fff8e1;
+  border-left: 3px solid #ffb300;
+  padding: 10px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  margin-bottom: 14px;
+  color: #6b5b1a;
+}
+.btn-row { display: flex; gap: 8px; margin-top: 14px; }
+.btn-row .btn { margin-top: 0; }
+.saved-list {
+  margin-top: 12px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+.saved-item {
+  background: #f1f5f9;
+  padding: 8px 12px;
+  border-radius: 6px;
+  margin-bottom: 6px;
+  font-size: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+.saved-item span { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.saved-item button {
+  background: #ef4444;
+  color: white;
+  border: none;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 11px;
+  cursor: pointer;
+}
+.step-note {
+  font-size: 12px;
+  color: #64748b;
+  margin-bottom: 12px;
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>📋 リサーチ依頼文メーカー</h1>
+    <p>要約・比較・メール下書き。AIへの依頼文をワンクリックで作成、コピーして貼るだけ。</p>
+  </header>
+
+  <div class="tabs">
+    <div class="tab active" data-tab="summary">📄 要約</div>
+    <div class="tab" data-tab="compare">⚖️ 比較</div>
+    <div class="tab" data-tab="mail">✉️ メール</div>
+    <div class="tab" data-tab="saved">💾 保存</div>
+  </div>
+
+  <!-- 要約 -->
+  <div class="panel" id="panel-summary">
+    <h2>ページを要約してもらう</h2>
+    <div class="hint">使い方：見ているページの本文をコピー→下に貼り付け→「作成」→出来た依頼文をコピーしてAIに貼る。</div>
+    <label>要約する文章（ページの本文を貼り付け）</label>
+    <textarea id="sumText" placeholder="ここに記事やPDFの本文をコピー＆ペースト..."></textarea>
+    <label>まとめ方</label>
+    <select id="sumStyle">
+      <option value="3行で">3行でざっくり</option>
+      <option value="箇条書き5点で">箇条書き5点で</option>
+      <option value="専門用語なしで小学生でもわかるように">やさしい言葉で</option>
+      <option value="ビジネスで使える要点と行動案付きで">ビジネス向け（行動案付き）</option>
+    </select>
+    <label>目的（任意）</label>
+    <input type="text" id="sumPurpose" placeholder="例：朝の情報収集、上司への報告">
+    <div class="btn-row">
+      <button class="btn" onclick="makeSummary()">依頼文を作成</button>
+      <button class="btn secondary" onclick="clearOut('sumOut')">クリア</button>
+    </div>
+    <div class="output-box" id="sumOut">ここに依頼文が表示されます</div>
+    <div class="btn-row">
+      <button class="btn" onclick="copyOut('sumOut')">📋 コピー</button>
+      <button class="btn secondary" onclick="saveOut('sumOut','要約')">💾 保存</button>
+    </div>
+  </div>
+
+  <!-- 比較 -->
+  <div class="panel" id="panel-compare" style="display:none;">
+    <h2>複数の選択肢を比較する</h2>
+    <div class="hint">3つのサービス・ツール・プランなどを比較する依頼文を作ります。それぞれの説明を貼るだけ。</div>
+    <label>比較したいテーマ</label>
+    <input type="text" id="cmpTheme" placeholder="例：会計ソフト、SaaSツール、プロジェクト管理アプリ">
+    <label>選択肢A（名前と説明）</label>
+    <textarea id="cmpA" placeholder="サービス名と、公式ページの説明文を貼る"></textarea>
+    <label>選択肢B</label>
+    <textarea id="cmpB"></textarea>
+    <label>選択肢C（任意）</label>
+    <textarea id="cmpC"></textarea>
+    <label>比較の観点</label>
+    <input type="text" id="cmpAxis" value="機能・料金・使いやすさ" placeholder="例：機能、料金、サポート">
+    <div class="btn-row">
+      <button class="btn" onclick="makeCompare()">依頼文を作成</button>
+      <button class="btn secondary" onclick="clearOut('cmpOut')">クリア</button>
+    </div>
+    <div class="output-box" id="cmpOut">ここに依頼文が表示されます</div>
+    <div class="btn-row">
+      <button class="btn" onclick="copyOut('cmpOut')">📋 コピー</button>
+      <button class="btn secondary" onclick="saveOut('cmpOut','比較')">💾 保存</button>
+    </div>
+  </div>
+
+  <!-- メール -->
+  <div class="panel" id="panel-mail" style="display:none;">
+    <h2>メール・チャットの下書き</h2>
+    <div class="hint">相手・目的・伝えたいことを埋めるだけ。丁寧な文面の依頼文が出来上がります。</div>
+    <label>宛先（誰に）</label>
+    <input type="text" id="mailTo" placeholder="例：上司、取引先の田中様、チームメンバー">
+    <label>目的（何を伝えたい？）</label>
+    <input type="text" id="mailPurpose" placeholder="例：納期を1日延ばしたい、打ち合わせの日程調整">
+    <label>伝えたい要点（箇条書きOK）</label>
+    <textarea id="mailPoints" placeholder="・原因は〇〇&#10;・新しい納期は〇月〇日&#10;・迷惑をおかけしてお詫び"></textarea>
+    <label>トーン</label>
+    <select id="mailTone">
+      <option value="丁寧でかしこまった">丁寧・かしこまった</option>
+      <option value="やわらかく親しみのある">やわらかい・親しみ</option>
+      <option value="簡潔でビジネスライクな">簡潔・ビジネスライク</option>
+      <option value="お詫びの気持ちを丁寧に伝える">お詫び</option>
+    </select>
+    <div class="btn-row">
+      <button class="btn" onclick="makeMail()">依頼文を作成</button>
+      <button class="btn secondary" onclick="clearOut('mailOut')">クリア</button>
+    </div>
+    <div class="output-box" id="mailOut">ここに依頼文が表示されます</div>
+    <div class="btn-row">
+      <button class="btn" onclick="copyOut('mailOut')">📋 コピー</button>
+      <button class="btn secondary" onclick="saveOut('mailOut','メール')">💾 保存</button>
+    </div>
+  </div>
+
+  <!-- 保存 -->
+  <div class="panel" id="panel-saved" style="display:none;">
+    <h2>保存した依頼文</h2>
+    <div class="step-note">よく使う依頼文はここに保存して使い回せます（この端末のみ保存）。</div>
+    <div class="saved-list" id="savedList"></div>
+    <button class="btn secondary" onclick="clearAllSaved()">すべて削除</button>
+  </div>
+</div>
+
+<script>
+// タブ切替
+document.querySelectorAll('.tab').forEach(t => {
+  t.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+    t.classList.add('active');
+    ['summary','compare','mail','saved'].forEach(n => {
+      document.getElementById('panel-'+n).style.display = 'none';
+    });
+    document.getElementById('panel-'+t.dataset.tab).style.display = 'block';
+    if (t.dataset.tab === 'saved') renderSaved();
+  });
+});
+
+function makeSummary() {
+  const text = document.getElementById('sumText').value.trim();
+  const style = document.getElementById('sumStyle').value;
+  const purpose = document.getElementById('sumPurpose').value.trim();
+  if (!text) { alert('要約したい文章を貼り付けてください'); return; }
+  let out = `以下の文章を${style}まとめてください。`;
+  if (purpose) out += `\n目的：${purpose}`;
+  out += `\n\n----- 対象の文章 -----\n${text}`;
+  document.getElementById('sumOut').textContent = out;
+}
+
+function makeCompare() {
+  const theme = document.getElementById('cmpTheme').value.trim() || '選択肢';
+  const a = document.getElementById('cmpA').value.trim();
+  const b = document.getElementById('cmpB').value.trim();
+  const c = document.getElementById('cmpC').value.trim();
+  const axis = document.getElementById('cmpAxis').value.trim() || '機能・料金';
+  if (!a || !b) { alert('少なくとも2つの選択肢を入力してください'); return; }
+  let out = `以下の${theme}を、${axis}の観点で表にまとめて比較してください。最後に、それぞれ「こんな人に向いている」という一言のおすすめコメントも付けてください。\n\n【A】\n${a}\n\n【B】\n${b}`;
+  if (c) out += `\n\n【C】\n${c}`;
+  document.getElementById('cmpOut').textContent = out;
+}
+
+function makeMail() {
+  const to = document.getElementById('mailTo').value.trim();
+  const purpose = document.getElementById('mailPurpose').value.trim();
+  const points = document.getElementById('mailPoints').value.trim();
+  const tone = document.getElementById('mailTone').value;
+  if (!to || !purpose) { alert('宛先と目的を入力してください'); return; }
+  let out = `${to}宛のメール文を、${tone}トーンで作成してください。\n\n目的：${purpose}`;
+  if (points) out += `\n\n伝えたい要点：\n${points}`;
+  out += `\n\n件名と本文の両方を作ってください。本文は署名の直前まででOKです。`;
+  document.getElementById('mailOut').textContent = out;
+}
+
+function copyOut(id) {
+  const text = document.getElementById(id).textContent;
+  if (!text || text.startsWith('ここに')) { alert('先に依頼文を作成してください'); return; }
+  navigator.clipboard.writeText(text).then(() => {
+    alert('コピーしました！AIのチャット欄に貼り付けて送信してください。');
+  }).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = text; document.body.appendChild(ta); ta.select();
+    document.execCommand('copy'); document.body.removeChild(ta);
+    alert('コピーしました！');
+  });
+}
+
+function clearOut(id) {
+  document.getElementById(id).textContent = 'ここに依頼文が表示されます';
+}
+
+function saveOut(id, type) {
+  const text = document.getElementById(id).textContent;
+  if (!text || text.startsWith('ここに')) { alert('先に依頼文を作成してください'); return; }
+  const list = JSON.parse(localStorage.getItem('savedPrompts') || '[]');
+  list.unshift({ type, text, date: new Date().toLocaleString('ja-JP') });
+  localStorage.setItem('savedPrompts', JSON.stringify(list.slice(0, 30)));
+  alert('保存しました（保存タブから確認できます）');
+}
+
+function renderSaved() {
+  const list = JSON.parse(localStorage.getItem('savedPrompts') || '[]');
+  const el = document.getElementById('savedList');
+  if (list.length === 0) {
+    el.innerHTML = '<div style="color:#94a3b8;font-size:13px;padding:12px;text-align:center;">まだ保存された依頼文はありません</div>';
+    return;
+  }
+  el.innerHTML = list.map((item, i) => `
+    <div class="saved-item">
+      <span>[${item.type}] ${item.text.substring(0, 40)}...</span>
+      <button onclick="copySaved(${i})">コピー</button>
+      <button onclick="deleteSaved(${i})">削除</button>
+    </div>
+  `).join('');
+}
+
+function copySaved(i) {
+  const list = JSON.parse(localStorage.getItem('savedPrompts') || '[]');
+  navigator.clipboard.writeText(list[i].text).then(() => alert('コピーしました！'));
+}
+
+function deleteSaved(i) {
+  const list = JSON.parse(localStorage.getItem('savedPrompts') || '[]');
+  list.splice(i, 1);
+  localStorage.setItem('savedPrompts', JSON.stringify(list));
+  renderSaved();
+}
+
+function clearAllSaved() {
+  if (confirm('すべての保存を削除しますか？')) {
+    localStorage.removeItem('savedPrompts');
+    renderSaved();
+  }
+}
+</script>
+</body>
+</html>
