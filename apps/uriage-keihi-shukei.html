@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="副業の売上とレシート経費。貼るだけで集計してAI依頼文まで作成">
+<title>売上・経費まとめ帳</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, "Hiragino Sans", "Yu Gothic", sans-serif; background: #f4f6f8; color: #333; line-height: 1.6; padding: 12px; }
+.container { max-width: 900px; margin: 0 auto; }
+h1 { font-size: 1.4rem; color: #2c5282; margin-bottom: 4px; }
+.subtitle { color: #666; font-size: 0.85rem; margin-bottom: 16px; }
+.tabs { display: flex; gap: 4px; margin-bottom: 12px; border-bottom: 2px solid #ddd; }
+.tab { flex: 1; padding: 10px; background: none; border: none; cursor: pointer; font-size: 0.95rem; color: #666; border-bottom: 3px solid transparent; margin-bottom: -2px; }
+.tab.active { color: #2c5282; border-bottom-color: #2c5282; font-weight: bold; }
+.panel { display: none; background: white; padding: 16px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+.panel.active { display: block; }
+h2 { font-size: 1.05rem; margin-bottom: 8px; color: #2c5282; }
+.hint { background: #fffbea; border-left: 3px solid #f0c040; padding: 8px 12px; font-size: 0.85rem; margin-bottom: 12px; border-radius: 4px; }
+textarea { width: 100%; min-height: 140px; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-family: monospace; font-size: 0.9rem; resize: vertical; }
+input, select { padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 0.95rem; }
+.row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+.row input { flex: 1; min-width: 100px; }
+button { background: #2c5282; color: white; border: none; padding: 10px 16px; border-radius: 4px; cursor: pointer; font-size: 0.95rem; }
+button:hover { background: #1a365d; }
+button.secondary { background: #718096; }
+button.danger { background: #c53030; }
+button.small { padding: 4px 8px; font-size: 0.8rem; }
+.result { margin-top: 16px; padding: 12px; background: #f7fafc; border-radius: 4px; }
+table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 0.9rem; }
+th, td { padding: 6px 8px; text-align: left; border-bottom: 1px solid #e2e8f0; }
+th { background: #edf2f7; }
+.total { font-weight: bold; background: #ebf8ff; }
+.bar { display: inline-block; background: #4299e1; height: 14px; vertical-align: middle; border-radius: 2px; }
+.actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+.copy-box { background: #2d3748; color: #f7fafc; padding: 10px; border-radius: 4px; font-size: 0.85rem; font-family: monospace; white-space: pre-wrap; margin-top: 8px; max-height: 300px; overflow-y: auto; }
+.empty { color: #999; text-align: center; padding: 20px; }
+@media (max-width: 600px) {
+  h1 { font-size: 1.2rem; }
+  .tab { font-size: 0.85rem; padding: 8px 4px; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>📊 売上・経費まとめ帳</h1>
+  <p class="subtitle">CSVを貼るだけで集計。レシート入力で経費一覧。AIに任せたい時の依頼文も作れます。</p>
+
+  <div class="tabs">
+    <button class="tab active" data-tab="sales">売上集計</button>
+    <button class="tab" data-tab="expense">経費レシート</button>
+    <button class="tab" data-tab="prompt">AI依頼文</button>
+  </div>
+
+  <!-- 売上集計 -->
+  <div class="panel active" id="sales">
+    <h2>売上CSVを貼り付けて集計</h2>
+    <div class="hint">💡 エクセルの表をコピーして下に貼るだけ。1列目=日付、2列目=商品名、3列目=金額 の順で。<br>複数月分をまとめて貼ってもOK。ヘッダー行があっても自動でスキップします。</div>
+    <textarea id="salesInput" placeholder="例：&#10;2024-01-05,りんご,1200&#10;2024-01-08,みかん,800&#10;2024-02-01,りんご,1500"></textarea>
+    <div class="actions">
+      <button onclick="analyzeSales()">集計する</button>
+      <button class="secondary" onclick="loadSampleSales()">サンプルを入れる</button>
+      <button class="secondary" onclick="document.getElementById('salesInput').value=''">クリア</button>
+    </div>
+    <div id="salesResult"></div>
+  </div>
+
+  <!-- 経費レシート -->
+  <div class="panel" id="expense">
+    <h2>レシートを1件ずつ入力</h2>
+    <div class="hint">💡 レシートの写真を見ながら入力。データはこの端末に保存されます。月末にCSVで書き出せます。</div>
+    <div class="row">
+      <input type="date" id="expDate">
+      <input type="text" id="expShop" placeholder="店名">
+      <input type="number" id="expAmount" placeholder="金額">
+      <input type="text" id="expCategory" placeholder="用途（例：交通費）" list="catList">
+      <datalist id="catList">
+        <option value="交通費"><option value="消耗品"><option value="会議費"><option value="通信費"><option value="その他">
+      </datalist>
+      <button onclick="addExpense()">追加</button>
+    </div>
+    <div id="expenseList"></div>
+    <div class="actions">
+      <button class="secondary" onclick="exportExpenseCSV()">CSVで書き出す</button>
+      <button class="danger" onclick="clearExpenses()">全削除</button>
+    </div>
+  </div>
+
+  <!-- AI依頼文 -->
+  <div class="panel" id="prompt">
+    <h2>AIに丸投げする時の依頼文を作る</h2>
+    <div class="hint">💡 手元にファイルが山ほどある時、AIツールに貼るための「お願い文」を自動で作ります。コピーして使ってください。</div>
+    <div class="row">
+      <select id="promptType" style="flex:1;min-width:200px">
+        <option value="sales">売上CSVをまとめて集計してほしい</option>
+        <option value="receipt">レシート画像を一覧表にしてほしい</option>
+        <option value="excel">エクセルの複数シートを合体してほしい</option>
+        <option value="rename">ファイル名を整理してほしい</option>
+      </select>
+      <button onclick="genPrompt()">依頼文を作る</button>
+    </div>
+    <div id="promptResult"></div>
+  </div>
+</div>
+
+<script>
+// タブ切替
+document.querySelectorAll('.tab').forEach(t => {
+  t.onclick = () => {
+    document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(x => x.classList.remove('active'));
+    t.classList.add('active');
+    document.getElementById(t.dataset.tab).classList.add('active');
+  };
+});
+
+// 売上集計
+function loadSampleSales() {
+  document.getElementById('salesInput').value =
+`日付,商品,金額
+2024-01-05,りんご,1200
+2024-01-08,みかん,800
+2024-01-15,りんご,1500
+2024-01-20,ぶどう,2200
+2024-02-01,りんご,1200
+2024-02-10,みかん,800
+2024-02-15,ぶどう,2200
+2024-02-25,いちご,3000
+2024-03-05,りんご,1500
+2024-03-12,いちご,3000`;
+}
+
+function analyzeSales() {
+  const txt = document.getElementById('salesInput').value.trim();
+  if (!txt) { alert('データを貼り付けてください'); return; }
+  const lines = txt.split(/\r?\n/);
+  const rows = [];
+  lines.forEach(line => {
+    const parts = line.split(/[,\t]/).map(s => s.trim());
+    if (parts.length < 3) return;
+    const amt = parseFloat(parts[2].replace(/[¥,円\s]/g, ''));
+    if (isNaN(amt)) return; // ヘッダー行スキップ
+    const d = parts[0].replace(/\//g, '-');
+    const month = d.substring(0, 7);
+    if (!/^\d{4}-\d{2}/.test(month)) return;
+    rows.push({ date: d, month: month, product: parts[1], amount: amt });
+  });
+  if (rows.length === 0) { document.getElementById('salesResult').innerHTML = '<div class="empty">読み取れるデータがありませんでした</div>'; return; }
+
+  const total = rows.reduce((s, r) => s + r.amount, 0);
+  const byProduct = {};
+  const byMonth = {};
+  rows.forEach(r => {
+    byProduct[r.product] = (byProduct[r.product] || 0) + r.amount;
+    byMonth[r.month] = (byMonth[r.month] || 0) + r.amount;
+  });
+  const prodRank = Object.entries(byProduct).sort((a,b) => b[1]-a[1]);
+  const monthList = Object.entries(byMonth).sort((a,b) => a[0].localeCompare(b[0]));
+  const maxMonth = Math.max(...monthList.map(m => m[1]));
+
+  let html = `<div class="result"><h2>集計結果</h2>
+    <p>件数: ${rows.length}件 / 合計: <strong>¥${total.toLocaleString()}</strong></p>
+    <h2 style="margin-top:12px">商品別ランキング</h2>
+    <table><tr><th>順位</th><th>商品</th><th>合計</th><th>件数</th></tr>`;
+  prodRank.forEach((p, i) => {
+    const cnt = rows.filter(r => r.product === p[0]).length;
+    html += `<tr><td>${i+1}</td><td>${escapeHtml(p[0])}</td><td>¥${p[1].toLocaleString()}</td><td>${cnt}</td></tr>`;
+  });
+  html += `<tr class="total"><td colspan="2">合計</td><td>¥${total.toLocaleString()}</td><td>${rows.length}</td></tr></table>
+    <h2 style="margin-top:12px">月別売上グラフ</h2><table>`;
+  monthList.forEach(m => {
+    const w = Math.round(m[1] / maxMonth * 300);
+    html += `<tr><td>${m[0]}</td><td><span class="bar" style="width:${w}px"></span> ¥${m[1].toLocaleString()}</td></tr>`;
+  });
+  html += `</table>
+    <div class="actions"><button class="secondary" onclick='downloadCSV(${JSON.stringify(JSON.stringify(prodRank))}, "shohin_ranking.csv", ["商品","合計"])'>商品ランキングをCSV保存</button>
+    <button class="secondary" onclick='downloadCSV(${JSON.stringify(JSON.stringify(monthList))}, "tsukibetsu.csv", ["月","合計"])'>月別売上をCSV保存</button></div>
+    </div>`;
+  document.getElementById('salesResult').innerHTML = html;
+}
+
+function downloadCSV(dataStr, filename, headers) {
+  const data = JSON.parse(dataStr);
+  let csv = headers.join(',') + '\n';
+  data.forEach(r => csv += r.join(',') + '\n');
+  const blob = new Blob([new Uint8Array([0xEF,0xBB,0xBF]), csv], {type:'text/csv'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename; a.click();
+  URL.revokeObjectURL(url);
+}
+
+function escapeHtml(s) { return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+// 経費
+let expenses = JSON.parse(localStorage.getItem('expenses') || '[]');
+
+function saveExp() { localStorage.setItem('expenses', JSON.stringify(expenses)); renderExpenses(); }
+
+function addExpense() {
+  const d = document.getElementById('expDate').value;
+  const s = document.getElementById('expShop').value.trim();
+  const a = parseFloat(document.getElementById('expAmount').value);
+  const c = document.getElementById('expCategory').value.trim() || 'その他';
+  if (!d || !s || isNaN(a)) { alert('日付・店名・金額を入力してください'); return; }
+  expenses.push({ date: d, shop: s, amount: a, category: c });
+  document.getElementById('expShop').value = '';
+  document.getElementById('expAmount').value = '';
+  saveExp();
+}
+
+function deleteExp(i) { expenses.splice(i, 1); saveExp(); }
+
+function clearExpenses() {
+  if (!confirm('すべての経費データを削除します。よろしいですか？')) return;
+  expenses = []; saveExp();
+}
+
+function renderExpenses() {
+  const el = document.getElementById('expenseList');
+  if (expenses.length === 0) { el.innerHTML = '<div class="empty">まだ登録がありません</div>'; return; }
+  expenses.sort((a,b) => a.date.localeCompare(b.date));
+  const total = expenses.reduce((s,e) => s + e.amount, 0);
+  const byCat = {};
+  expenses.forEach(e => byCat[e.category] = (byCat[e.category] || 0) + e.amount);
+  let html = '<table><tr><th>日付</th><th>店名</th><th>用途</th><th>金額</th><th></th></tr>';
+  expenses.forEach((e, i) => {
+    html += `<tr><td>${e.date}</td><td>${escapeHtml(e.shop)}</td><td>${escapeHtml(e.category)}</td><td>¥${e.amount.toLocaleString()}</td><td><button class="small danger" onclick="deleteExp(${i})">削除</button></td></tr>`;
+  });
+  html += `<tr class="total"><td colspan="3">合計</td><td colspan="2">¥${total.toLocaleString()}</td></tr></table>`;
+  html += '<h2 style="margin-top:12px">用途別</h2><table>';
+  Object.entries(byCat).sort((a,b)=>b[1]-a[1]).forEach(c => {
+    html += `<tr><td>${escapeHtml(c[0])}</td><td>¥${c[1].toLocaleString()}</td></tr>`;
+  });
+  html += '</table>';
+  el.innerHTML = html;
+}
+
+function exportExpenseCSV() {
+  if (expenses.length === 0) { alert('データがありません'); return; }
+  let csv = '日付,店名,用途,金額\n';
+  expenses.forEach(e => csv += `${e.date},${e.shop},${e.category},${e.amount}\n`);
+  const blob = new Blob([new Uint8Array([0xEF,0xBB,0xBF]), csv], {type:'text/csv'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'keihi.csv'; a.click();
+  URL.revokeObjectURL(url);
+}
+
+// 依頼文
+const prompts = {
+  sales: `【AIへの依頼文】
+このフォルダにある売上CSVファイル（複数枚）を全部読み込んで、以下をお願いします。
+
+1. 全ファイルを1つに結合して、合計金額を出す
+2. 商品ごとの売上ランキングを作る（金額の高い順）
+3. 月別の売上推移を表にする
+4. 結果をエクセルファイル（.xlsx）で「集計結果.xlsx」として保存
+5. 月別売上の棒グラフも入れる
+
+CSVは1列目=日付、2列目=商品名、3列目=金額の形式です。
+文字コードが違うファイルがあれば自動で判別してください。`,
+
+  receipt: `【AIへの依頼文】
+このフォルダにあるレシートの画像ファイル（.jpg / .png）を全部読み取って、以下の一覧表を作ってください。
+
+- 日付
+- 店名
+- 合計金額
+- 推測される用途（交通費・消耗品・会議費など）
+
+結果をエクセルファイル（.xlsx）で「経費一覧.xlsx」として保存してください。
+読み取れなかった項目は空欄でOKです。読み取れなかった画像ファイル名は別途リストで教えてください。`,
+
+  excel: `【AIへの依頼文】
+このフォルダにあるエクセルファイル（複数）を全部読み込んで、以下の作業をお願いします。
+
+1. すべてのシートを1つのシートに縦に連結する（列構成は全ファイル共通の前提）
+2. どのファイル由来かわかるように「元ファイル名」列を追加
+3. 重複行があれば削除
+4. 「統合結果.xlsx」として保存`,
+
+  rename: `【AIへの依頼文】
+このフォルダにあるファイルの名前を、以下のルールでリネームしてください。
+
+- ファイルの更新日付を先頭につける（YYYY-MM-DD_元の名前.拡張子）
+- 半角スペースはアンダースコアに置き換え
+- 実行前にリネーム予定の一覧を表示して、私の確認を待ってから実行
+
+元のファイル名との対応表もCSVで保存してください。`
+};
+
+function genPrompt() {
+  const type = document.getElementById('promptType').value;
+  const text = prompts[type];
+  document.getElementById('promptResult').innerHTML =
+    `<div class="copy-box" id="promptText">${escapeHtml(text)}</div>
+    <div class="actions"><button onclick="copyPrompt()">📋 コピーする</button></div>`;
+}
+
+function copyPrompt() {
+  const t = document.getElementById('promptText').innerText;
+  navigator.clipboard.writeText(t).then(() => alert('コピーしました！AIツールに貼り付けて使ってください'));
+}
+
+renderExpenses();
+// 今日の日付を初期値に
+document.getElementById('expDate').value = new Date().toISOString().substring(0, 10);
+</script>
+</body>
+</html>

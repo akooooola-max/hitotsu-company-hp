@@ -302,6 +302,23 @@
   .sb2{background:#8a6d4f;color:var(--white)}
   .sb3{background:var(--matcha);color:var(--white)}
 
+  /* ===== 他メニューへの導線 ===== */
+  .cross{padding:0 20px 78px}
+  .cross-card{display:block;max-width:760px;margin:0 auto;text-decoration:none;color:inherit;
+    background:var(--white);border:2px solid var(--maroon);border-radius:20px;
+    padding:30px 28px;text-align:center;box-shadow:0 6px 0 rgba(140,32,48,.16);
+    transition:transform .15s ease,box-shadow .15s ease}
+  .cross-card:hover{transform:translateY(-3px);box-shadow:0 9px 0 rgba(140,32,48,.16)}
+  .cross-eyebrow{display:inline-block;background:var(--maroon);color:#fff;
+    font-family:"Zen Maru Gothic",sans-serif;font-weight:900;font-size:12px;letter-spacing:.08em;
+    border-radius:999px;padding:4px 16px;margin-bottom:14px}
+  .cross-title{display:block;font-family:"Zen Maru Gothic",sans-serif;font-weight:900;
+    font-size:clamp(19px,3.4vw,25px);line-height:1.5;color:var(--maroon)}
+  .cross-desc{display:block;margin-top:10px;font-size:14px;line-height:1.9;color:#6b5c4c}
+  .cross-go{display:inline-block;margin-top:18px;background:var(--mustard);color:var(--ink);
+    font-family:"Zen Maru Gothic",sans-serif;font-weight:900;font-size:15px;
+    border-radius:999px;padding:13px 32px;box-shadow:0 3px 0 rgba(74,59,46,.18)}
+
   /* ===== フッター ===== */
   footer{background:var(--cream-deep);text-align:center;padding:44px 20px 36px}
   .foot-logo{display:flex;justify-content:center;align-items:center;gap:12px;margin-bottom:18px}
@@ -325,6 +342,7 @@
       <a href="#voice">受講者の声</a>
       <a href="#plan">研修プラン</a>
       <a href="#qa">Q&amp;A</a>
+      <a href="/consul/">AIコンサル</a>
       <a class="btn btn-entry" href="#entry">申し込み</a>
       <a class="btn btn-contact" href="#entry">お問い合わせ</a>
     </nav>
@@ -461,7 +479,7 @@
               <li>鹿児島で対面開催（少人数制）</li>
             </ul>
             <p class="plan-note">「まず雰囲気を知りたい」方に</p>
-            <a class="paybtn" data-pay="taiken" href="#">カード決済で申し込む</a>
+            <a class="paybtn" data-pay="taiken" href="#">ご相談済みの方：カード決済へ</a>
           </div>
         </article>
         <article class="plan pl2">
@@ -475,7 +493,7 @@
               <li>研修後1ヶ月の質問サポート付き</li>
             </ul>
             <p class="plan-note">少人数制・1人1台で実施します</p>
-            <a class="paybtn" data-pay="handson" href="#">カード決済で申し込む</a>
+            <a class="paybtn" data-pay="handson" href="#">ご相談済みの方：カード決済へ</a>
           </div>
         </article>
         <article class="plan pl3">
@@ -492,8 +510,17 @@
           </div>
         </article>
       </div>
-      <p class="pay-note">お支払いはカード決済（Stripe）・銀行振込・PayPay・当日現金に対応しています。<br>お申し込み後、日程はこちらからご連絡します。</p>
+      <p class="pay-note">はじめての方は、まず「申し込み」フォームか公式LINEでご相談ください。<br>内容と日程が決まった方は、各プランのボタンからカード決済いただけます（銀行振込・PayPay・当日現金も対応）。</p>
     </div>
+  </section>
+
+  <section class="cross">
+    <a class="cross-card" href="/consul/">
+      <span class="cross-eyebrow">研修以外のご相談</span>
+      <strong class="cross-title">AIコンサルタントの<br>メニューと料金</strong>
+      <span class="cross-desc">単発相談・アプリ作成・AI社員作り・<br>ホームページ制作・AI組織作り</span>
+      <span class="cross-go">メニューを見る ›</span>
+    </a>
   </section>
 
   <section class="qa" id="qa">
