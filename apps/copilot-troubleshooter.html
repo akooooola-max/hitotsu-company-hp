@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Copilotが動かない会社員。原因を5問で特定し次の一手まで案内">
+<title>Copilot つまずき解決ナビ</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, "Hiragino Sans", "Yu Gothic", sans-serif;
+    background: #f4f6fa;
+    color: #222;
+    line-height: 1.7;
+    padding: 16px;
+  }
+  .container {
+    max-width: 720px;
+    margin: 0 auto;
+    background: #fff;
+    border-radius: 12px;
+    padding: 24px 20px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+  }
+  h1 {
+    font-size: 20px;
+    color: #1a4a8a;
+    margin-bottom: 8px;
+  }
+  .lead {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 20px;
+  }
+  .tabs {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+  .tab {
+    flex: 1;
+    min-width: 90px;
+    padding: 10px 8px;
+    background: #e8ecf3;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    color: #555;
+  }
+  .tab.active {
+    background: #1a4a8a;
+    color: #fff;
+  }
+  .step {
+    background: #f9fafc;
+    border-left: 4px solid #1a4a8a;
+    padding: 14px 16px;
+    margin-bottom: 12px;
+    border-radius: 6px;
+  }
+  .step h3 {
+    font-size: 15px;
+    color: #1a4a8a;
+    margin-bottom: 6px;
+  }
+  .step p {
+    font-size: 14px;
+  }
+  .question {
+    background: #fff8e6;
+    padding: 16px;
+    border-radius: 8px;
+    margin-bottom: 12px;
+  }
+  .question p {
+    font-weight: bold;
+    margin-bottom: 10px;
+    font-size: 15px;
+  }
+  .choice {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 10px 14px;
+    margin-bottom: 6px;
+    background: #fff;
+    border: 1px solid #d0d5dd;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+  }
+  .choice:hover { background: #f0f4fa; }
+  .result {
+    background: #e6f4ea;
+    padding: 16px;
+    border-radius: 8px;
+    margin-top: 12px;
+    border-left: 4px solid #2e7d32;
+  }
+  .result h3 {
+    color: #2e7d32;
+    font-size: 15px;
+    margin-bottom: 8px;
+  }
+  .result ol, .result ul {
+    padding-left: 20px;
+    font-size: 14px;
+  }
+  .result li { margin-bottom: 4px; }
+  .btn {
+    background: #1a4a8a;
+    color: #fff;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    margin-top: 10px;
+  }
+  .btn.sub {
+    background: #888;
+  }
+  .prompt-box {
+    background: #f0f4fa;
+    padding: 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    margin-top: 8px;
+    white-space: pre-wrap;
+    font-family: monospace;
+    border: 1px dashed #99a;
+  }
+  .memo {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #d0d5dd;
+    border-radius: 6px;
+    font-size: 14px;
+    font-family: inherit;
+    resize: vertical;
+    min-height: 100px;
+  }
+  .saved-note {
+    font-size: 12px;
+    color: #2e7d32;
+    margin-top: 6px;
+  }
+  section { display: none; }
+  section.active { display: block; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>Copilot つまずき解決ナビ</h1>
+  <p class="lead">Word・Excel・Teamsで「動かない」を、質問に答えるだけで原因特定します。</p>
+
+  <div class="tabs">
+    <button class="tab active" data-target="diagnose">原因診断</button>
+    <button class="tab" data-target="word">Word</button>
+    <button class="tab" data-target="excel">Excel</button>
+    <button class="tab" data-target="teams">Teams</button>
+    <button class="tab" data-target="memo">メモ</button>
+  </div>
+
+  <!-- 診断 -->
+  <section id="diagnose" class="active">
+    <div id="quiz"></div>
+  </section>
+
+  <!-- Word -->
+  <section id="word">
+    <div class="step">
+      <h3>1. Copilotボタンが出ない場合</h3>
+      <p>①Officeを最新版にする（ファイル→アカウント→更新オプション→今すぐ更新）。②いったんWordを閉じて再起動。③会社アカウントでサインインし直す。</p>
+    </div>
+    <div class="step">
+      <h3>2. ライセンスの確認</h3>
+      <p>Copilotの利用には有料の追加ライセンスが必要な場合が多いです。情シス担当者に「Copilotのライセンスが付与されているか」を確認してください。</p>
+    </div>
+    <div class="step">
+      <h3>3. 依頼文の例</h3>
+      <p>下書き作成をお願いするときの例文です。</p>
+      <div class="prompt-box">取引先への納期遅延のお詫びメールの下書きを作ってください。相手は長年の取引先で、遅延は3営業日、代替案として分納を提案したいです。丁寧すぎず簡潔に。</div>
+    </div>
+  </section>
+
+  <!-- Excel -->
+  <section id="excel">
+    <div class="step">
+      <h3>1. 表が読めない・分析できない場合</h3>
+      <p>①データが「テーブル」形式になっているか確認（表のどこかを選択→挿入→テーブル）。②結合セルを解除する。③1行目に見出しを入れる。④OneDriveに保存してから開き直す。</p>
+    </div>
+    <div class="step">
+      <h3>2. ファイルの保存場所</h3>
+      <p>Copilotはローカル保存のファイルでは動かないことがあります。OneDriveまたはSharePointに保存し直してください。</p>
+    </div>
+    <div class="step">
+      <h3>3. 依頼文の例</h3>
+      <div class="prompt-box">この売上表で、先月より売上が落ちている商品を教えてください。落ち込み金額の大きい順に3つ、原因の仮説もあわせて。</div>
+    </div>
+  </section>
+
+  <!-- Teams -->
+  <section id="teams">
+    <div class="step">
+      <h3>1. 要約が出ない場合</h3>
+      <p>①会議が「レコーディング」または「トランスクリプション（文字起こし）」オンで開催されているか確認。②主催者側の設定で許可されている必要があります。③会議終了後、数分待つ。</p>
+    </div>
+    <div class="step">
+      <h3>2. 主催者に依頼すること</h3>
+      <p>「次回の会議は文字起こしをオンにして開始してほしい」と伝える。会議開始後に「…」→「トランスクリプションを開始」で有効化できます。</p>
+    </div>
+    <div class="step">
+      <h3>3. 依頼文の例</h3>
+      <div class="prompt-box">この会議で、私が担当することだけを箇条書きで教えてください。期限も併記してください。</div>
+    </div>
+  </section>
+
+  <!-- メモ -->
+  <section id="memo">
+    <div class="step">
+      <h3>状況メモ（情シス相談用）</h3>
+      <p>今どこで詰まっているかを書き残しておくと、情シスに相談するときに話が早いです。</p>
+      <textarea class="memo" id="memoText" placeholder="例：ExcelのCopilotボタンは表示されるが、押すと「このファイルではサポートされていません」と出る。ファイルはデスクトップ保存。"></textarea>
+      <button class="btn" onclick="saveMemo()">保存</button>
+      <button class="btn sub" onclick="clearMemo()">消去</button>
+      <div class="saved-note" id="savedNote"></div>
+    </div>
+  </section>
+</div>
+
+<script>
+// タブ切り替え
+document.querySelectorAll('.tab').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(btn.dataset.target).classList.add('active');
+  });
+});
+
+// 診断フロー
+const flow = {
+  start: {
+    q: "どのアプリで困っていますか？",
+    choices: [
+      { t: "Word（文章作成）", next: "wordQ1" },
+      { t: "Excel（表・データ）", next: "excelQ1" },
+      { t: "Teams（会議）", next: "teamsQ1" },
+      { t: "そもそもCopilotボタンが見当たらない", next: "noButton" }
+    ]
+  },
+  noButton: {
+    q: "Officeアプリのメニュー右上あたりに「Copilot」ボタンはありますか？",
+    choices: [
+      { t: "ない／グレーアウトしている", next: "resultLicense" },
+      { t: "あるが押しても反応しない", next: "resultUpdate" }
+    ]
+  },
+  wordQ1: {
+    q: "何を頼んだときに動きませんか？",
+    choices: [
+      { t: "文章の下書き作成", next: "wordQ2" },
+      { t: "既存文書の要約・修正", next: "wordQ2" }
+    ]
+  },
+  wordQ2: {
+    q: "エラーメッセージは出ますか？",
+    choices: [
+      { t: "「ライセンスがありません」系", next: "resultLicense" },
+      { t: "反応がない／読み込み中のまま", next: "resultUpdate" },
+      { t: "動くが結果がおかしい", next: "resultPrompt" }
+    ]
+  },
+  excelQ1: {
+    q: "ファイルはどこに保存されていますか？",
+    choices: [
+      { t: "OneDrive／SharePoint", next: "excelQ2" },
+      { t: "パソコン本体（デスクトップなど）", next: "resultCloud" }
+    ]
+  },
+  excelQ2: {
+    q: "表の形はどうなっていますか？",
+    choices: [
+      { t: "普通のセル（テーブル化していない）", next: "resultTable" },
+      { t: "テーブル化済み・見出しあり", next: "resultPrompt" },
+      { t: "結合セルがある", next: "resultMerge" }
+    ]
+  },
+  teamsQ1: {
+    q: "会議中に「文字起こし」または「録画」はオンでしたか？",
+    choices: [
+      { t: "オンだった／されていた", next: "teamsQ2" },
+      { t: "オフだった／不明", next: "resultTranscript" }
+    ]
+  },
+  teamsQ2: {
+    q: "会議が終わってどのくらい経ちましたか？",
+    choices: [
+      { t: "5分以内", next: "resultWait" },
+      { t: "それ以上経っている", next: "resultTeamsOther" }
+    ]
+  }
+};
+
+const results = {
+  resultLicense: {
+    title: "原因：ライセンス未付与の可能性が高い",
+    steps: [
+      "情シス担当者に「自分のアカウントにCopilotの追加ライセンスが付与されているか」を確認する",
+      "会社契約の場合、通常のOffice契約とは別に追加契約が必要",
+      "個人利用なら、対応する有料プランへの加入を検討する"
+    ]
+  },
+  resultUpdate: {
+    title: "原因：Officeが古い／一時的な不具合",
+    steps: [
+      "ファイル→アカウント→更新オプション→「今すぐ更新」を実行",
+      "アプリを完全に閉じて再起動",
+      "改善しなければ、いったんサインアウトしてサインインし直す"
+    ]
+  },
+  resultCloud: {
+    title: "原因：ローカル保存のファイルは対象外",
+    steps: [
+      "ファイル→名前を付けて保存→OneDriveまたはSharePointを選ぶ",
+      "保存し直したファイルを開いて再度依頼",
+      "自動保存がオンになっていることを確認"
+    ]
+  },
+  resultTable: {
+    title: "原因：表がテーブル形式になっていない",
+    steps: [
+      "表のどこかのセルをクリック",
+      "挿入タブ→テーブル→「先頭行を見出しとして使用」にチェック→OK",
+      "見出しに空欄がないかも確認",
+      "その状態で再度依頼する"
+    ]
+  },
+  resultMerge: {
+    title: "原因：結合セルがあると読めない",
+    steps: [
+      "結合セルを選択→ホーム→「セルの結合」を解除",
+      "空欄になったセルに、上のセルと同じ値を入れる",
+      "1行目に見出しを入れ、テーブル化する",
+      "再度依頼する"
+    ]
+  },
+  resultTranscript: {
+    title: "原因：文字起こしがオフだった",
+    steps: [
+      "残念ながら過去の会議は要約できません",
+      "次回から、会議開始後に「…」→「トランスクリプションを開始」をオン",
+      "主催者権限が必要な場合があるので、主催者に依頼",
+      "録画もあわせて有効にしておくと安心"
+    ]
+  },
+  resultWait: {
+    title: "対応：もう少し待つ",
+    steps: [
+      "要約の生成には数分〜十数分かかることがあります",
+      "Teams左メニューの「チャット」から会議のスレッドを確認",
+      "10分以上待って出ない場合は下の「その他」の対応へ"
+    ]
+  },
+  resultTeamsOther: {
+    title: "原因：文字起こしデータが保存されていない可能性",
+    steps: [
+      "会議チャットに「トランスクリプト」タブがあるか確認",
+      "なければ、主催者側の記録が保存されていない",
+      "主催者に文字起こしファイルの共有を依頼する",
+      "次回は必ず冒頭で文字起こしをオンにする"
+    ]
+  },
+  resultPrompt: {
+    title: "対応：依頼文（プロンプト）を見直す",
+    steps: [
+      "「何を・どんな形式で・誰向けに」を具体的に書く",
+      "曖昧な単語（いい感じに、など）を避ける",
+      "例：「この表で先月比マイナスの商品を、金額の大きい順に3つ、表形式で」",
+      "上のタブ「Word」「Excel」に依頼文の例があります"
+    ]
+  }
+};
+
+function renderQuiz(key) {
+  const q = flow[key];
+  const box = document.getElementById('quiz');
+  if (results[key]) {
+    const r = results[key];
+    box.innerHTML = `
+      <div class="result">
+        <h3>${r.title}</h3>
+        <ol>${r.steps.map(s => `<li>${s}</li>`).join('')}</ol>
+      </div>
+      <button class="btn" onclick="renderQuiz('start')">もう一度診断する</button>
+    `;
+    return;
+  }
+  box.innerHTML = `
+    <div class="question">
+      <p>${q.q}</p>
+      ${q.choices.map((c,i) => `<button class="choice" data-next="${c.next}">${c.t}</button>`).join('')}
+    </div>
+  `;
+  box.querySelectorAll('.choice').forEach(b => {
+    b.addEventListener('click', () => renderQuiz(b.dataset.next));
+  });
+}
+renderQuiz('start');
+
+// メモ保存
+function saveMemo() {
+  localStorage.setItem('copilotMemo', document.getElementById('memoText').value);
+  const now = new Date().toLocaleString('ja-JP');
+  document.getElementById('savedNote').textContent = '保存しました（' + now + '）';
+}
+function clearMemo() {
+  document.getElementById('memoText').value = '';
+  localStorage.removeItem('copilotMemo');
+  document.getElementById('savedNote').textContent = '消去しました';
+}
+window.addEventListener('load', () => {
+  const m = localStorage.getItem('copilotMemo');
+  if (m) document.getElementById('memoText').value = m;
+});
+</script>
+</body>
+</html>
