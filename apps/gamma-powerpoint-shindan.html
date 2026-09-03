@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="資料作成。今回はAI自動作成か手作りか、3問で即決">
+<title>スライドツール使い分け診断</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic", sans-serif;
+  background: #f5f7fa;
+  color: #333;
+  line-height: 1.7;
+  padding: 16px;
+  min-height: 100vh;
+}
+.container {
+  max-width: 720px;
+  margin: 0 auto;
+  background: #fff;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+}
+h1 {
+  font-size: 1.4rem;
+  color: #2c3e50;
+  margin-bottom: 8px;
+  border-left: 4px solid #4a90e2;
+  padding-left: 12px;
+}
+.lead {
+  color: #666;
+  font-size: 0.9rem;
+  margin-bottom: 24px;
+}
+.step {
+  background: #f8fafc;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+.step-title {
+  font-weight: bold;
+  color: #2c3e50;
+  margin-bottom: 12px;
+  font-size: 1rem;
+}
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.option {
+  display: flex;
+  align-items: center;
+  padding: 12px 14px;
+  background: #fff;
+  border: 2px solid #e0e6ed;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-size: 0.95rem;
+}
+.option:hover { border-color: #4a90e2; background: #f0f7ff; }
+.option.selected {
+  border-color: #4a90e2;
+  background: #e8f2ff;
+  font-weight: bold;
+}
+.option input { margin-right: 10px; }
+.result {
+  margin-top: 24px;
+  padding: 20px;
+  border-radius: 10px;
+  display: none;
+}
+.result.show { display: block; }
+.result-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+.result-title {
+  font-size: 1.3rem;
+  font-weight: bold;
+  margin-bottom: 12px;
+}
+.result-desc { font-size: 0.95rem; margin-bottom: 16px; }
+.result-steps {
+  background: rgba(255,255,255,0.7);
+  border-radius: 8px;
+  padding: 14px;
+  font-size: 0.9rem;
+}
+.result-steps h4 { margin-bottom: 8px; font-size: 0.95rem; }
+.result-steps ol { padding-left: 20px; }
+.result-steps li { margin-bottom: 4px; }
+.result-gamma { background: linear-gradient(135deg, #e8f2ff, #f0e6ff); }
+.result-gamma .result-badge { background: #4a90e2; color: #fff; }
+.result-ppt { background: linear-gradient(135deg, #fff4e6, #ffe6e6); }
+.result-ppt .result-badge { background: #d9534f; color: #fff; }
+.result-both { background: linear-gradient(135deg, #e6f7e6, #fff9e6); }
+.result-both .result-badge { background: #5cb85c; color: #fff; }
+.btn {
+  display: inline-block;
+  padding: 10px 20px;
+  background: #4a90e2;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  margin-top: 12px;
+}
+.btn:hover { background: #357abd; }
+.btn-sub {
+  background: #eee;
+  color: #333;
+  margin-left: 8px;
+}
+.compare {
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid #e0e6ed;
+}
+.compare h2 {
+  font-size: 1.1rem;
+  margin-bottom: 12px;
+  color: #2c3e50;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+th, td {
+  padding: 8px;
+  border: 1px solid #e0e6ed;
+  text-align: left;
+}
+th { background: #f0f4f8; }
+.note {
+  font-size: 0.8rem;
+  color: #888;
+  margin-top: 16px;
+  text-align: center;
+}
+@media (max-width: 480px) {
+  h1 { font-size: 1.2rem; }
+  .container { padding: 16px; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>スライドツール使い分け診断</h1>
+  <p class="lead">3つの質問に答えるだけで、今回の資料に合うツールが決まります。</p>
+
+  <div class="step">
+    <div class="step-title">Q1. 何のための資料ですか？</div>
+    <div class="options" data-q="purpose">
+      <label class="option"><input type="radio" name="q1" value="internal">社内プレゼン・勉強会・報告</label>
+      <label class="option"><input type="radio" name="q1" value="client">お客様への提案・営業資料</label>
+      <label class="option"><input type="radio" name="q1" value="draft">とりあえずのたたき台・ブレスト用</label>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-title">Q2. 期限はどれくらいですか？</div>
+    <div class="options" data-q="deadline">
+      <label class="option"><input type="radio" name="q2" value="urgent">今日〜明日中（急ぎ）</label>
+      <label class="option"><input type="radio" name="q2" value="normal">数日〜1週間</label>
+      <label class="option"><input type="radio" name="q2" value="long">2週間以上ある</label>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-title">Q3. 会社の指定テンプレートやロゴのルールはありますか？</div>
+    <div class="options" data-q="rule">
+      <label class="option"><input type="radio" name="q3" value="strict">厳しい指定がある（テンプレ必須）</label>
+      <label class="option"><input type="radio" name="q3" value="loose">なんとなくの慣習はある程度</label>
+      <label class="option"><input type="radio" name="q3" value="free">自由に作っていい</label>
+    </div>
+  </div>
+
+  <button class="btn" id="diagnoseBtn">診断する</button>
+  <button class="btn btn-sub" id="resetBtn">リセット</button>
+
+  <div class="result" id="result"></div>
+
+  <div class="compare">
+    <h2>ざっくり比較表</h2>
+    <table>
+      <tr><th></th><th>AI自動作成ツール</th><th>従来型スライドソフト</th></tr>
+      <tr><td>作成スピード</td><td>◎ 数十秒〜数分</td><td>△ 数時間</td></tr>
+      <tr><td>デザイン</td><td>◎ 自動で整う</td><td>○ 自分次第</td></tr>
+      <tr><td>細かい調整</td><td>△ 苦手</td><td>◎ 得意</td></tr>
+      <tr><td>会社テンプレ</td><td>× 使えない</td><td>◎ 使える</td></tr>
+      <tr><td>印刷・配布</td><td>△ 崩れやすい</td><td>◎ 安定</td></tr>
+      <tr><td>無料範囲</td><td>クレジット制</td><td>Web版なら無料</td></tr>
+    </table>
+  </div>
+
+  <p class="note">回答はこの端末に保存されます</p>
+</div>
+
+<script>
+// 選択状態の見た目
+document.querySelectorAll('.option input').forEach(input => {
+  input.addEventListener('change', (e) => {
+    const name = e.target.name;
+    document.querySelectorAll(`input[name="${name}"]`).forEach(i => {
+      i.closest('.option').classList.remove('selected');
+    });
+    e.target.closest('.option').classList.add('selected');
+    saveState();
+  });
+});
+
+function saveState() {
+  const state = {
+    q1: document.querySelector('input[name="q1"]:checked')?.value || '',
+    q2: document.querySelector('input[name="q2"]:checked')?.value || '',
+    q3: document.querySelector('input[name="q3"]:checked')?.value || ''
+  };
+  localStorage.setItem('slide-diagnose', JSON.stringify(state));
+}
+
+function loadState() {
+  const saved = localStorage.getItem('slide-diagnose');
+  if (!saved) return;
+  const state = JSON.parse(saved);
+  ['q1','q2','q3'].forEach(q => {
+    if (state[q]) {
+      const el = document.querySelector(`input[name="${q}"][value="${state[q]}"]`);
+      if (el) {
+        el.checked = true;
+        el.closest('.option').classList.add('selected');
+      }
+    }
+  });
+}
+
+document.getElementById('diagnoseBtn').addEventListener('click', () => {
+  const q1 = document.querySelector('input[name="q1"]:checked')?.value;
+  const q2 = document.querySelector('input[name="q2"]:checked')?.value;
+  const q3 = document.querySelector('input[name="q3"]:checked')?.value;
+
+  if (!q1 || !q2 || !q3) {
+    alert('3つすべて選んでください');
+    return;
+  }
+
+  // スコアリング: AI寄り(+) / 従来型寄り(-)
+  let score = 0;
+  if (q1 === 'draft') score += 2;
+  if (q1 === 'internal') score += 1;
+  if (q1 === 'client') score -= 1;
+
+  if (q2 === 'urgent') score += 2;
+  if (q2 === 'normal') score += 0;
+  if (q2 === 'long') score -= 1;
+
+  if (q3 === 'strict') score -= 3;
+  if (q3 === 'loose') score += 0;
+  if (q3 === 'free') score += 1;
+
+  const result = document.getElementById('result');
+  result.className = 'result show';
+
+  if (score >= 2) {
+    result.classList.add('result-gamma');
+    result.innerHTML = `
+      <span class="result-badge">おすすめ</span>
+      <div class="result-title">AI自動作成ツールで一気に作る</div>
+      <div class="result-desc">スピード重視・自由度が高い今回の資料は、AIに骨組みを作らせるのが最短ルートです。デザインも自動で整うので、内容に集中できます。</div>
+      <div class="result-steps">
+        <h4>進め方（目安30分）</h4>
+        <ol>
+          <li>作りたい資料のテーマを1〜2文で書き出す</li>
+          <li>AI自動作成ツールにテーマを入力してスライド生成</li>
+          <li>気に入らない箇所だけ手直しする</li>
+          <li>そのまま発表 or PDFで書き出す</li>
+        </ol>
+      </div>`;
+  } else if (score <= -2) {
+    result.classList.add('result-ppt');
+    result.innerHTML = `
+      <span class="result-badge">おすすめ</span>
+      <div class="result-title">従来型スライドソフトで作り込む</div>
+      <div class="result-desc">会社テンプレの遵守や細かい調整が必要な今回は、従来型ソフト一択です。安定性・印刷・共有のしやすさで安心できます。</div>
+      <div class="result-steps">
+        <h4>進め方</h4>
+        <ol>
+          <li>会社の指定テンプレートを開く</li>
+          <li>目次（章立て）を先に決める</li>
+          <li>1スライド1メッセージで作成</li>
+          <li>上長にレビュー依頼してから提出</li>
+        </ol>
+      </div>`;
+  } else {
+    result.classList.add('result-both');
+    result.innerHTML = `
+      <span class="result-badge">おすすめ</span>
+      <div class="result-title">合わせ技が最強：AIで骨組み → 手作業で仕上げ</div>
+      <div class="result-desc">今回のケースはハイブリッドが正解。AIで下書きを一気に作り、従来型ソフトで会社のルールに合わせて整えると、時短と品質を両立できます。</div>
+      <div class="result-steps">
+        <h4>進め方（目安1〜2時間）</h4>
+        <ol>
+          <li>AI自動作成ツールでたたき台を生成</li>
+          <li>内容をコピーして従来型ソフトに貼り付け</li>
+          <li>会社テンプレートに載せ替え・体裁調整</li>
+          <li>ロゴ・フォント・配色を統一して完成</li>
+        </ol>
+      </div>`;
+  }
+
+  result.scrollIntoView({ behavior: 'smooth', block: 'start' });
+});
+
+document.getElementById('resetBtn').addEventListener('click', () => {
+  localStorage.removeItem('slide-diagnose');
+  document.querySelectorAll('input[type="radio"]').forEach(i => i.checked = false);
+  document.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+  const result = document.getElementById('result');
+  result.className = 'result';
+  result.innerHTML = '';
+});
+
+loadState();
+</script>
+</body>
+</html>
