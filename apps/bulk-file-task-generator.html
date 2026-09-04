@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="事務作業の自動化。何をAIに頼むかの依頼文が一発で作れる">
+<title>事務作業まる投げ依頼文メーカー</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic",sans-serif;background:#f5f7fa;color:#333;line-height:1.6;padding:16px}
+.container{max-width:820px;margin:0 auto}
+h1{font-size:1.5rem;color:#2c3e50;margin-bottom:8px}
+.lead{color:#666;font-size:0.9rem;margin-bottom:20px}
+.card{background:#fff;border-radius:10px;padding:20px;margin-bottom:16px;box-shadow:0 2px 8px rgba(0,0,0,0.06)}
+.step{font-weight:bold;color:#2563eb;font-size:0.85rem;margin-bottom:8px}
+h2{font-size:1.1rem;margin-bottom:12px;color:#1f2937}
+label{display:block;font-weight:bold;margin-top:12px;margin-bottom:6px;font-size:0.9rem}
+select,textarea,input[type=text]{width:100%;padding:10px;border:1px solid #d1d5db;border-radius:6px;font-size:0.95rem;font-family:inherit}
+textarea{resize:vertical;min-height:70px}
+.hint{font-size:0.8rem;color:#888;margin-top:4px}
+button{background:#2563eb;color:#fff;border:none;padding:12px 20px;border-radius:6px;font-size:1rem;cursor:pointer;font-weight:bold;margin-top:16px;width:100%}
+button:hover{background:#1d4ed8}
+button.sub{background:#6b7280;margin-top:8px}
+button.sub:hover{background:#4b5563}
+.output{background:#f9fafb;border:1px solid #e5e7eb;border-radius:6px;padding:14px;white-space:pre-wrap;font-size:0.88rem;font-family:"Courier New",monospace;max-height:400px;overflow-y:auto;margin-top:8px}
+.hidden{display:none}
+.history-item{padding:10px;border-bottom:1px solid #eee;cursor:pointer;font-size:0.85rem}
+.history-item:hover{background:#f5f7fa}
+.history-item:last-child{border-bottom:none}
+.tag{display:inline-block;background:#dbeafe;color:#1e40af;padding:2px 8px;border-radius:10px;font-size:0.75rem;margin-right:6px}
+.tips{background:#fef3c7;border-left:4px solid #f59e0b;padding:12px;border-radius:4px;font-size:0.85rem;margin-top:12px}
+@media(min-width:640px){body{padding:24px}h1{font-size:1.8rem}}
+</style>
+</head>
+<body>
+<div class="container">
+<h1>事務作業まる投げ依頼文メーカー</h1>
+<p class="lead">「AIに何をどう頼めばいいか分からない」を解決。選ぶだけで、そのまま貼り付けて使える依頼文ができます。</p>
+
+<div class="card">
+<div class="step">STEP 1</div>
+<h2>どんな作業ですか？</h2>
+<label>作業の種類を選ぶ</label>
+<select id="taskType">
+<option value="">-- 選んでください --</option>
+<option value="extract">複数ファイルから情報を抜き出す（例：請求書から金額と取引先）</option>
+<option value="rewrite">文章の一括修正・言い換え</option>
+<option value="check">文章のチェック（誤字・表記ゆれ）</option>
+<option value="summarize">長い文書の要約</option>
+<option value="convert">形式の変換（表への整理など）</option>
+<option value="classify">たくさんのデータを仕分け・分類</option>
+<option value="translate">翻訳（原文の意味を保ったまま）</option>
+<option value="custom">その他（自分で書く）</option>
+</select>
+</div>
+
+<div class="card">
+<div class="step">STEP 2</div>
+<h2>詳しく教えてください</h2>
+<label>対象になるもの（例：フォルダ内のPDF請求書100件、社内マニュアル一式など）</label>
+<textarea id="target" placeholder="例：/請求書2024フォルダ の中のPDFファイル全部"></textarea>
+
+<label>やってほしいこと（できるだけ具体的に）</label>
+<textarea id="want" placeholder="例：取引先名・金額・請求日を抜き出す"></textarea>
+
+<label>結果の受け取り方（例：Excelにまとめる、Markdownで、CSVで保存）</label>
+<input type="text" id="output" placeholder="例：CSVファイルにまとめて保存">
+
+<label>気をつけてほしいこと（任意）</label>
+<textarea id="notes" placeholder="例：金額は税込・税抜を分けて／個人情報はマスキング"></textarea>
+</div>
+
+<button onclick="generate()">依頼文を作る</button>
+
+<div class="card hidden" id="resultCard">
+<h2>できた依頼文</h2>
+<p class="hint">↓これをそのままAIチャットに貼り付けてください</p>
+<div class="output" id="result"></div>
+<button class="sub" onclick="copyResult()">コピーする</button>
+<button class="sub" onclick="saveHistory()">この依頼文を保存</button>
+<div class="tips">
+💡 <b>コツ</b>：うまくいかない時は「もっと詳しく」「〇〇の形式で」など追加で伝えると精度が上がります。最初は5件くらいで試して、うまくいったら全件に広げるのがおすすめです。
+</div>
+</div>
+
+<div class="card">
+<h2>保存した依頼文</h2>
+<div id="history"><p class="hint">まだ保存はありません</p></div>
+</div>
+
+</div>
+
+<script>
+const templates = {
+  extract: {
+    verb: "情報を抜き出してほしい",
+    example: "取引先名・金額・日付など決まった項目を、正確に抜き出す"
+  },
+  rewrite: {
+    verb: "文章を書き直してほしい",
+    example: "指定のトーンや文体に合わせて言い換える"
+  },
+  check: {
+    verb: "文章をチェックしてほしい",
+    example: "誤字脱字・表記ゆれ・不自然な表現を指摘する"
+  },
+  summarize: {
+    verb: "内容を要約してほしい",
+    example: "重要ポイントを箇条書きでまとめる"
+  },
+  convert: {
+    verb: "形式を変換してほしい",
+    example: "表形式や指定のフォーマットに整理する"
+  },
+  classify: {
+    verb: "データを仕分け・分類してほしい",
+    example: "カテゴリ別に整理してタグ付けする"
+  },
+  translate: {
+    verb: "翻訳してほしい",
+    example: "原文の意味を保ちながら自然な訳文にする"
+  },
+  custom: {
+    verb: "",
+    example: ""
+  }
+};
+
+function generate(){
+  const type = document.getElementById('taskType').value;
+  const target = document.getElementById('target').value.trim();
+  const want = document.getElementById('want').value.trim();
+  const output = document.getElementById('output').value.trim();
+  const notes = document.getElementById('notes').value.trim();
+  
+  if(!type){ alert("作業の種類を選んでください"); return; }
+  if(!target || !want){ alert("対象とやってほしいことは入力してください"); return; }
+  
+  const t = templates[type];
+  let text = "";
+  
+  text += "【依頼内容】\n";
+  if(type !== 'custom' && t.verb){
+    text += "以下の作業を手伝ってください：" + t.verb + "\n\n";
+  } else {
+    text += "以下の作業を手伝ってください。\n\n";
+  }
+  
+  text += "■ 対象\n" + target + "\n\n";
+  text += "■ やってほしいこと\n" + want + "\n\n";
+  
+  if(output){
+    text += "■ 結果の出し方\n" + output + "\n\n";
+  }
+  
+  if(notes){
+    text += "■ 注意点\n" + notes + "\n\n";
+  }
+  
+  text += "■ 進め方のお願い\n";
+  text += "・作業に入る前に、進め方の計画を教えてください\n";
+  text += "・不明点があれば、勝手に進めず先に質問してください\n";
+  text += "・まず1〜2件を試してから全体に広げてください\n";
+  text += "・完了後、何をやったか要約を教えてください\n";
+  
+  document.getElementById('result').textContent = text;
+  document.getElementById('resultCard').classList.remove('hidden');
+  document.getElementById('resultCard').scrollIntoView({behavior:'smooth'});
+}
+
+function copyResult(){
+  const text = document.getElementById('result').textContent;
+  navigator.clipboard.writeText(text).then(()=>{
+    alert("コピーしました！AIチャットの入力欄に貼り付けてください。");
+  }).catch(()=>{
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    alert("コピーしました！");
+  });
+}
+
+function saveHistory(){
+  const text = document.getElementById('result').textContent;
+  const type = document.getElementById('taskType').value;
+  const target = document.getElementById('target').value.trim();
+  const label = target.substring(0,30) + (target.length>30?"...":"");
+  const typeLabels = {extract:"情報抜き出し",rewrite:"書き直し",check:"チェック",summarize:"要約",convert:"形式変換",classify:"仕分け",translate:"翻訳",custom:"その他"};
+  
+  const list = JSON.parse(localStorage.getItem('taskHistory') || '[]');
+  list.unshift({
+    id: Date.now(),
+    label: label,
+    type: typeLabels[type] || "作業",
+    text: text,
+    date: new Date().toLocaleDateString('ja-JP')
+  });
+  if(list.length > 20) list.length = 20;
+  localStorage.setItem('taskHistory', JSON.stringify(list));
+  renderHistory();
+  alert("保存しました");
+}
+
+function renderHistory(){
+  const list = JSON.parse(localStorage.getItem('taskHistory') || '[]');
+  const div = document.getElementById('history');
+  if(list.length === 0){
+    div.innerHTML = '<p class="hint">まだ保存はありません</p>';
+    return;
+  }
+  div.innerHTML = list.map(item => 
+    `<div class="history-item" onclick="loadHistory(${item.id})">
+      <span class="tag">${item.type}</span>
+      <span>${item.label}</span>
+      <span class="hint" style="float:right">${item.date}</span>
+    </div>`
+  ).join('') + '<button class="sub" onclick="clearHistory()">全て削除</button>';
+}
+
+function loadHistory(id){
+  const list = JSON.parse(localStorage.getItem('taskHistory') || '[]');
+  const item = list.find(i => i.id === id);
+  if(!item) return;
+  document.getElementById('result').textContent = item.text;
+  document.getElementById('resultCard').classList.remove('hidden');
+  document.getElementById('resultCard').scrollIntoView({behavior:'smooth'});
+}
+
+function clearHistory(){
+  if(confirm("保存した依頼文を全て削除しますか？")){
+    localStorage.removeItem('taskHistory');
+    renderHistory();
+  }
+}
+
+renderHistory();
+</script>
+</body>
+</html>
