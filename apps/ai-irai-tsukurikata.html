@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="メール・要約・企画。AIに何と頼めば良いか一発で作れる">
+<title>AI依頼文ビルダー</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic", sans-serif;
+    margin: 0; padding: 0;
+    background: #f4f6f8;
+    color: #222;
+    line-height: 1.6;
+  }
+  .container {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 20px 16px 60px;
+  }
+  h1 {
+    font-size: 1.4rem;
+    margin: 10px 0 6px;
+  }
+  .lead {
+    color: #555;
+    font-size: 0.9rem;
+    margin-bottom: 20px;
+  }
+  .card {
+    background: #fff;
+    border-radius: 10px;
+    padding: 18px 16px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    margin-bottom: 16px;
+  }
+  .tabs {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+  }
+  .tab {
+    flex: 1;
+    min-width: 90px;
+    padding: 10px 8px;
+    background: #e6ebf0;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    color: #333;
+  }
+  .tab.active {
+    background: #2b7de9;
+    color: #fff;
+    font-weight: bold;
+  }
+  label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: bold;
+    margin: 12px 0 4px;
+    color: #333;
+  }
+  .hint {
+    font-size: 0.75rem;
+    color: #777;
+    font-weight: normal;
+    margin-left: 4px;
+  }
+  input[type=text], textarea, select {
+    width: 100%;
+    padding: 10px;
+    font-size: 0.95rem;
+    border: 1px solid #cfd6dd;
+    border-radius: 6px;
+    font-family: inherit;
+    background: #fff;
+  }
+  textarea {
+    resize: vertical;
+    min-height: 80px;
+  }
+  .btn {
+    display: inline-block;
+    padding: 12px 20px;
+    background: #2b7de9;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 14px;
+  }
+  .btn:hover { background: #1f66c4; }
+  .btn.sub {
+    background: #6c7a89;
+    padding: 8px 14px;
+    font-size: 0.85rem;
+    margin-top: 8px;
+  }
+  .output-area {
+    margin-top: 14px;
+    background: #f8fafc;
+    border: 1px solid #dde3ea;
+    border-radius: 6px;
+    padding: 14px;
+    white-space: pre-wrap;
+    word-break: break-word;
+    font-size: 0.9rem;
+    min-height: 60px;
+  }
+  .output-area:empty::before {
+    content: "ここに依頼文が表示されます。上の欄を埋めて『依頼文を作る』ボタンを押してください。";
+    color: #999;
+  }
+  .steps {
+    background: #fff7e6;
+    border-left: 4px solid #f5a623;
+    padding: 12px 14px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    margin-top: 14px;
+  }
+  .steps ol { margin: 6px 0 0 20px; padding: 0; }
+  .copied {
+    color: #2b8a3e;
+    font-size: 0.85rem;
+    margin-left: 10px;
+  }
+  .history {
+    font-size: 0.85rem;
+  }
+  .history-item {
+    padding: 8px;
+    border-bottom: 1px solid #eee;
+  }
+  .history-item:last-child { border-bottom: none; }
+  .history-title { font-weight: bold; }
+  .history-date { color: #888; font-size: 0.75rem; }
+  .empty { color: #999; font-size: 0.85rem; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>📝 AI依頼文ビルダー</h1>
+  <p class="lead">「何て頼めばいいか分からない」を解決。項目を埋めるだけで、AIにコピペするだけの依頼文が完成します。</p>
+
+  <div class="card">
+    <div class="tabs">
+      <button class="tab active" data-tab="mail">メール返信</button>
+      <button class="tab" data-tab="summary">議事録要約</button>
+      <button class="tab" data-tab="plan">企画のたたき台</button>
+      <button class="tab" data-tab="ideas">アイデア出し</button>
+    </div>
+
+    <!-- メール -->
+    <div class="pane" id="pane-mail">
+      <label>誰宛て？ <span class="hint">例: 取引先の担当者</span></label>
+      <input type="text" id="m-to" placeholder="取引先のA社 田中様">
+      <label>何を伝えたい？ <span class="hint">箇条書きでOK</span></label>
+      <textarea id="m-content" placeholder="・納期を1週間延ばしてほしい&#10;・理由は部品の入荷遅れ&#10;・お詫びを丁寧に"></textarea>
+      <label>トーン</label>
+      <select id="m-tone">
+        <option>丁寧・かしこまった</option>
+        <option>親しみやすい・柔らかい</option>
+        <option>簡潔・ビジネスライク</option>
+        <option>お詫び中心</option>
+      </select>
+    </div>
+
+    <!-- 要約 -->
+    <div class="pane" id="pane-summary" style="display:none">
+      <label>要約したい文章 <span class="hint">議事録・長文レポート等</span></label>
+      <textarea id="s-text" placeholder="ここに会議の書き起こしや長文を貼り付け" style="min-height:140px"></textarea>
+      <label>何を抜き出したい？</label>
+      <select id="s-type">
+        <option>決定事項とToDo（担当者付き）</option>
+        <option>3行のかんたん要約</option>
+        <option>論点と結論</option>
+        <option>問題点と次のアクション</option>
+      </select>
+    </div>
+
+    <!-- 企画 -->
+    <div class="pane" id="pane-plan" style="display:none">
+      <label>何のたたき台？ <span class="hint">例: 新入社員向け研修プログラム</span></label>
+      <input type="text" id="p-theme" placeholder="新入社員向けの研修プログラム">
+      <label>対象者・条件 <span class="hint">誰向け・予算・期間など</span></label>
+      <textarea id="p-cond" placeholder="対象: 新卒10名 / 期間: 3日間 / オフィス開催"></textarea>
+      <label>案の数</label>
+      <select id="p-num">
+        <option>2案</option>
+        <option selected>3案</option>
+        <option>5案</option>
+      </select>
+    </div>
+
+    <!-- アイデア -->
+    <div class="pane" id="pane-ideas" style="display:none">
+      <label>何のアイデアが欲しい？ <span class="hint">例: キャッチコピー、企画名</span></label>
+      <input type="text" id="i-what" placeholder="キャッチコピー">
+      <label>対象・条件</label>
+      <textarea id="i-target" placeholder="40代女性向け化粧品 / 保湿がウリ"></textarea>
+      <label>個数</label>
+      <select id="i-num">
+        <option>5個</option>
+        <option selected>10個</option>
+        <option>20個</option>
+      </select>
+    </div>
+
+    <button class="btn" id="build">依頼文を作る</button>
+
+    <div class="output-area" id="output"></div>
+    <button class="btn sub" id="copy" style="display:none">📋 コピー</button>
+    <span class="copied" id="copied" style="display:none">コピーしました！</span>
+
+    <div class="steps">
+      <strong>使い方（3ステップ）</strong>
+      <ol>
+        <li>上の欄をうめて「依頼文を作る」を押す</li>
+        <li>できた文をコピーする</li>
+        <li>お使いのAIチャット画面に貼り付けて送信</li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="card">
+    <strong>📚 履歴（この端末に保存）</strong>
+    <div class="history" id="history"></div>
+    <button class="btn sub" id="clear-history" style="background:#c0392b">履歴を全削除</button>
+  </div>
+</div>
+
+<script>
+  // タブ切替
+  const tabs = document.querySelectorAll('.tab');
+  const panes = document.querySelectorAll('.pane');
+  let currentTab = 'mail';
+  tabs.forEach(t => {
+    t.addEventListener('click', () => {
+      tabs.forEach(x => x.classList.remove('active'));
+      t.classList.add('active');
+      currentTab = t.dataset.tab;
+      panes.forEach(p => p.style.display = 'none');
+      document.getElementById('pane-' + currentTab).style.display = 'block';
+      document.getElementById('output').textContent = '';
+      document.getElementById('copy').style.display = 'none';
+    });
+  });
+
+  // 依頼文生成
+  function buildPrompt() {
+    if (currentTab === 'mail') {
+      const to = document.getElementById('m-to').value.trim() || '相手先';
+      const content = document.getElementById('m-content').value.trim() || '(内容未入力)';
+      const tone = document.getElementById('m-tone').value;
+      return `${to}に送るビジネスメールの文面を作ってください。\n\n【伝えたい内容】\n${content}\n\n【トーン】\n${tone}\n\n【条件】\n- 件名も一緒に提案してください\n- そのまま送れる完成した文にしてください\n- 冒頭の挨拶と結びも自然に入れてください`;
+    }
+    if (currentTab === 'summary') {
+      const text = document.getElementById('s-text').value.trim() || '(本文未入力)';
+      const type = document.getElementById('s-type').value;
+      return `以下の文章から「${type}」を抜き出して整理してください。\n箇条書きで、読みやすくお願いします。\n\n---以下、対象の文章---\n${text}`;
+    }
+    if (currentTab === 'plan') {
+      const theme = document.getElementById('p-theme').value.trim() || '(テーマ未入力)';
+      const cond = document.getElementById('p-cond').value.trim() || '特になし';
+      const num = document.getElementById('p-num').value;
+      return `「${theme}」のたたき台を${num}考えてください。\n\n【条件】\n${cond}\n\n【出力形式】\n- 案ごとにタイトル、概要、メリット、想定される課題を記載\n- 初心者にも分かる言葉で\n- そのまま企画書に転記できる粒度で`;
+    }
+    if (currentTab === 'ideas') {
+      const what = document.getElementById('i-what').value.trim() || '(お題未入力)';
+      const target = document.getElementById('i-target').value.trim() || '特になし';
+      const num = document.getElementById('i-num').value;
+      return `${what}のアイデアを${num}出してください。\n\n【対象・条件】\n${target}\n\n【出力形式】\n- 番号付きリストで\n- それぞれに一言で狙い・意図を添えてください\n- ありきたりな案だけでなく、少し尖った案も混ぜてください`;
+    }
+    return '';
+  }
+
+  const outputEl = document.getElementById('output');
+  const copyBtn = document.getElementById('copy');
+  const copiedEl = document.getElementById('copied');
+
+  document.getElementById('build').addEventListener('click', () => {
+    const text = buildPrompt();
+    outputEl.textContent = text;
+    copyBtn.style.display = 'inline-block';
+    saveHistory(text);
+    renderHistory();
+  });
+
+  copyBtn.addEventListener('click', () => {
+    const ta = document.createElement('textarea');
+    ta.value = outputEl.textContent;
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); } catch(e) {}
+    document.body.removeChild(ta);
+    copiedEl.style.display = 'inline';
+    setTimeout(() => copiedEl.style.display = 'none', 2000);
+  });
+
+  // 履歴
+  const HKEY = 'ai_irai_history_v1';
+  function saveHistory(text) {
+    const list = JSON.parse(localStorage.getItem(HKEY) || '[]');
+    const labels = { mail:'メール', summary:'要約', plan:'企画', ideas:'アイデア' };
+    list.unshift({
+      tab: labels[currentTab],
+      text: text,
+      date: new Date().toLocaleString('ja-JP')
+    });
+    if (list.length > 20) list.length = 20;
+    localStorage.setItem(HKEY, JSON.stringify(list));
+  }
+  function renderHistory() {
+    const list = JSON.parse(localStorage.getItem(HKEY) || '[]');
+    const el = document.getElementById('history');
+    if (list.length === 0) {
+      el.innerHTML = '<p class="empty">まだ履歴はありません</p>';
+      return;
+    }
+    el.innerHTML = list.map((h, i) => `
+      <div class="history-item">
+        <div><span class="history-title">[${h.tab}]</span> <span class="history-date">${h.date}</span></div>
+        <div style="margin-top:4px;color:#444">${h.text.slice(0, 60).replace(/</g,'&lt;')}${h.text.length>60?'…':''}</div>
+        <button class="btn sub" data-idx="${i}" style="margin-top:6px">再表示</button>
+      </div>
+    `).join('');
+    el.querySelectorAll('button[data-idx]').forEach(b => {
+      b.addEventListener('click', () => {
+        const idx = +b.dataset.idx;
+        const list = JSON.parse(localStorage.getItem(HKEY) || '[]');
+        outputEl.textContent = list[idx].text;
+        copyBtn.style.display = 'inline-block';
+        window.scrollTo({top: 0, behavior:'smooth'});
+      });
+    });
+  }
+  document.getElementById('clear-history').addEventListener('click', () => {
+    if (confirm('履歴をすべて削除しますか？')) {
+      localStorage.removeItem(HKEY);
+      renderHistory();
+    }
+  });
+  renderHistory();
+</script>
+</body>
+</html>
