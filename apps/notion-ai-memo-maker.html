@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="調べた情報を貼るだけ。要約と社内共有メモが一気に整う">
+<title>調べもの要約メモ作成ツール</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic", sans-serif;
+    background: #f5f5f4;
+    color: #2a2a2a;
+    margin: 0;
+    padding: 16px;
+    line-height: 1.6;
+  }
+  .container {
+    max-width: 780px;
+    margin: 0 auto;
+  }
+  h1 {
+    font-size: 20px;
+    margin: 8px 0 4px;
+  }
+  .lead {
+    font-size: 13px;
+    color: #666;
+    margin-bottom: 20px;
+  }
+  .card {
+    background: #fff;
+    border-radius: 10px;
+    padding: 18px;
+    margin-bottom: 16px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  }
+  .step {
+    font-size: 12px;
+    color: #fff;
+    background: #4a7c59;
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 12px;
+    margin-bottom: 8px;
+  }
+  label {
+    display: block;
+    font-weight: 600;
+    font-size: 14px;
+    margin: 12px 0 6px;
+  }
+  textarea, input, select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #d4d4d0;
+    border-radius: 6px;
+    font-size: 14px;
+    font-family: inherit;
+  }
+  textarea {
+    min-height: 140px;
+    resize: vertical;
+  }
+  .row {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .row > * { flex: 1; min-width: 180px; }
+  button {
+    background: #4a7c59;
+    color: #fff;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 6px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 12px;
+  }
+  button:hover { background: #3a6448; }
+  button.sub {
+    background: #e7e5e0;
+    color: #333;
+    padding: 8px 14px;
+    font-size: 13px;
+    margin-right: 6px;
+  }
+  button.sub:hover { background: #d4d1cb; }
+  .output {
+    background: #fafaf7;
+    border: 1px dashed #c8c6c0;
+    border-radius: 6px;
+    padding: 14px;
+    white-space: pre-wrap;
+    font-size: 13px;
+    margin-top: 10px;
+    max-height: 400px;
+    overflow-y: auto;
+  }
+  .hint {
+    font-size: 12px;
+    color: #888;
+    margin-top: 4px;
+  }
+  .saved-list {
+    max-height: 220px;
+    overflow-y: auto;
+  }
+  .saved-item {
+    padding: 8px;
+    border-bottom: 1px solid #eee;
+    font-size: 13px;
+    cursor: pointer;
+  }
+  .saved-item:hover { background: #f5f5f0; }
+  .saved-item .del {
+    float: right;
+    color: #b44;
+    font-size: 12px;
+  }
+  .tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 12px;
+    border-bottom: 2px solid #e5e3de;
+  }
+  .tab {
+    padding: 8px 14px;
+    background: none;
+    color: #666;
+    border: none;
+    border-radius: 0;
+    margin: 0;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+  }
+  .tab.active {
+    color: #4a7c59;
+    border-bottom-color: #4a7c59;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>📝 調べもの要約メモ作成ツール</h1>
+  <p class="lead">集めた情報を貼るだけで、要約用と社内共有メモ用の「AIへの依頼文」を自動で作ります。作った依頼文はコピーして、お使いのAIに貼るだけ。</p>
+
+  <div class="card">
+    <span class="step">STEP 1</span>
+    <label>調べたい内容・テーマ</label>
+    <input type="text" id="topic" placeholder="例：競合サービスAの最新料金プラン">
+
+    <label>集めた情報・元の文章（Web記事、PDFの中身、議事録など）</label>
+    <textarea id="source" placeholder="ここに要約・整理したい長い文章を貼り付けてください。&#10;URLの一覧でもOKです。"></textarea>
+    <p class="hint">※ 貼り付けた内容はこの画面の中だけで扱います。送信されません。</p>
+
+    <div class="row">
+      <div>
+        <label>要約の長さ</label>
+        <select id="length">
+          <option value="3行">3行でざっくり</option>
+          <option value="5〜7行">5〜7行で要点</option>
+          <option value="箇条書き10項目程度">箇条書き詳しめ</option>
+        </select>
+      </div>
+      <div>
+        <label>共有相手</label>
+        <select id="audience">
+          <option value="社内メンバー（同僚）">社内メンバー（同僚）</option>
+          <option value="上司・役員">上司・役員</option>
+          <option value="他部署の担当者">他部署の担当者</option>
+          <option value="お客様・取引先">お客様・取引先</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <span class="step">STEP 2</span>
+    <div class="tabs">
+      <button class="tab active" data-tab="summary">要約用の依頼文</button>
+      <button class="tab" data-tab="memo">共有メモ用の依頼文</button>
+      <button class="tab" data-tab="search">調べもの用の依頼文</button>
+    </div>
+
+    <button onclick="generate()">依頼文を作る</button>
+    <button class="sub" onclick="copyOut()">📋 コピー</button>
+    <button class="sub" onclick="saveMemo()">💾 保存</button>
+
+    <div class="output" id="output">ここに依頼文が表示されます。作ったらコピーして、お使いのAIに貼り付けてください。</div>
+  </div>
+
+  <div class="card">
+    <span class="step">保存メモ</span>
+    <label>これまで保存した依頼文</label>
+    <div class="saved-list" id="savedList"></div>
+  </div>
+</div>
+
+<script>
+  let currentTab = 'summary';
+  document.querySelectorAll('.tab').forEach(t => {
+    t.onclick = () => {
+      document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+      t.classList.add('active');
+      currentTab = t.dataset.tab;
+    };
+  });
+
+  function generate() {
+    const topic = document.getElementById('topic').value.trim();
+    const source = document.getElementById('source').value.trim();
+    const length = document.getElementById('length').value;
+    const audience = document.getElementById('audience').value;
+
+    if (!topic && !source) {
+      alert('テーマまたは元の文章を入力してください。');
+      return;
+    }
+
+    let out = '';
+    if (currentTab === 'summary') {
+      out = `# 依頼\n以下の内容を「${length}」で要約してください。\n\n## テーマ\n${topic || '（未指定）'}\n\n## 元の文章\n${source || '（ここに文章を追加してください）'}\n\n## 出力形式\n- 見出し「要点まとめ」\n- 続けて要約本文\n- 最後に「補足で確認したい点」があれば1〜3個提示`;
+    } else if (currentTab === 'memo') {
+      out = `# 依頼\n以下の情報を、${audience}への「社内共有メモ」として整えてください。\n\n## テーマ\n${topic || '（未指定）'}\n\n## 元となる情報\n${source || '（ここに情報を追加してください）'}\n\n## 出力形式（そのままコピペで共有できる形）\n件名：\n---\nお疲れさまです。\n\n■ 背景・目的\n■ 要点（3〜5個の箇条書き）\n■ 詳細\n■ 次のアクション / 相談したいこと\n\nよろしくお願いします。`;
+    } else {
+      out = `# 依頼\n「${topic || '（テーマを入力してください）'}」について、最新の情報を調べて教えてください。\n\n## 知りたいこと\n- 概要\n- 特徴やポイント（3〜5個）\n- 比較すべき類似のもの\n- 参考にした情報源（できれば）\n\n## 出力形式\n- 見出しごとに整理\n- 表で比較できるものは表にする\n- 専門用語は簡単な言葉に言い換え\n\n${source ? '## 参考として渡す既存情報\n' + source : ''}`;
+    }
+
+    document.getElementById('output').textContent = out;
+  }
+
+  function copyOut() {
+    const text = document.getElementById('output').textContent;
+    if (!text || text.startsWith('ここに')) {
+      alert('先に依頼文を作ってください。');
+      return;
+    }
+    navigator.clipboard.writeText(text).then(() => {
+      alert('コピーしました。お使いのAIに貼り付けてください。');
+    }).catch(() => {
+      alert('コピーに失敗しました。手動で選択してください。');
+    });
+  }
+
+  function saveMemo() {
+    const text = document.getElementById('output').textContent;
+    const topic = document.getElementById('topic').value.trim() || '無題';
+    if (!text || text.startsWith('ここに')) {
+      alert('先に依頼文を作ってください。');
+      return;
+    }
+    const list = JSON.parse(localStorage.getItem('memos') || '[]');
+    list.unshift({
+      id: Date.now(),
+      title: topic + '（' + ({summary:'要約',memo:'共有メモ',search:'調べもの'}[currentTab]) + '）',
+      body: text,
+      date: new Date().toLocaleString('ja-JP')
+    });
+    localStorage.setItem('memos', JSON.stringify(list.slice(0, 30)));
+    renderList();
+    alert('保存しました。');
+  }
+
+  function renderList() {
+    const list = JSON.parse(localStorage.getItem('memos') || '[]');
+    const el = document.getElementById('savedList');
+    if (list.length === 0) {
+      el.innerHTML = '<p class="hint">まだ保存されたメモはありません。</p>';
+      return;
+    }
+    el.innerHTML = list.map(m =>
+      `<div class="saved-item" onclick="loadMemo(${m.id})">
+        <span class="del" onclick="event.stopPropagation();delMemo(${m.id})">削除</span>
+        <strong>${escapeHtml(m.title)}</strong><br>
+        <span class="hint">${m.date}</span>
+      </div>`
+    ).join('');
+  }
+
+  function loadMemo(id) {
+    const list = JSON.parse(localStorage.getItem('memos') || '[]');
+    const m = list.find(x => x.id === id);
+    if (m) {
+      document.getElementById('output').textContent = m.body;
+      window.scrollTo({ top: document.getElementById('output').offsetTop - 20, behavior: 'smooth' });
+    }
+  }
+
+  function delMemo(id) {
+    if (!confirm('このメモを削除しますか？')) return;
+    let list = JSON.parse(localStorage.getItem('memos') || '[]');
+    list = list.filter(x => x.id !== id);
+    localStorage.setItem('memos', JSON.stringify(list));
+    renderList();
+  }
+
+  function escapeHtml(s) {
+    return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+
+  renderList();
+</script>
+</body>
+</html>
