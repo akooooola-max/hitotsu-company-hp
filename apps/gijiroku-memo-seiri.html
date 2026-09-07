@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="議事録作成。走り書きメモから決定事項とToDoを一気に整理">
+<title>議事録メモ整理ツール</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic", sans-serif; background: #f4f6f9; color: #333; line-height: 1.6; padding: 16px; }
+.container { max-width: 900px; margin: 0 auto; }
+h1 { font-size: 1.5em; color: #2c5282; margin-bottom: 4px; }
+.subtitle { color: #666; font-size: 0.9em; margin-bottom: 20px; }
+.card { background: #fff; border-radius: 10px; padding: 20px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+.card h2 { font-size: 1.1em; color: #2c5282; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid #e2e8f0; }
+label { display: block; font-weight: bold; margin-bottom: 6px; font-size: 0.9em; }
+input[type="text"], input[type="date"], textarea { width: 100%; padding: 10px; border: 1px solid #cbd5e0; border-radius: 6px; font-size: 1em; font-family: inherit; }
+textarea { resize: vertical; min-height: 120px; }
+.row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; }
+.row > div { flex: 1; min-width: 200px; }
+button { background: #3182ce; color: #fff; border: none; padding: 10px 18px; border-radius: 6px; font-size: 0.95em; cursor: pointer; margin-right: 6px; margin-top: 6px; }
+button:hover { background: #2c5282; }
+button.secondary { background: #718096; }
+button.secondary:hover { background: #4a5568; }
+button.danger { background: #e53e3e; }
+button.danger:hover { background: #c53030; }
+.item-list { list-style: none; }
+.item-list li { display: flex; align-items: flex-start; gap: 8px; padding: 8px; background: #f7fafc; border-radius: 6px; margin-bottom: 6px; }
+.item-list li input[type="text"] { flex: 1; background: #fff; }
+.item-list li button { padding: 6px 10px; margin: 0; font-size: 0.85em; }
+.output-area { background: #f7fafc; border: 1px solid #cbd5e0; border-radius: 6px; padding: 14px; white-space: pre-wrap; font-family: "SF Mono", Consolas, monospace; font-size: 0.9em; min-height: 200px; margin-top: 10px; }
+.hint { background: #fff8dc; border-left: 4px solid #f6ad55; padding: 10px; font-size: 0.85em; margin-bottom: 12px; border-radius: 4px; }
+.tabs { display: flex; gap: 4px; margin-bottom: 16px; flex-wrap: wrap; }
+.tab { padding: 8px 14px; background: #e2e8f0; border-radius: 6px 6px 0 0; cursor: pointer; font-size: 0.9em; }
+.tab.active { background: #3182ce; color: #fff; }
+.section { display: none; }
+.section.active { display: block; }
+.small { font-size: 0.85em; color: #666; margin-top: 4px; }
+.save-status { color: #38a169; font-size: 0.85em; margin-left: 10px; }
+</style>
+</head>
+<body>
+<div class="container">
+<h1>📝 議事録メモ整理ツール</h1>
+<p class="subtitle">走り書きメモを、決定事項とToDoに整理して共有用テキストにまとめます</p>
+
+<div class="tabs">
+<div class="tab active" data-tab="input">1. 入力</div>
+<div class="tab" data-tab="organize">2. 整理</div>
+<div class="tab" data-tab="output">3. 共有用テキスト</div>
+</div>
+
+<div class="section active" id="input">
+<div class="card">
+<h2>会議情報</h2>
+<div class="row">
+<div><label>会議名</label><input type="text" id="meetingTitle" placeholder="例:定例ミーティング"></div>
+<div><label>日付</label><input type="date" id="meetingDate"></div>
+</div>
+<div class="row">
+<div><label>参加者(カンマ区切り)</label><input type="text" id="participants" placeholder="例:山田,鈴木,佐藤"></div>
+</div>
+</div>
+
+<div class="card">
+<h2>走り書きメモを貼る</h2>
+<div class="hint">💡 会議中に取ったメモ、文字起こし、キーワードの羅列などをそのまま貼ってください。改行区切りだと整理しやすいです。</div>
+<label>元メモ</label>
+<textarea id="rawMemo" placeholder="例:&#10;・新製品Aの発売は3月に決定&#10;・予算は500万で承認&#10;・山田さん→広告案を来週まで&#10;・鈴木さん→在庫確認&#10;・次回は2/15に開催"></textarea>
+<button onclick="autoOrganize()">▶ 自動で仕分けして次へ</button>
+<button class="secondary" onclick="goTab('organize')">手動で仕分けする</button>
+</div>
+</div>
+
+<div class="section" id="organize">
+<div class="card">
+<h2>📌 議題・話し合った内容</h2>
+<div class="hint">議題ごとに箇条書きで。話の要点をまとめて。</div>
+<ul class="item-list" id="topicList"></ul>
+<button onclick="addItem('topicList','議題や話の要点を書く')">+ 追加</button>
+</div>
+
+<div class="card">
+<h2>✅ 決定事項</h2>
+<div class="hint">「〜に決まった」「〜で承認」などをここに。</div>
+<ul class="item-list" id="decisionList"></ul>
+<button onclick="addItem('decisionList','決定した内容を書く')">+ 追加</button>
+</div>
+
+<div class="card">
+<h2>📋 ToDo(担当・期限つき)</h2>
+<div class="hint">「誰が」「いつまでに」「何を」の形で。</div>
+<ul class="item-list" id="todoList"></ul>
+<button onclick="addItem('todoList','例:山田さん / 2/10まで / 広告案作成')">+ 追加</button>
+</div>
+
+<div class="card">
+<h2>📅 次回・その他メモ</h2>
+<ul class="item-list" id="otherList"></ul>
+<button onclick="addItem('otherList','その他メモ')">+ 追加</button>
+</div>
+
+<div class="card">
+<button onclick="generateOutput(); goTab('output')">▶ 共有用テキストを作る</button>
+<button class="secondary" onclick="goTab('input')">◀ 入力に戻る</button>
+</div>
+</div>
+
+<div class="section" id="output">
+<div class="card">
+<h2>共有用テキスト</h2>
+<div class="hint">💡 このままメールやチャットにコピペできます。</div>
+<div class="output-area" id="outputText"></div>
+<button onclick="copyOutput()">📋 コピー</button>
+<button class="secondary" onclick="downloadOutput()">💾 テキストで保存</button>
+<button class="secondary" onclick="goTab('organize')">◀ 修正に戻る</button>
+<span class="save-status" id="copyStatus"></span>
+</div>
+
+<div class="card">
+<h2>整理を頼むための依頼文(参考)</h2>
+<div class="hint">別のAIツールに整理を任せたいときは、下の依頼文と元メモを一緒に貼ると同じような結果が得られます。</div>
+<div class="output-area" id="promptText"></div>
+<button onclick="copyPrompt()">📋 依頼文をコピー</button>
+</div>
+</div>
+
+<div class="card">
+<button class="danger" onclick="clearAll()">🗑 すべてクリア</button>
+<button class="secondary" onclick="saveData()">💾 途中保存</button>
+<span class="save-status" id="saveStatus"></span>
+<p class="small">入力内容は自動的にブラウザに保存されます(このパソコン内のみ)</p>
+</div>
+
+</div>
+
+<script>
+const STORAGE_KEY = 'gijirokuMemoData';
+
+document.querySelectorAll('.tab').forEach(t => {
+  t.addEventListener('click', () => goTab(t.dataset.tab));
+});
+
+function goTab(name) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === name));
+  document.querySelectorAll('.section').forEach(s => s.classList.toggle('active', s.id === name));
+  window.scrollTo(0,0);
+}
+
+function addItem(listId, placeholder, value='') {
+  const ul = document.getElementById(listId);
+  const li = document.createElement('li');
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.placeholder = placeholder;
+  input.value = value;
+  input.addEventListener('input', saveData);
+  const btn = document.createElement('button');
+  btn.className = 'danger';
+  btn.textContent = '×';
+  btn.onclick = () => { li.remove(); saveData(); };
+  li.appendChild(input);
+  li.appendChild(btn);
+  ul.appendChild(li);
+  return input;
+}
+
+function autoOrganize() {
+  const raw = document.getElementById('rawMemo').value.trim();
+  if (!raw) { alert('元メモを入力してください'); return; }
+  
+  ['topicList','decisionList','todoList','otherList'].forEach(id => {
+    document.getElementById(id).innerHTML = '';
+  });
+  
+  const lines = raw.split(/\n|。/).map(l => l.trim().replace(/^[・\-\*●○◆▼→\s]+/,'')).filter(l => l.length > 1);
+  
+  lines.forEach(line => {
+    const lower = line;
+    if (/決[定ま]|承認|確定|合意|決まっ|OKになった/.test(lower)) {
+      addItem('decisionList','',line);
+    } else if (/(まで|期限|担当|→|やる|作成|準備|確認|連絡|対応|報告|提出|チェック).*(さん|担当|まで)|(さん|担当).*(まで|やる|作成|準備|確認|連絡|対応)/.test(lower) || /さん.*→/.test(lower) || /→.*(まで|作成|確認)/.test(lower)) {
+      addItem('todoList','',line);
+    } else if (/次回|来週|来月|開催|予定/.test(lower)) {
+      addItem('otherList','',line);
+    } else {
+      addItem('topicList','',line);
+    }
+  });
+  
+  saveData();
+  goTab('organize');
+}
+
+function getList(id) {
+  return Array.from(document.querySelectorAll('#'+id+' input')).map(i => i.value.trim()).filter(v => v);
+}
+
+function generateOutput() {
+  const title = document.getElementById('meetingTitle').value.trim() || '議事録';
+  const date = document.getElementById('meetingDate').value;
+  const participants = document.getElementById('participants').value.trim();
+  
+  let out = '【'+title+'】\n';
+  if (date) out += '日時: '+date+'\n';
+  if (participants) out += '参加者: '+participants+'\n';
+  out += '\n';
+  
+  const topics = getList('topicList');
+  const decisions = getList('decisionList');
+  const todos = getList('todoList');
+  const others = getList('otherList');
+  
+  if (topics.length) {
+    out += '■ 議題・話し合った内容\n';
+    topics.forEach(t => out += '  ・'+t+'\n');
+    out += '\n';
+  }
+  if (decisions.length) {
+    out += '■ 決定事項\n';
+    decisions.forEach(t => out += '  ✅ '+t+'\n');
+    out += '\n';
+  }
+  if (todos.length) {
+    out += '■ ToDo\n';
+    todos.forEach(t => out += '  □ '+t+'\n');
+    out += '\n';
+  }
+  if (others.length) {
+    out += '■ 次回・その他\n';
+    others.forEach(t => out += '  ・'+t+'\n');
+    out += '\n';
+  }
+  
+  document.getElementById('outputText').textContent = out;
+  
+  const raw = document.getElementById('rawMemo').value.trim();
+  const prompt = '以下の会議メモを整理してください。\n\n【出力してほしい形式】\n1. 議題・話し合った内容(箇条書き)\n2. 決定事項(箇条書き)\n3. ToDo(担当者・期限つき)\n4. 次回予定・その他メモ\n\n【元メモ】\n'+raw;
+  document.getElementById('promptText').textContent = prompt;
+}
+
+function copyOutput() {
+  const text = document.getElementById('outputText').textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    document.getElementById('copyStatus').textContent = 'コピーしました!';
+    setTimeout(() => document.getElementById('copyStatus').textContent = '', 2000);
+  });
+}
+
+function copyPrompt() {
+  const text = document.getElementById('promptText').textContent;
+  navigator.clipboard.writeText(text).then(() => alert('依頼文をコピーしました'));
+}
+
+function downloadOutput() {
+  const text = document.getElementById('outputText').textContent;
+  const title = document.getElementById('meetingTitle').value.trim() || '議事録';
+  const blob = new Blob([text], {type: 'text/plain'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = title+'.txt';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function saveData() {
+  const data = {
+    title: document.getElementById('meetingTitle').value,
+    date: document.getElementById('meetingDate').value,
+    participants: document.getElementById('participants').value,
+    raw: document.getElementById('rawMemo').value,
+    topics: getList('topicList'),
+    decisions: getList('decisionList'),
+    todos: getList('todoList'),
+    others: getList('otherList')
+  };
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  const s = document.getElementById('saveStatus');
+  if (s) { s.textContent = '保存済'; setTimeout(() => s.textContent = '', 1500); }
+}
+
+function loadData() {
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if (!raw) return;
+  try {
+    const d = JSON.parse(raw);
+    document.getElementById('meetingTitle').value = d.title || '';
+    document.getElementById('meetingDate').value = d.date || '';
+    document.getElementById('participants').value = d.participants || '';
+    document.getElementById('rawMemo').value = d.raw || '';
+    (d.topics||[]).forEach(v => addItem('topicList','',v));
+    (d.decisions||[]).forEach(v => addItem('decisionList','',v));
+    (d.todos||[]).forEach(v => addItem('todoList','',v));
+    (d.others||[]).forEach(v => addItem('otherList','',v));
+  } catch(e) {}
+}
+
+function clearAll() {
+  if (!confirm('すべての入力を消します。よろしいですか?')) return;
+  localStorage.removeItem(STORAGE_KEY);
+  location.reload();
+}
+
+['meetingTitle','meetingDate','participants','rawMemo'].forEach(id => {
+  document.getElementById(id).addEventListener('input', saveData);
+});
+
+loadData();
+if (!document.getElementById('meetingDate').value) {
+  document.getElementById('meetingDate').valueAsDate = new Date();
+}
+</script>
+</body>
+</html>
