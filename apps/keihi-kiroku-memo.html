@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>交際費・旅費 記録メモ</title>
+<meta name="description" content="打ち上げ・会食・出張を、その場で「誰と・何のために・いくら」まで記録。月末にCSVで書き出して税理士へ。">
+<style>
+  :root{
+    --bg:#f5f6f8; --card:#ffffff; --text:#1f2430; --muted:#8a90a0;
+    --line:#e8eaf0; --accent:#e8834e; --accent-soft:#fff1e8; --green:#2fb56b; --red:#e5484d;
+    --shadow:0 1px 3px rgba(20,24,40,.06),0 8px 24px rgba(20,24,40,.05);
+  }
+  @media (prefers-color-scheme: dark){
+    :root{ --bg:#12141c; --card:#1b1e29; --text:#e9ebf2; --muted:#8a90a5; --line:#2a2e3d;
+      --accent:#ff9a55; --accent-soft:#33261c; --green:#3fce7c; --red:#ff6b6f;
+      --shadow:0 1px 3px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.35); }
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic UI",sans-serif;background:var(--bg);color:var(--text);line-height:1.6;padding:24px 16px 120px;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:620px;margin:0 auto}
+  header{margin-bottom:18px}
+  .kicker{font-size:13px;color:var(--muted);font-weight:600}
+  h1{font-size:24px;font-weight:800;letter-spacing:-.01em;margin-top:2px}
+  .sub{font-size:13px;color:var(--muted);margin-top:4px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);padding:16px;margin-bottom:16px}
+  label{display:block;font-size:13px;font-weight:700;margin:10px 0 4px}
+  input,select,textarea{width:100%;font:inherit;color:var(--text);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+  textarea{min-height:64px;resize:vertical}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+  .chip{border:1px solid var(--line);background:var(--bg);border-radius:999px;padding:6px 12px;font-size:13px;cursor:pointer}
+  .chip.on{background:var(--accent-soft);border-color:var(--accent);color:var(--accent);font-weight:700}
+  .btn{display:block;width:100%;margin-top:14px;border:0;border-radius:12px;padding:14px;font:inherit;font-weight:800;font-size:16px;cursor:pointer;background:var(--accent);color:#fff}
+  .btn.ghost{background:transparent;border:1px solid var(--line);color:var(--text);font-weight:600;font-size:14px;padding:11px}
+  .hint{font-size:12px;color:var(--muted);margin-top:8px}
+  .check{display:flex;gap:8px;align-items:flex-start;font-size:13px;margin-top:8px}
+  .check input{width:auto;margin-top:4px}
+  .month{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+  .month b{font-size:18px}
+  .sum{display:flex;gap:10px;flex-wrap:wrap;margin:8px 0 12px}
+  .sum div{flex:1;min-width:120px;background:var(--bg);border-radius:10px;padding:8px 10px;font-size:12px;color:var(--muted)}
+  .sum div b{display:block;font-size:17px;color:var(--text)}
+  .item{border-top:1px solid var(--line);padding:10px 0;display:flex;gap:10px;align-items:flex-start}
+  .item .m{flex:1;font-size:14px}
+  .item .m small{display:block;color:var(--muted);font-size:12px}
+  .item .a{font-weight:800;white-space:nowrap}
+  .item button{border:0;background:none;color:var(--red);font-size:12px;cursor:pointer}
+  .tag{display:inline-block;font-size:11px;padding:1px 8px;border-radius:999px;background:var(--accent-soft);color:var(--accent);font-weight:700;margin-right:4px}
+  .warn{color:var(--red);font-size:12px;margin-top:6px;display:none}
+  .empty{color:var(--muted);font-size:13px;padding:12px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="kicker">Hitotsu Company ｜ 道具箱</div>
+    <h1>交際費・旅費 記録メモ</h1>
+    <p class="sub">打ち上げ・会食・出張を、その場で「誰と・何のために・いくら」まで残す。月末にCSVで税理士へ。データはこの端末にだけ保存されます。</p>
+  </header>
+
+  <div class="card">
+    <label>種類</label>
+    <div class="chips" id="kind">
+      <span class="chip on" data-v="交際費">交際費（会食・打ち上げ）</span>
+      <span class="chip" data-v="会議費">会議費（打合せ・カフェ）</span>
+      <span class="chip" data-v="旅費交通費">旅費交通費（出張）</span>
+      <span class="chip" data-v="会場費">会場費（フットサル・研修）</span>
+    </div>
+    <div class="row2">
+      <div><label>日付</label><input type="date" id="date"></div>
+      <div><label>金額（円）</label><input type="number" inputmode="numeric" id="amount" placeholder="12000"></div>
+    </div>
+    <label>誰と（人数も）</label>
+    <input type="text" id="who" placeholder="例：大人の放課後 部員6名（うち見込み客2名）">
+    <label>目的（事業との関係）</label>
+    <input type="text" id="why" placeholder="例：定例後の打ち上げ。AI社員室の案内・相談">
+    <label>店名・場所</label>
+    <input type="text" id="where" placeholder="例：○○居酒屋 天文館店">
+    <label>メモ（任意）</label>
+    <textarea id="memo" placeholder="例：2名がAI社員室に興味。来週LINEでフォロー"></textarea>
+    <div class="check"><input type="checkbox" id="receipt"><span>領収書をもらった（写真を撮った）</span></div>
+    <div class="warn" id="warn"></div>
+    <button class="btn" id="save">記録する</button>
+    <p class="hint">「自分ひとり」「事業と関係ない」支出は経費にしない。迷ったら記録だけ残して税理士に聞く。</p>
+  </div>
+
+  <div class="card">
+    <div class="month"><button class="chip" id="prev">‹</button><b id="mlabel"></b><button class="chip" id="next">›</button></div>
+    <div class="sum" id="sum"></div>
+    <div id="list"></div>
+    <button class="btn ghost" id="csv">この月をCSVでコピー（税理士へ送る用）</button>
+    <button class="btn ghost" id="wipe" style="margin-top:8px;color:var(--red)">この端末の記録をすべて削除</button>
+  </div>
+</div>
+<script>
+(function(){
+  var KEY='hitotsu_keihi_v1';
+  function load(){try{return JSON.parse(localStorage.getItem(KEY)||'[]')}catch(e){return[]}}
+  function save(a){try{localStorage.setItem(KEY,JSON.stringify(a))}catch(e){}}
+  var $=function(id){return document.getElementById(id)};
+  var kind='交際費';
+  $('kind').addEventListener('click',function(e){var c=e.target.closest('.chip');if(!c)return;
+    $('kind').querySelectorAll('.chip').forEach(function(x){x.classList.remove('on')});c.classList.add('on');kind=c.dataset.v});
+  var today=new Date();$('date').value=today.toISOString().slice(0,10);
+  var cur=new Date(today.getFullYear(),today.getMonth(),1);
+  function yen(n){return Number(n||0).toLocaleString('ja-JP')+'円'}
+  function render(){
+    var all=load(),ym=cur.getFullYear()+'-'+String(cur.getMonth()+1).padStart(2,'0');
+    $('mlabel').textContent=cur.getFullYear()+'年'+(cur.getMonth()+1)+'月';
+    var rows=all.filter(function(r){return r.date.slice(0,7)===ym}).sort(function(a,b){return a.date<b.date?1:-1});
+    var by={};rows.forEach(function(r){by[r.kind]=(by[r.kind]||0)+Number(r.amount)});
+    var total=rows.reduce(function(s,r){return s+Number(r.amount)},0);
+    $('sum').innerHTML='<div>合計<b>'+yen(total)+'</b></div>'+Object.keys(by).map(function(k){return '<div>'+k+'<b>'+yen(by[k])+'</b></div>'}).join('');
+    $('list').innerHTML=rows.length?rows.map(function(r){return '<div class="item"><div class="m"><span class="tag">'+r.kind+'</span>'+esc(r.who)+'<small>'+r.date+'　'+esc(r.why)+(r.where?'　@'+esc(r.where):'')+(r.receipt?'':'　<span style="color:var(--red)">領収書なし</span>')+'</small></div><div class="a">'+yen(r.amount)+'<br><button data-id="'+r.id+'">削除</button></div></div>'}).join(''):'<p class="empty">この月の記録はまだありません。</p>';
+  }
+  function esc(s){return String(s||'').replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+  $('save').onclick=function(){
+    var w=$('warn');w.style.display='none';
+    if(!$('date').value||!$('amount').value){w.textContent='日付と金額は必須です。';w.style.display='block';return}
+    if(!$('who').value||!$('why').value){w.textContent='「誰と」「目的」が空です。経費にするなら、ここが一番大事です。';w.style.display='block';return}
+    var all=load();all.push({id:Date.now(),kind:kind,date:$('date').value,amount:$('amount').value,who:$('who').value,why:$('why').value,where:$('where').value,memo:$('memo').value,receipt:$('receipt').checked});
+    save(all);['amount','who','why','where','memo'].forEach(function(id){$(id).value=''});$('receipt').checked=false;
+    cur=new Date($('date').value.slice(0,4),Number($('date').value.slice(5,7))-1,1);render();
+  };
+  $('list').onclick=function(e){var b=e.target.closest('button');if(!b)return;if(!confirm('この記録を削除しますか？'))return;save(load().filter(function(r){return String(r.id)!==b.dataset.id}));render()};
+  $('prev').onclick=function(){cur=new Date(cur.getFullYear(),cur.getMonth()-1,1);render()};
+  $('next').onclick=function(){cur=new Date(cur.getFullYear(),cur.getMonth()+1,1);render()};
+  $('csv').onclick=function(){
+    var ym=cur.getFullYear()+'-'+String(cur.getMonth()+1).padStart(2,'0');
+    var rows=load().filter(function(r){return r.date.slice(0,7)===ym}).sort(function(a,b){return a.date<b.date?-1:1});
+    var q=function(s){return '"'+String(s||'').replace(/"/g,'""')+'"'};
+    var csv=['日付,科目,金額,誰と,目的,場所,領収書,メモ'].concat(rows.map(function(r){return [r.date,r.kind,r.amount,q(r.who),q(r.why),q(r.where),r.receipt?'あり':'なし',q(r.memo)].join(',')})).join('\n');
+    (navigator.clipboard?navigator.clipboard.writeText(csv):Promise.reject()).then(function(){alert('コピーしました。メールやLINEに貼り付けて送れます。')},function(){prompt('コピーしてください',csv)});
+  };
+  $('wipe').onclick=function(){if(confirm('この端末の記録をすべて削除します。よろしいですか？')){save([]);render()}};
+  render();
+})();
+</script>
+</body>
+</html>
