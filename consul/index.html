@@ -2,10 +2,10 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0b1020">
 <title>AIコンサルタント ひとつ｜メニューと料金</title>
-<meta name="description" content="AIコンサルタント（Hitotsu Company）のメニューと料金。単発相談・アプリ作成・AI社員作り・ホームページ制作・AI組織作りに加え、月額のAI社員室・顧問プラン・AI部署プラン。実データはお預かりしない安心設計です。">
+<meta name="description" content="AIコンサルタント（Hitotsu Company）のメニューと料金。単発相談・アプリ作成・ホームページ制作。AI社員とAI部署は「1回つくって終わり」と「毎月そだてる」から選べます。実データはお預かりしない安心設計です。">
 <meta property="og:type" content="website">
 <meta property="og:title" content="AIコンサルタント ひとつ｜メニューと料金">
-<meta property="og:description" content="単発相談・アプリ作成・AI社員作り・ホームページ制作・AI組織作り、そして月額のAI社員プラン。メニューと料金の一覧です。">
+<meta property="og:description" content="単発相談・アプリ作成・ホームページ制作・AI社員・AI部署。単発と月額から選べる、メニューと料金の一覧です。">
 <meta property="og:site_name" content="Hitotsu Company">
 <style>
 :root{--bg:#0b1020;--bg2:#101833;--panel:#131d3c;--ink:#f0f4ff;--muted:#95a3c6;
@@ -112,6 +112,17 @@ p{margin:14px 0}
  background:rgba(52,217,119,.14);border:1px solid rgba(52,217,119,.5);color:var(--green);
  border-radius:12px;padding:13px 20px;font-size:15px;font-weight:900;text-decoration:none}
 .applybtn:active{transform:scale(.98)}
+.dual{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.dual .opt{background:var(--bg2);border:1px solid var(--line);border-radius:13px;padding:13px 14px;display:flex;flex-direction:column}
+.dual .opt.pick{border-color:var(--acc);background:linear-gradient(180deg,rgba(255,176,32,.10),transparent)}
+.dual .lb{font-size:12px;font-weight:900;color:var(--muted);line-height:1.5}
+.dual .opt.pick .lb{color:var(--acc)}
+.dual .pr{font-size:24px;font-weight:900;letter-spacing:-.02em;margin-top:4px;line-height:1.25}
+.dual .pr small{font-size:13px;font-weight:800}
+.dual .ds{font-size:12.5px;color:var(--muted);margin-top:6px;line-height:1.65;flex:1}
+.paybtn.mini,.applybtn.mini{margin-top:10px;padding:11px 12px;font-size:13.5px;border-radius:10px;box-shadow:none}
+@media(max-width:420px){.dual{grid-template-columns:1fr}}
+
 .subnote{margin-top:10px;font-size:13px;color:var(--muted)}
 .subnote a{color:var(--acc);font-weight:800;text-decoration:none}
 .compare{margin-top:22px;background:var(--bg2);border:1px solid var(--line);border-radius:14px;padding:16px 18px;font-size:14.5px}
@@ -174,9 +185,10 @@ footer{padding:36px 0 46px;border-top:1px solid var(--line);text-align:center}
   </div>
 </div></section>
 
-<section><div class="wrap">
+<section id="monthly"><div class="wrap">
   <p class="eyebrow">メニューと料金</p>
   <h2>やることと、値段。<br>これだけです。</h2>
+  <p class="muted"><span class="nb">AI社員とAI部署は、</span><span class="nb">「1回つくって終わり」と</span><span class="nb">「毎月そだてる」から選べます。</span><span class="nb">月額はいつでも解約できます。</span></p>
   <div class="menu">
 
     <div class="mi" id="m-soudan">
@@ -195,47 +207,81 @@ footer{padding:36px 0 46px;border-top:1px solid var(--line);text-align:center}
       <a class="paybtn" data-pay="app" href="#">ご相談済みの方：カード決済へ</a>
     </div>
 
-    <div class="mi" id="m-shain">
-      <h3>AI社員作り</h3>
-      <div class="price">30,000<small>円</small></div>
-      <p><span class="nb">あなたの仕事のやり方を覚えたAI社員を</span><span class="nb">1人作ります。</span><span class="nb">毎回おなじ説明をしなくても、</span><span class="nb">最後まで仕事をやってくれます。</span></p>
-      <a class="morelink" href="/card">Hitotsu Companyの名刺を見る →</a>
-      <p class="subnote">毎月育てていきたい方は <a href="#m-komon">顧問プラン（月額）</a> なら初月に含まれます。</p>
-      <a class="paybtn" data-pay="shain" href="#">ご相談済みの方：カード決済へ</a>
-    </div>
-
     <div class="mi" id="m-web">
       <h3>ホームページ制作</h3>
       <div class="price">50,000<small>円</small></div>
-      <p><span class="nb">お店・サービスの紹介ページを1枚から。</span><span class="nb">スマホ対応・QRコード付きで納品します。</span></p>
+      <p><span class="nb">お店・サービスの紹介ページを1枚から。</span><span class="nb">スマホ対応・QRコード付きで納品します。</span><span class="nb">公開後の更新代行が必要な方には、</span><span class="nb">おまかせ保守（5,000円／月）もあります。</span></p>
       <a class="morelink" href="/hp/">プランのくわしい説明を見る →</a>
       <a class="paybtn" data-pay="web" href="#">ご相談済みの方：カード決済へ</a>
     </div>
 
+    <div class="mi" id="m-shain">
+      <h3>AI社員</h3>
+      <p><span class="nb">あなたの仕事のやり方を覚えたAI社員を</span><span class="nb">1人つくります。</span><span class="nb">毎回おなじ説明をしなくても、</span><span class="nb">最後まで仕事をやってくれます。</span></p>
+      <div class="dual">
+        <div class="opt">
+          <div class="lb">1回つくって終わり</div>
+          <div class="pr">30,000<small>円</small></div>
+          <div class="ds">つくって納品。あとはご自身で使い続けます。</div>
+          <a class="paybtn mini" data-pay="shain" href="#">カード決済へ</a>
+        </div>
+        <div class="opt pick">
+          <div class="lb">★ 毎月そだてる（顧問プラン）</div>
+          <div class="pr">19,800<small>円/月</small></div>
+          <div class="ds">初月に上の「AI社員づくり（30,000円）」を含みます。</div>
+          <a class="applybtn mini" href="https://line.me/R/ti/p/@188jocyd">申し込む・相談する</a>
+          <a class="paybtn mini" data-pay="komon" href="#">カード決済へ</a>
+        </div>
+      </div>
+      <ul class="incl">
+        <li><i>✓</i><span>毎月：AI社員の改善1回 ＋ 専用ツール1本まで作成</span></li>
+        <li><i>✓</i><span>毎月1日：「AI社員 稼働レポート」をお届け</span></li>
+        <li><i>✓</i><span>LINEでいつでも質問（AI社員が一次回答、翌営業日までにひとつが確認）</span></li>
+        <li><i>✓</i><span>月1回 30分のZoomまたは対面</span></li>
+      </ul>
+      <a class="morelink" href="/card">Hitotsu Companyの名刺を見る →</a>
+    </div>
+
     <div class="mi hot" id="m-soshiki">
       <span class="tag">いちばん人気</span>
-      <h3>AI組織作り</h3>
-      <div class="price">100,000<small>円</small></div>
-      <p><span class="nb">AI社員を役割ごとにチームで揃えて、</span><span class="nb">あなたの会社の中に「AIの部署」を作ります。</span><span class="nb">事務・発信・書類づくりを</span><span class="nb">まとめて任せられる状態で納品します。</span></p>
+      <h3>AI部署</h3>
+      <p><span class="nb">AI社員を役割ごとにチームで揃えて、</span><span class="nb">あなたの会社の中に「AIの部署」をつくります。</span><span class="nb">事務・発信・書類づくりを</span><span class="nb">まとめて任せられる状態にします。</span></p>
+      <div class="dual">
+        <div class="opt">
+          <div class="lb">1回つくって終わり</div>
+          <div class="pr">100,000<small>円</small></div>
+          <div class="ds">AIチームを構築して納品。運用はご自身で。</div>
+          <a class="paybtn mini" data-pay="soshiki" href="#">カード決済へ</a>
+        </div>
+        <div class="opt pick">
+          <div class="lb">★ 毎月そだてる（AI部署プラン）</div>
+          <div class="pr">59,800<small>円/月〜</small></div>
+          <div class="ds">初月に上の「AI部署づくり（100,000円）」を含みます。</div>
+          <a class="applybtn mini" href="https://line.me/R/ti/p/@188jocyd">申し込む・相談する</a>
+          <a class="paybtn mini" data-pay="busho" href="#">カード決済へ</a>
+        </div>
+      </div>
+      <ul class="incl">
+        <li><i>✓</i><span>毎月：業務自動化の追加・AIメンバーの追加</span></li>
+        <li><i>✓</i><span>毎月：経営者向けの月次レポート</span></li>
+        <li><i>✓</i><span>顧問プランの内容をすべて含む</span></li>
+        <li><i>✓</i><span>3か月に1回、対面での見直し会</span></li>
+      </ul>
       <a class="morelink" href="/#org">当社のAI社員の組織図を見る →</a>
-      <p class="subnote">作ったあとも運用を任せたい方は <a href="#m-busho">AI部署プラン（月額）</a> なら初月に含まれます。</p>
-      <a class="paybtn" data-pay="soshiki" href="#">ご相談済みの方：カード決済へ</a>
     </div>
 
   </div>
   <p class="tiny muted" style="margin-top:18px;text-align:center"><span class="nb">はじめての方は、まず下の</span><span class="nb">公式LINEか対面でご相談ください。</span><span class="nb">内容が決まった方は、</span><span class="nb">各カードのボタンからそのままカード決済できます</span><span class="nb">（銀行振込・PayPay・現金も対応）。</span></p>
 </div></section>
 
-<section id="monthly"><div class="wrap">
-  <p class="eyebrow">月額プラン</p>
-  <h2>作って終わりにしない。<br>毎月、働かせ続ける。</h2>
-  <p class="muted"><span class="nb">AIは作った日がいちばん弱く、</span><span class="nb">使いながら直すほど強くなります。</span><span class="nb">その「直す・増やす・見守る」を、</span><span class="nb">月額でこちらが引き受けます。</span><span class="nb">いつでも解約できます。</span></p>
+<section><div class="wrap">
+  <p class="eyebrow">自分でつくれるようになりたい方へ</p>
+  <h2>AI社員室。<br>設計図を、毎週1通。</h2>
   <div class="menu">
-
     <div class="mi sub" id="m-shitsu">
       <h3>AI社員室</h3>
       <div class="price">2,980<small>円</small><span class="per">/月</span></div>
-      <p><span class="nb">自分でAI社員を作れるようになりたい方の部屋。</span><span class="nb">当社54名のAI社員の「設計図」を、</span><span class="nb">毎週1通お届けします。</span></p>
+      <p><span class="nb">つくるのを任せるのではなく、</span><span class="nb">自分でつくれるようになりたい方の部屋です。</span><span class="nb">当社54名のAI社員の「設計図」を、</span><span class="nb">毎週1通お届けします。</span></p>
       <ul class="incl">
         <li><i>✓</i><span>毎週1通、AI社員の設計図（役割・判断基準・プロンプト）</span></li>
         <li><i>✓</i><span>毎朝更新の道具箱の「作り方」を読み放題</span></li>
@@ -244,40 +290,8 @@ footer{padding:36px 0 46px;border-top:1px solid var(--line);text-align:center}
       </ul>
       <a class="applybtn" href="https://note.com/hitotsu_ai/membership" rel="noopener">noteメンバーシップで申し込む</a>
     </div>
-
-    <div class="mi sub hot" id="m-komon">
-      <span class="tag">事業者におすすめ</span>
-      <h3>AI社員 顧問プラン</h3>
-      <div class="price">19,800<small>円</small><span class="per">/月</span></div>
-      <p><span class="nb">あなた専用のAI社員を1人お作りして、</span><span class="nb">そのあと毎月、育て続けます。</span><span class="nb">「作ったけど使わなくなった」を</span><span class="nb">起こさないためのプランです。</span></p>
-      <ul class="incl">
-        <li><i>✓</i><span>毎月：AI社員の改善1回 ＋ 専用ツール1本まで作成</span></li>
-        <li><i>✓</i><span>毎月1日：「AI社員 稼働レポート」をお届け</span></li>
-        <li><i>✓</i><span>LINEでいつでも質問（AI社員が一次回答、翌営業日までにひとつが確認）</span></li>
-        <li><i>✓</i><span>月1回 30分のZoomまたは対面</span></li>
-      </ul>
-      <p class="first"><b>初月に含まれるもの：</b>AI社員作り（通常30,000円）。すでにお作りした方は初月から運用に入ります。</p>
-      <a class="applybtn" href="https://line.me/R/ti/p/@188jocyd">LINEで申し込む・相談する</a>
-      <a class="paybtn" data-pay="komon" href="#">ご相談済みの方：カード決済へ</a>
-    </div>
-
-    <div class="mi sub" id="m-busho">
-      <h3>AI部署プラン</h3>
-      <div class="price">59,800<small>円</small><span class="per">/月〜</span></div>
-      <p><span class="nb">AIの部署（3〜5名のAIチーム）を作り、</span><span class="nb">運用ごとお任せいただくプランです。</span><span class="nb">放課後等デイ・士業・複数店舗の事業者向け。</span></p>
-      <ul class="incl">
-        <li><i>✓</i><span>毎月：業務自動化の追加・AIメンバーの追加</span></li>
-        <li><i>✓</i><span>毎月：経営者向け月次レポート</span></li>
-        <li><i>✓</i><span>顧問プランの内容をすべて含む</span></li>
-        <li><i>✓</i><span>3か月に1回、対面での見直し会</span></li>
-      </ul>
-      <p class="first"><b>初月に含まれるもの：</b>AI組織作り（通常100,000円）。</p>
-      <a class="applybtn" href="https://line.me/R/ti/p/@188jocyd">LINEで申し込む・相談する</a>
-      <a class="paybtn" data-pay="busho" href="#">ご相談済みの方：カード決済へ</a>
-    </div>
-
   </div>
-  <div class="compare"><span class="nb"><b>どれを選べばいい？</b></span><br><span class="nb">自分で作れるようになりたい → AI社員室。</span><span class="nb">作るのは任せて使いたい → 顧問プラン。</span><span class="nb">事務・発信・書類をまとめて任せたい → AI部署プラン。</span><br><span class="nb">迷ったらLINEで「月額」とだけ送ってください。</span></div>
+  <div class="compare"><span class="nb"><b>どれを選べばいい？</b></span><br><span class="nb">自分でつくれるようになりたい → AI社員室。</span><span class="nb">つくるのは任せて、毎月そだてたい → AI社員の顧問プラン。</span><span class="nb">事務・発信・書類をまとめて任せたい → AI部署プラン。</span><br><span class="nb">迷ったらLINEで「どれがいい？」とだけ送ってください。</span></div>
 </div></section>
 
 <section class="ex"><div class="wrap">
@@ -361,17 +375,16 @@ footer{padding:36px 0 46px;border-top:1px solid var(--line);text-align:center}
     soudan:['m-soudan','単発相談（60分）','5,000円','まずは1時間、話すのが近道です。'],
     app:['m-app','アプリ作成','10,000円','毎日の面倒は、道具にして片付けましょう。'],
     web:['m-web','ホームページ制作','50,000円','このページのようなサイトを、あなたのお店にも。'],
-    shain:['m-shain','AI社員作り','30,000円','あなたの仕事を覚えたAIを、まず1人。'],
-    soshiki:['m-soshiki','AI組織作り','100,000円','毎日使っているなら、次はチームで任せる番です。'],
-    komon:['m-komon','AI社員 顧問プラン','19,800円/月','あなた専用のAI社員を作って、毎月育てます。'],
-    busho:['m-busho','AI部署プラン','59,800円/月〜','毎日使っているなら、部署ごと任せる番です。']
+    shain:['m-shain','AI社員','30,000円 または 19,800円/月','まず1人。毎月そだてるなら顧問プランです。'],
+    soshiki:['m-soshiki','AI部署','100,000円 または 59,800円/月〜','毎日使っているなら、部署ごと任せる番です。'],
+    shitsu:['m-shitsu','AI社員室','2,980円/月','自分でつくれるようになりたい方はこちら。']
   };
   var q1=document.getElementById('q1'),q2=document.getElementById('q2'),res=document.getElementById('qres');
   q1.querySelectorAll('.chip').forEach(function(b){b.onclick=function(){
     q1v=+b.dataset.q1;q1.style.display='none';q2.style.display='block';
   }});
   q2.querySelectorAll('.chip').forEach(function(b){b.onclick=function(){
-    var k=b.dataset.q2;if(k==='hito')k=(q1v===2)?'busho':'komon';
+    var k=b.dataset.q2;if(k==='hito')k=(q1v===2)?'soshiki':'shain';
     var m=MAP[k];
     q2.style.display='none';res.style.display='block';
     res.innerHTML='<p class="q" style="margin:0">あなたへのおすすめは…</p>'
