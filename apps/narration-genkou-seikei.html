@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="動画ナレーション制作。原稿を読み上げAI用に整えて一発生成">
+<title>ナレーション原稿ととのえツール</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic", sans-serif;
+  background: #f5f7fa;
+  color: #2c3e50;
+  line-height: 1.6;
+  padding: 16px;
+}
+.container { max-width: 900px; margin: 0 auto; }
+header {
+  background: linear-gradient(135deg, #4a90e2, #357abd);
+  color: white;
+  padding: 24px 20px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+}
+h1 { font-size: 1.5rem; margin-bottom: 8px; }
+.subtitle { font-size: 0.9rem; opacity: 0.95; }
+.card {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+.card h2 {
+  font-size: 1.1rem;
+  margin-bottom: 12px;
+  color: #357abd;
+  border-left: 4px solid #4a90e2;
+  padding-left: 10px;
+}
+label { display: block; font-size: 0.9rem; margin-bottom: 6px; font-weight: 600; }
+textarea, input, select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #cbd5e0;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-family: inherit;
+  background: #fafbfc;
+}
+textarea { min-height: 140px; resize: vertical; }
+.row { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
+.row > div { flex: 1; min-width: 140px; }
+button {
+  background: #4a90e2;
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-right: 8px;
+  margin-top: 8px;
+}
+button:hover { background: #357abd; }
+button.secondary { background: #718096; }
+button.secondary:hover { background: #4a5568; }
+.output {
+  background: #f7fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 14px;
+  margin-top: 12px;
+  white-space: pre-wrap;
+  font-size: 0.92rem;
+  min-height: 100px;
+  word-wrap: break-word;
+}
+.stats {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+  font-size: 0.85rem;
+}
+.stat {
+  background: #edf2f7;
+  padding: 6px 12px;
+  border-radius: 20px;
+}
+.stat.warn { background: #fed7aa; color: #7c2d12; }
+.stat.ok { background: #c6f6d5; color: #22543d; }
+.tips {
+  background: #fffbeb;
+  border-left: 4px solid #f59e0b;
+  padding: 12px 14px;
+  border-radius: 6px;
+  font-size: 0.87rem;
+  margin-top: 12px;
+}
+.tips b { color: #78350f; }
+.checkitem {
+  padding: 8px 0;
+  border-bottom: 1px dashed #e2e8f0;
+  font-size: 0.9rem;
+}
+.checkitem:last-child { border-bottom: none; }
+.check-ng { color: #c53030; }
+.check-ok { color: #2f855a; }
+.saved-list {
+  max-height: 200px;
+  overflow-y: auto;
+}
+.saved-item {
+  padding: 8px;
+  background: #f7fafc;
+  border-radius: 6px;
+  margin-bottom: 6px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+}
+.saved-item button { padding: 4px 10px; font-size: 0.8rem; margin: 0 0 0 6px; }
+.del-btn { background: #e53e3e !important; }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>🎙️ ナレーション原稿ととのえツール</h1>
+    <div class="subtitle">動画用の原稿を、音声AIが読みやすい形に自動で整えます</div>
+  </header>
+
+  <div class="card">
+    <h2>1. 設定</h2>
+    <div class="row">
+      <div>
+        <label>用途</label>
+        <select id="purpose">
+          <option value="youtube">YouTube動画ナレーション</option>
+          <option value="training">社内研修・eラーニング</option>
+          <option value="product">商品紹介動画</option>
+          <option value="explanation">解説動画</option>
+        </select>
+      </div>
+      <div>
+        <label>1分あたりの読み速度（文字/分）</label>
+        <select id="speed">
+          <option value="300">ゆっくり（300字/分）</option>
+          <option value="350" selected>標準（350字/分）</option>
+          <option value="400">やや速め（400字/分）</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>2. 原稿を貼り付け</h2>
+    <label>ここに原稿を入力（またはコピペ）</label>
+    <textarea id="input" placeholder="例：こんにちは。本日は当社の新サービスについてご紹介します。..."></textarea>
+    <div class="stats" id="stats"></div>
+    <button onclick="processText()">✨ 音声AI用に整える</button>
+    <button class="secondary" onclick="saveDraft()">💾 下書き保存</button>
+    <button class="secondary" onclick="clearInput()">クリア</button>
+  </div>
+
+  <div class="card">
+    <h2>3. 整えた原稿（コピーして音声AIに貼り付け）</h2>
+    <div class="output" id="output">ここに整えた原稿が表示されます。</div>
+    <div class="stats" id="outStats"></div>
+    <button onclick="copyOutput()">📋 コピー</button>
+    <button class="secondary" onclick="downloadText()">📄 テキスト保存</button>
+    <div class="tips">
+      <b>💡 音声AIに貼るときのコツ</b><br>
+      句読点や改行が声の「間」になります。長すぎる文は途中で息切れするので短く分けています。数字や英語はカタカナに直すと、より自然に読まれやすくなります。
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>4. 読みやすさチェック</h2>
+    <div id="checkResult">「音声AI用に整える」ボタンを押すとチェック結果が出ます。</div>
+  </div>
+
+  <div class="card">
+    <h2>5. 下書き一覧</h2>
+    <div class="saved-list" id="savedList">まだ保存された下書きはありません。</div>
+  </div>
+</div>
+
+<script>
+const inputEl = document.getElementById('input');
+const outputEl = document.getElementById('output');
+const statsEl = document.getElementById('stats');
+const outStatsEl = document.getElementById('outStats');
+const checkEl = document.getElementById('checkResult');
+const savedListEl = document.getElementById('savedList');
+
+function updateStats() {
+  const text = inputEl.value;
+  const chars = text.length;
+  const speed = parseInt(document.getElementById('speed').value);
+  const sec = Math.round(chars / speed * 60);
+  const min = Math.floor(sec / 60);
+  const s = sec % 60;
+  const timeStr = min > 0 ? `${min}分${s}秒` : `${s}秒`;
+  
+  let warn = '';
+  if (chars > 2500) warn = '<span class="stat warn">⚠ 無料枠を超える可能性</span>';
+  else if (chars > 1500) warn = '<span class="stat warn">やや長め</span>';
+  else warn = '<span class="stat ok">適正な長さ</span>';
+  
+  statsEl.innerHTML = `
+    <span class="stat">📝 ${chars}文字</span>
+    <span class="stat">⏱ 目安 ${timeStr}</span>
+    ${warn}
+  `;
+}
+
+function processText() {
+  let text = inputEl.value.trim();
+  if (!text) { alert('原稿を入力してください'); return; }
+  
+  // 全角統一
+  text = text.replace(/,/g, '、').replace(/\./g, '。');
+  // 半角スペース削除（日本語の場合）
+  text = text.replace(/([ぁ-んァ-ヶ一-龥])\s+([ぁ-んァ-ヶ一-龥])/g, '$1$2');
+  // 連続改行を1つに
+  text = text.replace(/\n{3,}/g, '\n\n');
+  // 文末で改行
+  text = text.replace(/。\s*/g, '。\n');
+  text = text.replace(/！/g, '！\n').replace(/？/g, '？\n');
+  // 長すぎる文（読点で分割の提案）
+  const lines = text.split('\n').map(line => {
+    if (line.length > 60) {
+      // 読点位置で改行を促す
+      return line.replace(/、/g, '、\n');
+    }
+    return line;
+  });
+  text = lines.join('\n').replace(/\n{3,}/g, '\n\n').trim();
+  
+  // 括弧内をスペースで区切り読みやすく
+  text = text.replace(/（(.+?)）/g, '（$1）');
+  
+  outputEl.textContent = text;
+  updateOutStats(text);
+  runChecks(text);
+}
+
+function updateOutStats(text) {
+  const chars = text.replace(/\s/g, '').length;
+  const speed = parseInt(document.getElementById('speed').value);
+  const sec = Math.round(chars / speed * 60);
+  const min = Math.floor(sec / 60);
+  const s = sec % 60;
+  const timeStr = min > 0 ? `${min}分${s}秒` : `${s}秒`;
+  outStatsEl.innerHTML = `
+    <span class="stat">📝 ${chars}文字（空白除く）</span>
+    <span class="stat">⏱ 目安 ${timeStr}</span>
+  `;
+}
+
+function runChecks(text) {
+  const checks = [];
+  
+  // 長文チェック
+  const sentences = text.split(/[。！？\n]/).filter(s => s.trim());
+  const longOnes = sentences.filter(s => s.length > 50);
+  if (longOnes.length > 0) {
+    checks.push({ ok: false, msg: `長すぎる文が${longOnes.length}箇所あります（50字超）。息継ぎしにくいため、読点で区切ることをおすすめします。` });
+  } else {
+    checks.push({ ok: true, msg: '文の長さは適切です。' });
+  }
+  
+  // 英数字チェック
+  const alnum = text.match(/[a-zA-Z0-9]{3,}/g);
+  if (alnum && alnum.length > 0) {
+    checks.push({ ok: false, msg: `英数字が含まれています（例: ${alnum.slice(0,3).join(', ')}）。読み間違い防止のためカタカナ表記への変換を検討してください。` });
+  } else {
+    checks.push({ ok: true, msg: '英数字の読み問題はなさそうです。' });
+  }
+  
+  // 記号チェック
+  const symbols = text.match(/[※#★☆●○◆◇]/g);
+  if (symbols) {
+    checks.push({ ok: false, msg: `装飾記号が含まれています。音声では読まれないか変な読みになるため削除を推奨します。` });
+  } else {
+    checks.push({ ok: true, msg: '装飾記号なし。' });
+  }
+  
+  // 文字数チェック
+  const chars = text.replace(/\s/g, '').length;
+  if (chars > 2500) {
+    checks.push({ ok: false, msg: `文字数が多め（${chars}字）。無料プランでは月の枠に注意し、章ごとに分割生成を推奨します。` });
+  } else {
+    checks.push({ ok: true, msg: `文字数は${chars}字。一度に生成しやすい長さです。` });
+  }
+  
+  checkEl.innerHTML = checks.map(c => 
+    `<div class="checkitem ${c.ok ? 'check-ok' : 'check-ng'}">${c.ok ? '✅' : '⚠️'} ${c.msg}</div>`
+  ).join('');
+}
+
+function copyOutput() {
+  const text = outputEl.textContent;
+  if (!text || text === 'ここに整えた原稿が表示されます。') { alert('先に原稿を整えてください'); return; }
+  navigator.clipboard.writeText(text).then(() => {
+    alert('コピーしました！音声AIの入力欄に貼り付けてください。');
+  }).catch(() => {
+    // フォールバック
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    alert('コピーしました！');
+  });
+}
+
+function downloadText() {
+  const text = outputEl.textContent;
+  if (!text || text === 'ここに整えた原稿が表示されます。') { alert('先に原稿を整えてください'); return; }
+  const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `narration_${new Date().getTime()}.txt`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function clearInput() {
+  if (confirm('入力内容をクリアしますか？')) {
+    inputEl.value = '';
+    updateStats();
+  }
+}
+
+function saveDraft() {
+  const text = inputEl.value.trim();
+  if (!text) { alert('保存する内容がありません'); return; }
+  const title = prompt('下書きのタイトル', `原稿_${new Date().toLocaleDateString('ja-JP')}`);
+  if (!title) return;
+  const drafts = JSON.parse(localStorage.getItem('narration_drafts') || '[]');
+  drafts.unshift({ title, text, date: new Date().toISOString() });
+  localStorage.setItem('narration_drafts', JSON.stringify(drafts.slice(0, 20)));
+  loadDrafts();
+  alert('保存しました');
+}
+
+function loadDrafts() {
+  const drafts = JSON.parse(localStorage.getItem('narration_drafts') || '[]');
+  if (drafts.length === 0) {
+    savedListEl.innerHTML = 'まだ保存された下書きはありません。';
+    return;
+  }
+  savedListEl.innerHTML = drafts.map((d, i) => `
+    <div class="saved-item">
+      <span>📄 ${escapeHtml(d.title)}（${d.text.length}字）</span>
+      <span>
+        <button onclick="loadDraft(${i})">読込</button>
+        <button class="del-btn" onclick="delDraft(${i})">削除</button>
+      </span>
+    </div>
+  `).join('');
+}
+
+function loadDraft(i) {
+  const drafts = JSON.parse(localStorage.getItem('narration_drafts') || '[]');
+  if (drafts[i]) {
+    inputEl.value = drafts[i].text;
+    updateStats();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+}
+
+function delDraft(i) {
+  if (!confirm('削除しますか？')) return;
+  const drafts = JSON.parse(localStorage.getItem('narration_drafts') || '[]');
+  drafts.splice(i, 1);
+  localStorage.setItem('narration_drafts', JSON.stringify(drafts));
+  loadDrafts();
+}
+
+function escapeHtml(s) {
+  return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+inputEl.addEventListener('input', updateStats);
+document.getElementById('speed').addEventListener('change', updateStats);
+updateStats();
+loadDrafts();
+</script>
+</body>
+</html>
