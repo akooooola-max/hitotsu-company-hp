@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="資料の図解化。文章を貼るだけで構造が見え、そのまま作図へ">
+<title>図解下書きメーカー</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, "Hiragino Sans", "Meiryo", sans-serif; background: #f5f7fa; color: #222; line-height: 1.6; padding: 16px; }
+.container { max-width: 900px; margin: 0 auto; }
+h1 { font-size: 20px; margin-bottom: 6px; color: #1a3a5c; }
+.lead { font-size: 13px; color: #666; margin-bottom: 20px; }
+.card { background: #fff; border-radius: 10px; padding: 18px; margin-bottom: 16px; box-shadow: 0 1px 4px rgba(0,0,0,.06); }
+.card h2 { font-size: 15px; margin-bottom: 10px; color: #1a3a5c; border-left: 4px solid #4a90e2; padding-left: 8px; }
+textarea { width: 100%; min-height: 140px; padding: 10px; border: 1px solid #ccd; border-radius: 6px; font-size: 14px; font-family: inherit; resize: vertical; }
+.controls { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+button { background: #4a90e2; color: #fff; border: none; padding: 10px 16px; border-radius: 6px; font-size: 14px; cursor: pointer; font-weight: bold; }
+button:hover { background: #3a7bc8; }
+button.sub { background: #eef2f7; color: #333; }
+button.sub:hover { background: #dde4ed; }
+.type-select { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0; }
+.type-btn { padding: 6px 12px; background: #eef2f7; color: #333; border-radius: 20px; font-size: 13px; font-weight: normal; }
+.type-btn.active { background: #4a90e2; color: #fff; }
+.preview { background: #fafbfd; border: 1px dashed #ccd; border-radius: 8px; padding: 16px; min-height: 100px; }
+.hint { font-size: 12px; color: #888; margin-top: 6px; }
+.copy-area { background: #f0f4f8; padding: 12px; border-radius: 6px; font-size: 13px; white-space: pre-wrap; word-break: break-all; max-height: 200px; overflow-y: auto; margin-top: 10px; font-family: "Consolas", "Menlo", monospace; }
+
+/* 図解プレビュー各種 */
+.flow { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.flow .step { background: #4a90e2; color: #fff; padding: 10px 14px; border-radius: 6px; font-size: 13px; flex: 0 1 auto; }
+.flow .arrow { color: #4a90e2; font-size: 20px; font-weight: bold; }
+.list-blocks { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; }
+.list-blocks .item { background: #fff; border: 2px solid #4a90e2; padding: 12px; border-radius: 8px; font-size: 13px; text-align: center; }
+.pyramid { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.pyramid .level { background: #4a90e2; color: #fff; padding: 8px 12px; text-align: center; font-size: 13px; border-radius: 4px; }
+.compare { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.compare .col { background: #fff; border: 2px solid #4a90e2; padding: 12px; border-radius: 8px; }
+.compare .col h3 { font-size: 14px; color: #4a90e2; margin-bottom: 8px; }
+.compare .col ul { list-style: disc; padding-left: 20px; font-size: 13px; }
+.mind { text-align: center; }
+.mind .center { display: inline-block; background: #1a3a5c; color: #fff; padding: 12px 20px; border-radius: 30px; font-size: 14px; margin-bottom: 12px; }
+.mind .branches { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+.mind .branch { background: #4a90e2; color: #fff; padding: 8px 14px; border-radius: 20px; font-size: 13px; }
+.empty { color: #999; text-align: center; padding: 30px 0; font-size: 13px; }
+.footer-note { font-size: 12px; color: #888; text-align: center; margin-top: 20px; }
+</style>
+</head>
+<body>
+<div class="container">
+<h1>📊 図解下書きメーカー</h1>
+<p class="lead">文章を貼り付けて、図解の「構造」を先に決める。作図ツールに持っていく前の下書きを、ここで整えます。</p>
+
+<div class="card">
+<h2>① 図にしたい文章を貼り付け</h2>
+<textarea id="input" placeholder="例：&#10;サービス導入は3ステップです。まずお問い合わせをいただき、次にヒアリング面談を実施、最後に契約となります。&#10;&#10;※箇条書きや改行区切りでもOKです"></textarea>
+<div class="hint">💡 箇条書き（・- 1.）や句点「。」で区切ると、より正確に分解されます</div>
+</div>
+
+<div class="card">
+<h2>② 図の種類を選ぶ</h2>
+<div class="type-select" id="typeSelect">
+<button class="type-btn active" data-type="flow">→ フロー図（手順）</button>
+<button class="type-btn" data-type="list">□ 並列リスト（要素）</button>
+<button class="type-btn" data-type="pyramid">▲ ピラミッド（階層）</button>
+<button class="type-btn" data-type="compare">⇔ 比較（2列）</button>
+<button class="type-btn" data-type="mind">◎ 中心と枝（マインド）</button>
+</div>
+<div class="controls">
+<button onclick="generate()">図解の下書きを作る</button>
+<button class="sub" onclick="saveDraft()">この内容を保存</button>
+<button class="sub" onclick="loadDraft()">前回の続きを読込</button>
+</div>
+</div>
+
+<div class="card">
+<h2>③ プレビュー</h2>
+<div class="preview" id="preview"><div class="empty">上のボタンを押すと、ここに下書きが表示されます</div></div>
+</div>
+
+<div class="card">
+<h2>④ 作図ツールにそのまま貼れる整形文</h2>
+<p class="hint">下の文を作図系のサービスに貼り付けると、意図した構造で図が出やすくなります。</p>
+<div class="copy-area" id="output">まだ下書きが作られていません</div>
+<div class="controls">
+<button onclick="copyOutput()">整形文をコピー</button>
+</div>
+</div>
+
+<div class="card">
+<h2>💡 うまく図が出ないときのコツ</h2>
+<ul style="font-size:13px; padding-left:20px; line-height:1.9;">
+<li><b>日本語が崩れる場合</b>：短い文に区切り、句点「。」で終わらせる</li>
+<li><b>思った図が出ない場合</b>：まず種類を選んでから貼ると、AIも構造を掴みやすい</li>
+<li><b>要素が多すぎる場合</b>：5〜7個までに絞る。多いと図が読みにくくなる</li>
+<li><b>専門用語が化ける場合</b>：カタカナや英字は括弧で補足を入れる</li>
+</ul>
+</div>
+
+<p class="footer-note">※ データはお使いのブラウザ内のみに保存されます</p>
+</div>
+
+<script>
+let currentType = 'flow';
+
+document.querySelectorAll('.type-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentType = btn.dataset.type;
+  });
+});
+
+function parseItems(text) {
+  if (!text.trim()) return [];
+  // 箇条書き優先
+  let lines = text.split(/\n/).map(l => l.trim()).filter(l => l);
+  let items = [];
+  const bulletRe = /^[\-・●○◆■□\*]|^\d+[\.\)、]|^[①-⑳]/;
+  const bulletLines = lines.filter(l => bulletRe.test(l));
+  if (bulletLines.length >= 2) {
+    items = bulletLines.map(l => l.replace(bulletRe, '').trim());
+  } else {
+    // 句点で分解
+    let joined = lines.join(' ');
+    items = joined.split(/[。\n]/).map(s => s.trim()).filter(s => s.length > 0);
+  }
+  return items.slice(0, 8);
+}
+
+function generate() {
+  const text = document.getElementById('input').value;
+  const items = parseItems(text);
+  const preview = document.getElementById('preview');
+  const output = document.getElementById('output');
+
+  if (items.length === 0) {
+    preview.innerHTML = '<div class="empty">文章を入力してください</div>';
+    output.textContent = 'まだ下書きが作られていません';
+    return;
+  }
+
+  let html = '', prompt = '';
+
+  switch(currentType) {
+    case 'flow':
+      html = '<div class="flow">';
+      items.forEach((item, i) => {
+        html += `<div class="step">${escapeHtml(item)}</div>`;
+        if (i < items.length - 1) html += '<div class="arrow">→</div>';
+      });
+      html += '</div>';
+      prompt = '以下の内容をフロー図（手順の流れ）にしてください。矢印で順番につないでください。\n\n';
+      items.forEach((it, i) => prompt += `${i+1}. ${it}\n`);
+      break;
+
+    case 'list':
+      html = '<div class="list-blocks">';
+      items.forEach(item => {
+        html += `<div class="item">${escapeHtml(item)}</div>`;
+      });
+      html += '</div>';
+      prompt = '以下の要素を並列に並べたブロック図（カード型のリスト）にしてください。\n\n';
+      items.forEach((it, i) => prompt += `・${it}\n`);
+      break;
+
+    case 'pyramid':
+      html = '<div class="pyramid">';
+      items.forEach((item, i) => {
+        const width = 40 + (i / Math.max(items.length-1,1)) * 55;
+        html += `<div class="level" style="width:${width}%">${escapeHtml(item)}</div>`;
+      });
+      html += '</div>';
+      prompt = '以下の内容をピラミッド図（階層構造）にしてください。上が最上位、下が土台です。\n\n';
+      items.forEach((it, i) => prompt += `第${i+1}層（上から）: ${it}\n`);
+      break;
+
+    case 'compare':
+      const mid = Math.ceil(items.length / 2);
+      const left = items.slice(0, mid);
+      const right = items.slice(mid);
+      html = '<div class="compare">';
+      html += '<div class="col"><h3>A</h3><ul>';
+      left.forEach(it => html += `<li>${escapeHtml(it)}</li>`);
+      html += '</ul></div>';
+      html += '<div class="col"><h3>B</h3><ul>';
+      right.forEach(it => html += `<li>${escapeHtml(it)}</li>`);
+      html += '</ul></div>';
+      html += '</div>';
+      prompt = '以下の内容を2列の比較図にしてください。\n\n【A】\n';
+      left.forEach(it => prompt += `・${it}\n`);
+      prompt += '\n【B】\n';
+      right.forEach(it => prompt += `・${it}\n`);
+      break;
+
+    case 'mind':
+      const center = items[0] || 'テーマ';
+      const branches = items.slice(1);
+      html = '<div class="mind"><div class="center">' + escapeHtml(center) + '</div><div class="branches">';
+      branches.forEach(b => html += `<div class="branch">${escapeHtml(b)}</div>`);
+      html += '</div></div>';
+      prompt = `以下の内容を中心と枝のマインドマップ図にしてください。\n\n【中心テーマ】\n${center}\n\n【枝】\n`;
+      branches.forEach(b => prompt += `・${b}\n`);
+      break;
+  }
+
+  preview.innerHTML = html;
+  output.textContent = prompt.trim();
+}
+
+function escapeHtml(s) {
+  return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function copyOutput() {
+  const text = document.getElementById('output').textContent;
+  if (!text || text.includes('まだ下書き')) { alert('先に下書きを作ってください'); return; }
+  navigator.clipboard.writeText(text).then(() => alert('コピーしました'), () => {
+    // フォールバック
+    const ta = document.createElement('textarea');
+    ta.value = text; document.body.appendChild(ta); ta.select();
+    document.execCommand('copy'); document.body.removeChild(ta);
+    alert('コピーしました');
+  });
+}
+
+function saveDraft() {
+  const data = { text: document.getElementById('input').value, type: currentType };
+  localStorage.setItem('zukai_draft', JSON.stringify(data));
+  alert('保存しました');
+}
+
+function loadDraft() {
+  const raw = localStorage.getItem('zukai_draft');
+  if (!raw) { alert('保存されたデータはありません'); return; }
+  const data = JSON.parse(raw);
+  document.getElementById('input').value = data.text || '';
+  currentType = data.type || 'flow';
+  document.querySelectorAll('.type-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.type === currentType);
+  });
+  alert('読み込みました');
+}
+
+// 初回読込
+window.addEventListener('load', () => {
+  const raw = localStorage.getItem('zukai_draft');
+  if (raw) {
+    try {
+      const data = JSON.parse(raw);
+      document.getElementById('input').value = data.text || '';
+      currentType = data.type || 'flow';
+      document.querySelectorAll('.type-btn').forEach(b => {
+        b.classList.toggle('active', b.dataset.type === currentType);
+      });
+    } catch(e) {}
+  }
+});
+</script>
+</body>
+</html>

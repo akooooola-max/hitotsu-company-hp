@@ -4,3 +4,5 @@
 wrangler.jsonc
 .wrangler/**
 src/**
+_preview/**
+**/*.bak*
