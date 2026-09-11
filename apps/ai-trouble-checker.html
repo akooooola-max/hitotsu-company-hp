@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="AI作業のトラブル。ファイル未保存や誤編集を落ち着いて自己解決">
+<title>AI作業トラブル 診断＆対処ガイド</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic", sans-serif;
+    background: #f4f6f8;
+    color: #222;
+    margin: 0;
+    padding: 16px;
+    line-height: 1.7;
+  }
+  .container { max-width: 780px; margin: 0 auto; }
+  h1 {
+    font-size: 1.4em;
+    background: #2c5aa0;
+    color: white;
+    padding: 16px;
+    border-radius: 8px 8px 0 0;
+    margin: 0;
+  }
+  .lead {
+    background: white;
+    padding: 12px 16px;
+    border-left: 4px solid #2c5aa0;
+    font-size: 0.9em;
+    color: #555;
+    margin-bottom: 16px;
+    border-radius: 0 0 8px 8px;
+  }
+  .card {
+    background: white;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  }
+  .card h2 {
+    font-size: 1.05em;
+    margin: 0 0 12px 0;
+    color: #2c5aa0;
+    border-bottom: 2px solid #eef2f7;
+    padding-bottom: 8px;
+  }
+  .trouble-btn {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: #f8f9fb;
+    border: 1px solid #dde3ea;
+    padding: 14px;
+    border-radius: 6px;
+    margin-bottom: 8px;
+    cursor: pointer;
+    font-size: 0.95em;
+    transition: all 0.15s;
+  }
+  .trouble-btn:hover { background: #eef2f7; border-color: #2c5aa0; }
+  .trouble-btn.active { background: #2c5aa0; color: white; border-color: #2c5aa0; }
+  .solution {
+    display: none;
+    background: #fffbea;
+    border: 1px solid #ffe58f;
+    padding: 14px;
+    border-radius: 6px;
+    margin-top: 10px;
+  }
+  .solution.show { display: block; }
+  .solution h3 {
+    margin: 0 0 8px 0;
+    font-size: 1em;
+    color: #ad6800;
+  }
+  .solution ol { padding-left: 22px; margin: 8px 0; }
+  .solution li { margin-bottom: 6px; }
+  .step-box {
+    background: #f0f7ff;
+    border-left: 3px solid #2c5aa0;
+    padding: 10px 12px;
+    margin: 8px 0;
+    border-radius: 4px;
+    font-size: 0.9em;
+  }
+  .copy-box {
+    background: #263238;
+    color: #eceff1;
+    padding: 12px;
+    border-radius: 6px;
+    font-family: "Courier New", monospace;
+    font-size: 0.85em;
+    white-space: pre-wrap;
+    word-break: break-all;
+    margin: 8px 0;
+  }
+  .copy-btn {
+    background: #52c41a;
+    color: white;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.85em;
+    margin-top: 4px;
+  }
+  .copy-btn:hover { background: #389e0d; }
+  .checklist {
+    background: white;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  }
+  .checklist label {
+    display: block;
+    padding: 8px;
+    border-bottom: 1px solid #f0f0f0;
+    cursor: pointer;
+    font-size: 0.92em;
+  }
+  .checklist label:last-child { border-bottom: none; }
+  .checklist input[type="checkbox"] { margin-right: 8px; transform: scale(1.2); }
+  .memo-area {
+    width: 100%;
+    min-height: 100px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 0.9em;
+    resize: vertical;
+  }
+  .save-btn {
+    background: #2c5aa0;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9em;
+    margin-top: 6px;
+  }
+  .save-btn:hover { background: #1e4176 }
+  .saved-msg { color: #52c41a; font-size: 0.85em; margin-left: 10px; }
+  .warn {
+    background: #fff1f0;
+    border: 1px solid #ffa39e;
+    color: #a8071a;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 0.85em;
+    margin: 8px 0;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>🛠️ AI作業トラブル 診断＆対処ガイド</h1>
+  <div class="lead">
+    「ファイルが読めない」「保存されない」「勝手に書き換えられた」…落ち着いて一つずつ確認しましょう。作業前チェックと、症状別の解決手順をまとめました。
+  </div>
+
+  <div class="checklist">
+    <h2 style="font-size:1.05em; margin:0 0 8px 0; color:#2c5aa0;">✅ 作業開始前のチェック（毎回確認）</h2>
+    <label><input type="checkbox" data-key="chk1"> 作業対象のフォルダ（場所）を明確に伝えたか</label>
+    <label><input type="checkbox" data-key="chk2"> 大事なファイルはバックアップを取ったか</label>
+    <label><input type="checkbox" data-key="chk3"> 触ってほしくない場所を先に伝えたか</label>
+    <label><input type="checkbox" data-key="chk4"> ファイル名にスペースや日本語がないか（トラブルの元）</label>
+    <label><input type="checkbox" data-key="chk5"> 大きな変更前は「まず計画だけ見せて」と依頼したか</label>
+  </div>
+
+  <div class="card">
+    <h2>❓ 起きているトラブルを選んでください</h2>
+    <button class="trouble-btn" data-target="s1">📂 ファイルが読み込めない・見つからないと言われる</button>
+    <div id="s1" class="solution">
+      <h3>対処手順</h3>
+      <ol>
+        <li>今どのフォルダで作業しているか確認する</li>
+        <li>ファイル名のスペル・大文字小文字・拡張子を確認</li>
+        <li>ファイルまでの<b>正しい道順（パス）</b>を伝え直す</li>
+      </ol>
+      <div class="step-box">
+        💡 <b>コツ：</b>「デスクトップの◯◯フォルダの中の△△.txtを読んで」と、場所を最初から順に伝えると確実です。
+      </div>
+      <p style="margin:8px 0 4px; font-size:0.9em;">▼ そのままコピーして貼り付けられる依頼文</p>
+      <div class="copy-box" id="copy1">まず、現在の作業フォルダを教えてください。次に、そのフォルダ内にあるファイル一覧を表示してください。私が触ってほしいファイル名は「（ここにファイル名）」です。見つからない場合は、探した場所と結果を教えてください。</div>
+      <button class="copy-btn" data-copy="copy1">📋 コピー</button>
+    </div>
+
+    <button class="trouble-btn" data-target="s2">💾 変更が保存されない・反映されない</button>
+    <div id="s2" class="solution">
+      <h3>対処手順</h3>
+      <ol>
+        <li>本当に書き込み権限のあるフォルダか確認</li>
+        <li>ファイルを他のアプリで開いていないか確認（Excelなど）</li>
+        <li>変更後のファイル内容を見せてもらい、実際にPCで開き直して確認</li>
+      </ol>
+      <div class="warn">⚠️ クラウド同期中のフォルダ（OneDrive等）はロックされることがあります。</div>
+      <p style="margin:8px 0 4px; font-size:0.9em;">▼ 確認用の依頼文</p>
+      <div class="copy-box" id="copy2">先ほどの変更が正しく保存されたか確認してください。ファイルを再度開いて、変更後の内容を最初の10行だけ表示してください。もし保存できていない場合、その理由（権限エラーなど）を教えてください。</div>
+      <button class="copy-btn" data-copy="copy2">📋 コピー</button>
+    </div>
+
+    <button class="trouble-btn" data-target="s3">😱 頼んでいない場所を勝手に書き換えられた</button>
+    <div id="s3" class="solution">
+      <h3>対処手順</h3>
+      <ol>
+        <li><b>すぐに作業を止める</b>（追加の指示を出さない）</li>
+        <li>変更されたファイルの一覧を出してもらう</li>
+        <li>元に戻せるものは戻す（バックアップ・ゴミ箱・履歴機能）</li>
+        <li>次回から作業範囲を最初に明示する</li>
+      </ol>
+      <div class="warn">⚠️ 焦って追加指示を出すと、さらに広範囲が変更される恐れがあります。</div>
+      <p style="margin:8px 0 4px; font-size:0.9em;">▼ 状況把握のための依頼文</p>
+      <div class="copy-box" id="copy3">作業を一旦停止してください。今回のセッションで、あなたが変更・作成・削除したファイルをすべてリスト化してください。それぞれ「ファイル名」「何をしたか」「元に戻せるか」の3点を教えてください。私の許可なしに新しい変更はしないでください。</div>
+      <button class="copy-btn" data-copy="copy3">📋 コピー</button>
+    </div>
+
+    <button class="trouble-btn" data-target="s4">🔒 アクセス権限エラーが出る</button>
+    <div id="s4" class="solution">
+      <h3>対処手順</h3>
+      <ol>
+        <li>作業フォルダを、自分のユーザー領域（ドキュメントやデスクトップ）に移す</li>
+        <li>システムフォルダ（Program Files等）は避ける</li>
+        <li>ファイルが「読み取り専用」になっていないか、プロパティで確認</li>
+      </ol>
+      <div class="step-box">
+        💡 <b>推奨場所：</b> ドキュメント内に「作業用」フォルダを1つ作り、そこですべて完結させると安全です。
+      </div>
+    </div>
+
+    <button class="trouble-btn" data-target="s5">🌀 動作が重い・応答が返ってこない</button>
+    <div id="s5" class="solution">
+      <h3>対処手順</h3>
+      <ol>
+        <li>1〜2分待つ（大きなファイルは時間がかかる）</li>
+        <li>返ってこない場合は一度セッションを中断し、再度開始</li>
+        <li>次回は「大きなファイルは分割して読んで」と伝える</li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>📝 今回のトラブルメモ（記録して次回に活かす）</h2>
+    <textarea class="memo-area" id="memo" placeholder="例：2024/○/○ 議事録フォルダ整理中、××が原因で△△が起きた。次回は先に○○を確認する。"></textarea>
+    <button class="save-btn" id="saveMemo">💾 メモを保存</button>
+    <span class="saved-msg" id="savedMsg"></span>
+  </div>
+
+  <div class="card">
+    <h2>🛡️ 事故を防ぐ「安全な頼み方」テンプレ</h2>
+    <p style="font-size:0.9em; color:#555;">大きな作業を頼む前に、これを貼るだけで事故が激減します。</p>
+    <div class="copy-box" id="copyTpl">これから以下の作業をお願いします：
+【作業内容】（ここに書く）
+【対象フォルダ】（ここに書く。ここ以外は絶対に触らない）
+【触ってはいけないもの】（あれば書く）
+
+まず、実行前に「何を・どの順番で・どのファイルに」行うかの計画を箇条書きで見せてください。私が「OK」と返してから、実際の作業を始めてください。途中で予定外のことが必要になったら、必ず私に確認してください。</div>
+    <button class="copy-btn" data-copy="copyTpl">📋 コピー</button>
+  </div>
+
+</div>
+
+<script>
+  // トラブル解決ボタン
+  document.querySelectorAll('.trouble-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const target = document.getElementById(btn.dataset.target);
+      const isOpen = target.classList.contains('show');
+      document.querySelectorAll('.solution').forEach(s => s.classList.remove('show'));
+      document.querySelectorAll('.trouble-btn').forEach(b => b.classList.remove('active'));
+      if (!isOpen) {
+        target.classList.add('show');
+        btn.classList.add('active');
+      }
+    });
+  });
+
+  // コピー機能
+  document.querySelectorAll('.copy-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const text = document.getElementById(btn.dataset.copy).textContent;
+      navigator.clipboard.writeText(text).then(() => {
+        const original = btn.textContent;
+        btn.textContent = '✅ コピーしました！';
+        setTimeout(() => btn.textContent = original, 1500);
+      }).catch(() => {
+        // フォールバック
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+        btn.textContent = '✅ コピーしました！';
+        setTimeout(() => btn.textContent = '📋 コピー', 1500);
+      });
+    });
+  });
+
+  // チェックリスト保存
+  document.querySelectorAll('.checklist input[type="checkbox"]').forEach(cb => {
+    const key = 'ai_trouble_' + cb.dataset.key;
+    cb.checked = localStorage.getItem(key) === '1';
+    cb.addEventListener('change', () => {
+      localStorage.setItem(key, cb.checked ? '1' : '0');
+    });
+  });
+
+  // メモ保存
+  const memo = document.getElementById('memo');
+  memo.value = localStorage.getItem('ai_trouble_memo') || '';
+  document.getElementById('saveMemo').addEventListener('click', () => {
+    localStorage.setItem('ai_trouble_memo', memo.value);
+    const msg = document.getElementById('savedMsg');
+    msg.textContent = '保存しました';
+    setTimeout(() => msg.textContent = '', 2000);
+  });
+</script>
+</body>
+</html>
