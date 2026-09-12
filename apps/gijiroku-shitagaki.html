@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="会議の議事録。文字起こしを貼るだけで下書きが整う">
+<title>議事録下書きメーカー</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic", sans-serif; background: #f5f7fa; color: #333; line-height: 1.6; padding: 16px; }
+.container { max-width: 800px; margin: 0 auto; }
+h1 { font-size: 22px; margin-bottom: 8px; color: #1a5490; }
+.lead { font-size: 14px; color: #666; margin-bottom: 20px; }
+.card { background: #fff; border-radius: 10px; padding: 20px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+label { display: block; font-weight: bold; margin-bottom: 6px; font-size: 14px; }
+.hint { font-size: 12px; color: #888; margin-bottom: 8px; }
+input[type="text"], input[type="date"], textarea, select { width: 100%; padding: 10px; border: 1px solid #d0d7de; border-radius: 6px; font-size: 14px; font-family: inherit; margin-bottom: 12px; }
+textarea { resize: vertical; min-height: 80px; }
+textarea.big { min-height: 200px; }
+button { background: #1a5490; color: #fff; border: none; padding: 12px 20px; border-radius: 6px; font-size: 15px; cursor: pointer; font-weight: bold; margin-right: 8px; margin-bottom: 8px; }
+button:hover { background: #163f6b; }
+button.sub { background: #6c757d; }
+button.sub:hover { background: #545b62; }
+button.danger { background: #dc3545; }
+.tabs { display: flex; gap: 4px; margin-bottom: 16px; flex-wrap: wrap; }
+.tab { padding: 8px 14px; background: #e9ecef; border-radius: 6px 6px 0 0; cursor: pointer; font-size: 14px; }
+.tab.active { background: #1a5490; color: #fff; }
+.output { background: #f8f9fa; border: 1px solid #d0d7de; border-radius: 6px; padding: 16px; white-space: pre-wrap; font-size: 13px; font-family: "Menlo", "Consolas", monospace; min-height: 200px; }
+.step { display: flex; align-items: flex-start; margin-bottom: 12px; font-size: 14px; }
+.step-num { background: #1a5490; color: #fff; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; margin-right: 10px; flex-shrink: 0; }
+.saved-list { list-style: none; }
+.saved-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #eee; font-size: 14px; }
+.saved-item:last-child { border-bottom: none; }
+.saved-item a { color: #1a5490; cursor: pointer; text-decoration: underline; }
+.small-btn { padding: 4px 10px; font-size: 12px; margin: 0 0 0 8px; }
+.info-box { background: #fff8e1; border-left: 4px solid #ffb300; padding: 12px; border-radius: 4px; font-size: 13px; margin-bottom: 12px; }
+@media (max-width: 600px) { h1 { font-size: 18px; } button { width: 100%; margin-right: 0; } }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>📝 議事録下書きメーカー</h1>
+  <p class="lead">文字起こしテキストを貼り付けるだけで、議事録の下書きを整えます。</p>
+
+  <div class="tabs">
+    <div class="tab active" data-tab="make">下書きを作る</div>
+    <div class="tab" data-tab="saved">保存した議事録</div>
+    <div class="tab" data-tab="help">使い方</div>
+  </div>
+
+  <!-- 作成タブ -->
+  <div id="tab-make">
+    <div class="card">
+      <label>会議名</label>
+      <input type="text" id="title" placeholder="例：週次定例ミーティング">
+
+      <label>開催日</label>
+      <input type="date" id="date">
+
+      <label>参加者（カンマまたは改行区切り）</label>
+      <textarea id="members" placeholder="例：山田, 佐藤, 鈴木"></textarea>
+
+      <label>文字起こしテキスト</label>
+      <div class="hint">会議の録音を文字起こししたテキストをそのまま貼り付けてください。</div>
+      <textarea id="transcript" class="big" placeholder="ここに文字起こしを貼り付け..."></textarea>
+
+      <label>議題（分かっていれば、1行に1つ）</label>
+      <textarea id="agenda" placeholder="例：&#10;来月の売上目標&#10;新人研修の進め方"></textarea>
+
+      <button onclick="generate()">✨ 下書きを整える</button>
+      <button class="sub" onclick="clearForm()">クリア</button>
+    </div>
+
+    <div class="card">
+      <label>整った下書き</label>
+      <div class="hint">下の内容を編集できます。そのままコピーして社内で共有できます。</div>
+      <textarea id="output" class="output" style="min-height:300px;"></textarea>
+      <button onclick="copyOutput()">📋 コピー</button>
+      <button class="sub" onclick="saveDraft()">💾 保存</button>
+      <button class="sub" onclick="downloadTxt()">⬇ テキスト保存</button>
+    </div>
+
+    <div class="card">
+      <label>AIに要約を頼む依頼文（オプション）</label>
+      <div class="info-box">より高精度な要約が欲しいときは、下のボタンで依頼文を作れます。それをお使いのAIチャットに貼り付けてください。</div>
+      <button onclick="makePrompt()">🤖 AIへの依頼文を作る</button>
+      <textarea id="prompt" class="output" style="min-height:150px; margin-top:12px;" placeholder="ここに依頼文が表示されます"></textarea>
+      <button onclick="copyPrompt()">📋 依頼文をコピー</button>
+    </div>
+  </div>
+
+  <!-- 保存タブ -->
+  <div id="tab-saved" style="display:none;">
+    <div class="card">
+      <label>保存済み議事録</label>
+      <ul id="savedList" class="saved-list"></ul>
+    </div>
+  </div>
+
+  <!-- ヘルプタブ -->
+  <div id="tab-help" style="display:none;">
+    <div class="card">
+      <label>使い方（3ステップ）</label>
+      <div class="step"><div class="step-num">1</div><div>お手持ちの文字起こしツールで、会議の音声をテキストに変換します。</div></div>
+      <div class="step"><div class="step-num">2</div><div>そのテキストを「文字起こしテキスト」欄に貼り付けます。会議名・参加者も入れます。</div></div>
+      <div class="step"><div class="step-num">3</div><div>「下書きを整える」ボタンを押すと、決まった型に沿った議事録の下書きができます。編集してそのまま共有できます。</div></div>
+      <div class="info-box" style="margin-top:16px;">💡 このアプリはブラウザ内だけで動きます。入力した内容は外部に送信されません。保存もお使いのブラウザ内にのみ残ります。</div>
+    </div>
+  </div>
+</div>
+
+<script>
+// タブ切替
+document.querySelectorAll('.tab').forEach(t => {
+  t.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+    t.classList.add('active');
+    ['make','saved','help'].forEach(n => document.getElementById('tab-'+n).style.display = 'none');
+    document.getElementById('tab-'+t.dataset.tab).style.display = 'block';
+    if (t.dataset.tab === 'saved') renderSaved();
+  });
+});
+
+// 日付初期化
+document.getElementById('date').valueAsDate = new Date();
+
+function parseList(s) {
+  return s.split(/[,、\n]/).map(x => x.trim()).filter(Boolean);
+}
+
+// 決定事項・TODOをキーワードで抽出
+function extractItems(text) {
+  const lines = text.split(/[。\n]/).map(l => l.trim()).filter(Boolean);
+  const decisions = [];
+  const todos = [];
+  const questions = [];
+  const decKeywords = ['決定', '決まり', '決めま', 'とします', 'ということで', '合意', '確定'];
+  const todoKeywords = ['やる', 'します', '対応', '進めま', '確認しま', 'までに', 'お願い', '担当'];
+  const qKeywords = ['？', '?', 'どうする', 'どうしま', 'いかが'];
+  lines.forEach(l => {
+    if (l.length < 4 || l.length > 120) return;
+    if (decKeywords.some(k => l.includes(k))) decisions.push(l);
+    else if (todoKeywords.some(k => l.includes(k))) todos.push(l);
+    else if (qKeywords.some(k => l.includes(k))) questions.push(l);
+  });
+  return { decisions: decisions.slice(0,8), todos: todos.slice(0,8), questions: questions.slice(0,5) };
+}
+
+function generate() {
+  const title = document.getElementById('title').value.trim() || '（会議名未入力）';
+  const date = document.getElementById('date').value || '';
+  const members = parseList(document.getElementById('members').value);
+  const transcript = document.getElementById('transcript').value.trim();
+  const agenda = parseList(document.getElementById('agenda').value);
+
+  if (!transcript) {
+    alert('文字起こしテキストを貼り付けてください。');
+    return;
+  }
+
+  const items = extractItems(transcript);
+
+  let out = '';
+  out += '■ 議事録：' + title + '\n';
+  out += '日時：' + (date || '（未入力）') + '\n';
+  out += '参加者：' + (members.length ? members.join('、') : '（未入力）') + '\n';
+  out += '\n';
+  out += '━━━━━━━━━━━━━━━━━━━━\n';
+  out += '【議題】\n';
+  if (agenda.length) {
+    agenda.forEach((a,i) => out += (i+1) + '. ' + a + '\n');
+  } else {
+    out += '（記入してください）\n';
+  }
+  out += '\n';
+  out += '【決定事項】\n';
+  if (items.decisions.length) {
+    items.decisions.forEach(d => out += '・' + d + '\n');
+  } else {
+    out += '・（該当なし／手動で追記）\n';
+  }
+  out += '\n';
+  out += '【次のアクション（ToDo）】\n';
+  if (items.todos.length) {
+    items.todos.forEach(t => out += '・[ ] ' + t + '（担当：　　／期日：　　）\n');
+  } else {
+    out += '・[ ] （手動で追記）\n';
+  }
+  out += '\n';
+  out += '【保留・要検討】\n';
+  if (items.questions.length) {
+    items.questions.forEach(q => out += '・' + q + '\n');
+  } else {
+    out += '・（該当なし）\n';
+  }
+  out += '\n';
+  out += '━━━━━━━━━━━━━━━━━━━━\n';
+  out += '【発言メモ（原文）】\n';
+  out += transcript.substring(0, 2000) + (transcript.length > 2000 ? '\n…（以下略）' : '');
+
+  document.getElementById('output').value = out;
+  window.scrollTo({top: document.getElementById('output').getBoundingClientRect().top + window.scrollY - 20, behavior: 'smooth'});
+}
+
+function clearForm() {
+  if (!confirm('入力内容をクリアしますか？')) return;
+  ['title','members','transcript','agenda','output','prompt'].forEach(id => document.getElementById(id).value = '');
+}
+
+function copyOutput() {
+  const t = document.getElementById('output');
+  if (!t.value) { alert('先に下書きを作成してください。'); return; }
+  t.select();
+  document.execCommand('copy');
+  alert('コピーしました。');
+}
+
+function copyPrompt() {
+  const t = document.getElementById('prompt');
+  if (!t.value) { alert('先に依頼文を作成してください。'); return; }
+  t.select();
+  document.execCommand('copy');
+  alert('コピーしました。');
+}
+
+function makePrompt() {
+  const transcript = document.getElementById('transcript').value.trim();
+  if (!transcript) { alert('文字起こしテキストを入力してください。'); return; }
+  const title = document.getElementById('title').value.trim() || '会議';
+  let p = '';
+  p += '以下は「' + title + '」の文字起こしです。次の形式で議事録を作成してください。\n\n';
+  p += '【出力形式】\n';
+  p += '1. 会議の概要（3行以内）\n';
+  p += '2. 議題ごとの要点\n';
+  p += '3. 決定事項（箇条書き）\n';
+  p += '4. 次のアクション（担当者・期日つき箇条書き）\n';
+  p += '5. 保留・要検討事項\n\n';
+  p += '【文字起こし】\n';
+  p += transcript;
+  document.getElementById('prompt').value = p;
+}
+
+function downloadTxt() {
+  const text = document.getElementById('output').value;
+  if (!text) { alert('先に下書きを作成してください。'); return; }
+  const title = document.getElementById('title').value.trim() || 'gijiroku';
+  const date = document.getElementById('date').value || '';
+  const blob = new Blob([text], {type: 'text/plain;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = (date ? date + '_' : '') + title + '.txt';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function saveDraft() {
+  const text = document.getElementById('output').value;
+  if (!text) { alert('先に下書きを作成してください。'); return; }
+  const title = document.getElementById('title').value.trim() || '無題';
+  const date = document.getElementById('date').value || new Date().toISOString().slice(0,10);
+  const list = JSON.parse(localStorage.getItem('gijiroku_list') || '[]');
+  list.unshift({
+    id: Date.now(),
+    title: title,
+    date: date,
+    body: text,
+    transcript: document.getElementById('transcript').value,
+    members: document.getElementById('members').value,
+    agenda: document.getElementById('agenda').value
+  });
+  localStorage.setItem('gijiroku_list', JSON.stringify(list.slice(0, 50)));
+  alert('保存しました。');
+}
+
+function renderSaved() {
+  const list = JSON.parse(localStorage.getItem('gijiroku_list') || '[]');
+  const ul = document.getElementById('savedList');
+  ul.innerHTML = '';
+  if (!list.length) {
+    ul.innerHTML = '<li style="padding:20px; color:#888; text-align:center;">まだ保存された議事録はありません。</li>';
+    return;
+  }
+  list.forEach(item => {
+    const li = document.createElement('li');
+    li.className = 'saved-item';
+    const left = document.createElement('div');
+    left.innerHTML = '<a>' + escapeHtml(item.title) + '</a><br><span style="font-size:12px;color:#888;">' + item.date + '</span>';
+    left.querySelector('a').onclick = () => loadItem(item.id);
+    const right = document.createElement('div');
+    const del = document.createElement('button');
+    del.textContent = '削除';
+    del.className = 'small-btn danger';
+    del.onclick = () => deleteItem(item.id);
+    right.appendChild(del);
+    li.appendChild(left);
+    li.appendChild(right);
+    ul.appendChild(li);
+  });
+}
+
+function loadItem(id) {
+  const list = JSON.parse(localStorage.getItem('gijiroku_list') || '[]');
+  const item = list.find(x => x.id === id);
+  if (!item) return;
+  document.getElementById('title').value = item.title;
+  document.getElementById('date').value = item.date;
+  document.getElementById('members').value = item.members || '';
+  document.getElementById('transcript').value = item.transcript || '';
+  document.getElementById('agenda').value = item.agenda || '';
+  document.getElementById('output').value = item.body;
+  document.querySelector('.tab[data-tab="make"]').click();
+}
+
+function deleteItem(id) {
+  if (!confirm('削除しますか？')) return;
+  let list = JSON.parse(localStorage.getItem('gijiroku_list') || '[]');
+  list = list.filter(x => x.id !== id);
+  localStorage.setItem('gijiroku_list', JSON.stringify(list));
+  renderSaved();
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+</script>
+</body>
+</html>
