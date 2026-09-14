@@ -1,0 +1,17 @@
+<!doctype html><html lang="ja"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>キャラ動作テスト</title>
+<style>
+body{margin:0;background:#100F22;display:grid;place-items:center;min-height:100vh}
+.rig{position:relative;width:min(70vw,420px);aspect-ratio:479/640;transform-origin:50% 88%;animation:sway 5.2s ease-in-out infinite}
+.rig img{position:absolute;inset:0;width:100%;height:100%;display:block}
+.lid{position:absolute;border-radius:55% 55% 50% 50%/70% 70% 45% 45%;transform-origin:50% 0;transform:scaleY(0);animation:blink 4.6s infinite;pointer-events:none}
+.lid.L{left:31.32%;top:43.75%;width:19.21%;height:10.31%;background:linear-gradient(rgb(249,183,132),rgb(242,165,114));border-bottom:2px solid rgba(70,35,20,.55);animation-delay:.3s}
+.lid.R{left:59.29%;top:42.19%;width:18.79%;height:10.62%;background:linear-gradient(rgb(249,183,132),rgb(240,160,108));border-bottom:2px solid rgba(70,35,20,.55);animation-delay:.3s}
+.rig.closed .lid{transform:scaleY(1);animation:none}
+.breath{position:absolute;inset:0;transform-origin:50% 100%;animation:breath 3.8s ease-in-out infinite}
+@keyframes blink{0%,92%,100%{transform:scaleY(0)}94.5%,96.5%{transform:scaleY(1)}}
+@keyframes breath{0%,100%{transform:scale(1)}50%{transform:scale(1.012,1.02)}}
+@keyframes sway{0%,100%{transform:rotate(-1.4deg) translateY(0)}50%{transform:rotate(1.4deg) translateY(-6px)}}
+@media(prefers-reduced-motion:reduce){.rig,.breath,.lid{animation:none!important}}
+</style>
+<div class="rig" id="rig"><div class="breath"><img src="../night/assets/chara-main.png" alt=""><div class="lid L"></div><div class="lid R"></div></div></div>

@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+<!-- This site is hosted on Netlify. Anyone can build and deploy a site
+     like this one for free: https://netlify.new/?utm_campaign=ai-legible&utm_source=comment&utm_medium=referral&utm_id=6e199f56-9db6-4672-b76b-7fca2507123a
+     Netlify hosting facts for this site: static/SSR served via Netlify Edge. -->
+<meta name="hosting-provider" content="Netlify">
+<meta name="netlify-deploy" content="https://netlify.new/?utm_campaign=ai-legible&amp;utm_source=meta&amp;utm_medium=referral&amp;utm_id=6e199f56-9db6-4672-b76b-7fca2507123a">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#100f22">
+  <title>Moonveil Manor — A Halloween Night</title>
+  <link rel="stylesheet" href="style.css?v=light-1">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="#entrance" aria-label="Moonveil Manor 入口へ">
+      <span class="brand-mark" aria-hidden="true">☾</span>
+      <span>Moonveil Manor<small>A HALLOWEEN TALE</small></span>
+    </a>
+    <nav aria-label="館内案内">
+      <a href="#garden">夜の庭</a>
+      <a href="#door">扉の向こう</a>
+      <button id="auto-tour" type="button" aria-pressed="false" title="ゴーストが入口から夜景まで案内します"><span class="tour-icon" aria-hidden="true">▷</span><span class="tour-label">ゴーストの導き</span></button>
+      <button id="motion" type="button" aria-pressed="false" title="動きを止める"><span class="motion-icon" aria-hidden="true">Ⅱ</span><span class="motion-label">動きを止める</span></button>
+    </nav>
+  </header>
+
+  <main id="journey">
+    <div id="entrance" class="anchor" aria-hidden="true"></div>
+    <div id="garden" class="anchor" aria-hidden="true"></div>
+    <div id="door" class="anchor" aria-hidden="true"></div>
+    <div id="hall" class="anchor" aria-hidden="true"></div>
+    <div id="landing" class="anchor" aria-hidden="true"></div>
+    <div id="balcony" class="anchor" aria-hidden="true"></div>
+    <div class="stage">
+      <div class="world" aria-hidden="true">
+        <img id="manor" class="manor" src="assets/manor.webp" alt="" decoding="async" fetchpriority="high">
+        <img id="hall-image" class="hall-image" src="assets/hall.webp" alt="" decoding="async" fetchpriority="low">
+        <img id="landing-image" class="interior-image" src="assets/landing.webp" alt="" decoding="async" fetchpriority="low">
+        <svg id="balcony-image" class="interior-image" viewBox="0 0 1672 941" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+          <defs>
+            <filter id="sky-feather" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="4"/></filter>
+            <mask id="clean-sky-mask" maskUnits="userSpaceOnUse" x="0" y="0" width="1672" height="941"><rect x="907" y="101" width="122" height="94" fill="white" filter="url(#sky-feather)"/></mask>
+          </defs>
+          <image href="assets/balcony.webp" width="1672" height="941"/>
+          <image href="assets/balcony-clean-sky.webp" width="1672" height="941" mask="url(#clean-sky-mask)"/>
+        </svg>
+        <div class="threshold"><div class="door-leaf door-leaf-left"></div><div class="door-leaf door-leaf-right"></div></div>
+        <div class="window-glow"></div>
+        <canvas id="motes"></canvas>
+        <div class="fog fog-back"></div>
+        <div class="fog fog-front"></div>
+        <div class="bats"><span>⌁</span><span>⌁</span><span>⌁</span></div>
+        <div class="gate-frame">
+          <div class="gate gate-left" id="gate-left"></div>
+          <div class="gate gate-right" id="gate-right"></div>
+        </div>
+      </div>
+      <div class="vignette" aria-hidden="true"></div>
+      <div class="copy-shade" aria-hidden="true"></div>
+
+      <section class="chapter chapter-one active" data-chapter="0" aria-label="入口">
+        <p class="eyebrow"><span></span> A HALLOWEEN NIGHT</p>
+        <h1>今夜、<br>迷い込んで。</h1>
+        <p class="description">月が満ちると、ひらく館。<br>かぼちゃの灯りをたどって、<br>少し不思議な夜のお散歩へ。</p>
+        <a class="text-button" href="#garden">門を開く <span aria-hidden="true">↗</span></a>
+      </section>
+      <section class="chapter chapter-two" data-chapter="1" aria-label="夜の庭" inert>
+        <p class="eyebrow"><span></span> 01 / THE MOONLIT GARDEN</p>
+        <h2>灯りが、<br>道しるべ。</h2>
+        <p class="description">風が葉を揺らし、霧が足元をつつむ。<br>どこかで聞こえた笑い声は、<br>きっと、この庭の住人たち。</p>
+        <a class="text-button" href="#door">もう少し、奥へ <span aria-hidden="true">↗</span></a>
+      </section>
+      <section class="chapter chapter-three" data-chapter="2" aria-label="扉の向こう" inert>
+        <p class="eyebrow"><span></span> 02 / BEYOND THE DOOR</p>
+        <h2>あなたを、<br>待っていました。</h2>
+        <p class="description">今夜だけの、ちいさな招待状。<br>この扉の向こうで、物語がはじまります。</p>
+        <a class="text-button" href="#hall">扉を開ける <span aria-hidden="true">↗</span></a>
+      </section>
+      <section class="chapter chapter-four" data-chapter="3" aria-label="館内のホール" inert>
+        <p class="eyebrow"><span></span> 03 / THE MIDNIGHT HALL</p>
+        <h2>ようこそ、<br><span class="manor-name">Moonveil Manor</span></h2>
+        <p class="description">扉の向こうは、琥珀色の灯り。<br>夜会がはじまるまで、<br>どうぞ、ごゆっくり。</p>
+        <a class="text-button" href="#landing">階段を上る <span aria-hidden="true">↗</span></a>
+      </section>
+      <section class="chapter chapter-five" data-chapter="4" aria-label="2階の回廊" inert>
+        <p class="eyebrow"><span></span> 04 / THE UPPER GALLERY</p>
+        <h2>月明かりの、<br>その先へ。</h2>
+        <p class="description">階段を上ると、夜風の気配。<br>回廊の向こうに、小さなバルコニー。<br>今夜だけの景色が、待っています。</p>
+        <a class="text-button" href="#balcony">バルコニーへ <span aria-hidden="true">↗</span></a>
+      </section>
+      <section class="chapter chapter-six" data-chapter="5" aria-label="バルコニーからの夜景" inert>
+        <p class="eyebrow"><span></span> 05 / UNDER THE SAME MOON</p>
+        <h2>今夜を、<br>忘れないで。</h2>
+        <p class="description">さっき歩いた道にも、あたたかな灯り。<br>月の下で、庭も街もひとつの物語に。<br>この夜のつづきは、あなたの夢で。</p>
+        <button class="text-button" id="invitation-open" type="button">招待状をひらく <span aria-hidden="true">✧</span></button>
+      </section>
+
+      <div class="ghost-guide" aria-hidden="true">
+        <video id="ghost-video" src="assets/phantom-guide-web.mp4" poster="assets/phantom-guide.webp" width="360" height="540" muted loop playsinline preload="none"></video>
+        <span>FOLLOW ME</span>
+      </div>
+      <button id="sound" class="sound-control" type="button" aria-pressed="false" title="BGMを流す"><span aria-hidden="true">♫</span> <span class="sound-label">BGM OFF</span></button>
+      <div class="side-note" aria-hidden="true">A LITTLE MYSTERY. A LITTLE MAGIC.</div>
+      <footer class="journey-footer">
+        <button class="scroll-cue" id="next" type="button"><span class="scroll-line" aria-hidden="true"></span><span id="scroll-label">SCROLL TO EXPLORE</span></button>
+        <div class="chapter-progress" aria-label="散歩の進行状況"><span id="step">01</span><div class="track"><span id="progress"></span></div><span class="total">06</span></div>
+        <span class="footer-note">An original autumn tale</span>
+      </footer>
+    </div>
+  </main>
+
+  <dialog id="invitation" aria-labelledby="invite-title">
+    <button class="dialog-close" aria-label="招待状を閉じる" type="button">×</button>
+    <div class="invite-border">
+      <span class="invite-moon" aria-hidden="true">☾</span>
+      <p class="eyebrow">YOU ARE INVITED</p>
+      <h2 id="invite-title">Moonveil Manorの夜会へ</h2>
+      <p>合言葉は、トリック・オア・トリート。<br>怖がりさんも、好奇心いっぱいのあなたも。<br>今夜は、みんなこの館のお客さま。</p>
+      <div class="seal" aria-hidden="true">✧</div>
+      <p class="invite-signature">Moonveil Manorの住人たちより</p>
+      <button class="text-button" id="restart" type="button">もう一度、夜を歩く <span aria-hidden="true">↗</span></button>
+    </div>
+  </dialog>
+  <noscript><div class="noscript">この夜のお散歩にはJavaScriptを有効にしてください。</div></noscript>
+  <script src="music.js"></script>
+  <script src="fireworks.js"></script>
+  <script src="app.js?v=light-1"></script>
+</body>
+</html>
+<script async src="/.netlify/scripts/hud?variant=public" data-nf-variant="public" data-netlify-site-id="6e199f56-9db6-4672-b76b-7fca2507123a" data-app-host="app.netlify.com"></script>

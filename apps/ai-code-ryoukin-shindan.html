@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="コード補助AI。使い方を答えるだけで最適プランと月額の目安が出る">
+<title>コード補助AI 料金プラン診断</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, "Hiragino Sans", "Yu Gothic", sans-serif;
+  background: #f5f7fa;
+  color: #2c3e50;
+  line-height: 1.7;
+  padding: 16px;
+}
+.container {
+  max-width: 720px;
+  margin: 0 auto;
+  background: #fff;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+h1 {
+  font-size: 22px;
+  margin-bottom: 8px;
+  color: #1a365d;
+}
+.lead {
+  font-size: 14px;
+  color: #555;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid #eef2f7;
+}
+.step {
+  margin-bottom: 20px;
+  padding: 16px;
+  background: #f9fbfd;
+  border-radius: 8px;
+  border-left: 4px solid #4a90e2;
+}
+.step-title {
+  font-weight: bold;
+  font-size: 15px;
+  margin-bottom: 12px;
+  color: #1a365d;
+}
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.options label {
+  display: flex;
+  align-items: flex-start;
+  padding: 10px 12px;
+  background: #fff;
+  border: 2px solid #e1e8ed;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-size: 14px;
+}
+.options label:hover {
+  border-color: #4a90e2;
+  background: #f0f7ff;
+}
+.options input[type="radio"] {
+  margin-right: 10px;
+  margin-top: 3px;
+  flex-shrink: 0;
+}
+.options input[type="radio"]:checked + span {
+  font-weight: bold;
+}
+.options label:has(input:checked) {
+  border-color: #4a90e2;
+  background: #eaf3ff;
+}
+button {
+  width: 100%;
+  padding: 14px;
+  background: #4a90e2;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 8px;
+}
+button:hover { background: #3a7bc8; }
+button.secondary {
+  background: #95a5a6;
+  margin-top: 12px;
+}
+button.secondary:hover { background: #7f8c8d; }
+.result {
+  margin-top: 24px;
+  padding: 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
+  border-radius: 12px;
+  display: none;
+}
+.result.show { display: block; }
+.result-plan {
+  font-size: 26px;
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+.result-price {
+  font-size: 20px;
+  margin-bottom: 16px;
+  opacity: 0.95;
+}
+.result-reason {
+  background: rgba(255,255,255,0.15);
+  padding: 12px 14px;
+  border-radius: 8px;
+  font-size: 14px;
+  margin-bottom: 12px;
+}
+.result-tips {
+  background: rgba(255,255,255,0.15);
+  padding: 12px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+}
+.result-tips ul { padding-left: 20px; margin-top: 6px; }
+.compare-table {
+  margin-top: 24px;
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.compare-table th, .compare-table td {
+  padding: 10px 8px;
+  border: 1px solid #e1e8ed;
+  text-align: left;
+}
+.compare-table th {
+  background: #1a365d;
+  color: #fff;
+}
+.compare-table tr:nth-child(even) { background: #f9fbfd; }
+.compare-title {
+  font-size: 16px;
+  font-weight: bold;
+  margin-top: 24px;
+  margin-bottom: 8px;
+  color: #1a365d;
+}
+.note {
+  font-size: 12px;
+  color: #777;
+  margin-top: 12px;
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>💡 コード補助AI 料金プラン診断</h1>
+  <p class="lead">3つの質問に答えるだけで、あなたに合ったプランと月額の目安がわかります。IT初心者でもOK。</p>
+
+  <div id="quiz">
+    <div class="step">
+      <div class="step-title">Q1. どのくらいの頻度で使いますか？</div>
+      <div class="options" data-q="freq">
+        <label><input type="radio" name="freq" value="try"><span>まず試してみたい／月に数回さわる程度</span></label>
+        <label><input type="radio" name="freq" value="weekly"><span>週に何度か使いたい（副業や趣味で）</span></label>
+        <label><input type="radio" name="freq" value="daily"><span>ほぼ毎日、仕事でがっつり使いたい</span></label>
+        <label><input type="radio" name="freq" value="heavy"><span>1日中つけっぱなしで作業を任せたい</span></label>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-title">Q2. 主な使い道はどれに近いですか？</div>
+      <div class="options" data-q="use">
+        <label><input type="radio" name="use" value="learn"><span>勉強・お試し・簡単なチャット</span></label>
+        <label><input type="radio" name="use" value="tool"><span>ちょっとしたツールや自動化を作りたい</span></label>
+        <label><input type="radio" name="use" value="work"><span>仕事のコードを書く・直す・レビュー</span></label>
+        <label><input type="radio" name="use" value="integrate"><span>自社のシステムに組み込みたい</span></label>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-title">Q3. 料金のイメージは？</div>
+      <div class="options" data-q="budget">
+        <label><input type="radio" name="budget" value="free"><span>できれば無料で済ませたい</span></label>
+        <label><input type="radio" name="budget" value="low"><span>月3,000円くらいまでなら払える</span></label>
+        <label><input type="radio" name="budget" value="mid"><span>月1〜3万円は投資できる</span></label>
+        <label><input type="radio" name="budget" value="usage"><span>使った分だけ払う方式が合っている</span></label>
+      </div>
+    </div>
+
+    <button onclick="diagnose()">診断する</button>
+  </div>
+
+  <div id="result" class="result">
+    <div class="result-plan" id="planName"></div>
+    <div class="result-price" id="planPrice"></div>
+    <div class="result-reason" id="planReason"></div>
+    <div class="result-tips" id="planTips"></div>
+    <button class="secondary" onclick="reset()">もう一度診断する</button>
+  </div>
+
+  <div class="compare-title">📊 プラン比較（月額の目安）</div>
+  <table class="compare-table">
+    <thead>
+      <tr><th>プラン</th><th>月額目安</th><th>向いている人</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>無料プラン</td><td>0円</td><td>お試し・軽い相談</td></tr>
+      <tr><td>個人向け有料</td><td>約3,000円</td><td>週数回〜毎日少し</td></tr>
+      <tr><td>上位個人プラン</td><td>約1.5〜3万円</td><td>仕事で毎日ヘビーに</td></tr>
+      <tr><td>API従量課金</td><td>使った分だけ</td><td>システム組み込み・不定期</td></tr>
+    </tbody>
+  </table>
+  <p class="note">※ 料金は目安です。契約時に公式サイトで最新情報をご確認ください。</p>
+</div>
+
+<script>
+const plans = {
+  free: {
+    name: "無料プラン",
+    price: "月額 0円",
+    reason: "まずは費用ゼロで感触を確かめるのがおすすめです。制限はありますが、基本的な会話や質問には十分使えます。",
+    tips: ["物足りなくなったら有料プランを検討","日をまたぐと制限がリセットされることが多い","長文や重い作業は上位プランが快適"]
+  },
+  personal: {
+    name: "個人向け有料プラン",
+    price: "月額 約3,000円（年契約でやや安く）",
+    reason: "週に数回〜毎日少し使うライトユーザーに一番コスパが良いプランです。無料版より制限が大幅に緩和されます。",
+    tips: ["1ヶ月使ってみて足りなければ上位へ","副業や勉強用途ならこれで十分","家族や仕事で共有はできない点に注意"]
+  },
+  pro: {
+    name: "上位個人プラン",
+    price: "月額 約1.5〜3万円（利用量で複数段階あり）",
+    reason: "仕事で毎日ガッツリ使う人向け。使える量が大幅に増え、長時間の作業を任せられます。",
+    tips: ["最初は下位グレードから試すのが安全","チームで使うなら人数分の契約が必要","使い切れないと割高になるので使用量を見直す"]
+  },
+  api: {
+    name: "API 従量課金",
+    price: "使った文字数に応じて課金（数百円〜数万円）",
+    reason: "自分でシステムに組み込みたい、または使う日と使わない日の差が大きい人に向いています。",
+    tips: ["最初に少額の上限を設定して事故防止","毎日たくさん使うなら定額プランの方が安くなることが多い","導入にはやや技術的な設定が必要"]
+  }
+};
+
+function getVal(name) {
+  const el = document.querySelector(`input[name="${name}"]:checked`);
+  return el ? el.value : null;
+}
+
+function diagnose() {
+  const freq = getVal('freq');
+  const use = getVal('use');
+  const budget = getVal('budget');
+  
+  if (!freq || !use || !budget) {
+    alert('すべての質問に答えてください');
+    return;
+  }
+
+  let planKey = 'personal';
+
+  if (use === 'integrate' || budget === 'usage') {
+    planKey = 'api';
+  } else if (budget === 'free' && freq === 'try') {
+    planKey = 'free';
+  } else if (freq === 'heavy' || (freq === 'daily' && use === 'work' && budget === 'mid')) {
+    planKey = 'pro';
+  } else if (freq === 'try' && use === 'learn') {
+    planKey = 'free';
+  } else if (budget === 'mid' && (freq === 'daily' || freq === 'heavy')) {
+    planKey = 'pro';
+  } else {
+    planKey = 'personal';
+  }
+
+  const p = plans[planKey];
+  document.getElementById('planName').textContent = '👉 ' + p.name;
+  document.getElementById('planPrice').textContent = p.price;
+  document.getElementById('planReason').textContent = p.reason;
+  document.getElementById('planTips').innerHTML = '<b>💡 ワンポイント</b><ul>' + p.tips.map(t => `<li>${t}</li>`).join('') + '</ul>';
+
+  document.getElementById('quiz').style.display = 'none';
+  document.getElementById('result').classList.add('show');
+  
+  localStorage.setItem('lastDiag', JSON.stringify({freq, use, budget, planKey, date: new Date().toISOString()}));
+  window.scrollTo({top: document.getElementById('result').offsetTop - 20, behavior: 'smooth'});
+}
+
+function reset() {
+  document.querySelectorAll('input[type="radio"]').forEach(r => r.checked = false);
+  document.getElementById('quiz').style.display = 'block';
+  document.getElementById('result').classList.remove('show');
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+
+window.addEventListener('load', () => {
+  const saved = localStorage.getItem('lastDiag');
+  if (saved) {
+    try {
+      const d = JSON.parse(saved);
+      const set = (n, v) => { const el = document.querySelector(`input[name="${n}"][value="${v}"]`); if (el) el.checked = true; };
+      set('freq', d.freq); set('use', d.use); set('budget', d.budget);
+    } catch(e){}
+  }
+});
+</script>
+</body>
+</html>

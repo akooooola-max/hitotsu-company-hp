@@ -1,0 +1,355 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#100F22">
+<meta name="description" content="鹿児島のAIコンサルタント「ひとつ」。夜の相談室をめぐり、10秒診断、無料の道具箱、メニューと料金へ。夜9時からZoomで相談できます。">
+<title>夜のAI相談室｜AIコンサルタント ひとつ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{color-scheme:dark;--night:#100F22;--gold:#DFB47B;--cream:#F8EAD3;--line:rgba(223,180,123,.3);--font:"Shippori Mincho","Yu Mincho","Hiragino Mincho ProN",serif}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden}body{background:var(--night);color:var(--cream);font:400 15px/1.9 var(--font);-webkit-text-size-adjust:100%;-webkit-font-smoothing:antialiased}button,a{-webkit-tap-highlight-color:transparent}button{font:inherit;cursor:pointer}a{color:inherit;text-underline-offset:5px}a:focus-visible,button:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--gold);outline-offset:5px}button:disabled{cursor:default}button{color:inherit}button,a{touch-action:manipulation}button:focus:not(:focus-visible){outline:none}p,h1,h2,h3{margin:0}h1,h2,h3{font-weight:500}button{border-radius:0}::selection{background:var(--gold);color:var(--night)}[hidden]{display:none!important}
+.skip{position:fixed;top:8px;left:8px;z-index:100;background:var(--cream);color:var(--night);padding:8px 16px;transform:translateY(-150%)}.skip:focus{transform:translateY(0)}
+.site-header{position:fixed;z-index:20;inset:0 0 auto;display:flex;align-items:center;justify-content:space-between;padding:24px 4vw;background:linear-gradient(var(--night),transparent);pointer-events:none}.site-header>*{pointer-events:auto}.brand{text-decoration:none;display:flex;align-items:center;gap:13px}.brand-mark{font-size:29px;color:var(--gold);font-weight:400}.brand small{display:block;font:9px/1.7 Georgia,serif;letter-spacing:.23em;color:var(--gold)}.brand strong{display:block;font-size:13px;font-weight:400;letter-spacing:.1em}.controls{display:flex;gap:10px}.control{border:1px solid var(--line);background:rgba(16,15,34,.8);padding:9px 14px;min-height:44px;font-size:12px;letter-spacing:.05em}.control:hover,.control[aria-pressed=true]{border-color:var(--gold);color:var(--gold)}.control-dot{display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--gold);margin-right:8px}
+.tour{height:100vh;height:100dvh;overflow-y:auto;overflow-x:hidden;scroll-snap-type:y mandatory;scrollbar-width:none;overscroll-behavior-y:none;position:relative}.tour::-webkit-scrollbar{display:none}.scene{height:100vh;height:100dvh;position:relative;overflow:hidden;scroll-snap-align:start;scroll-snap-stop:always;isolation:isolate;background:radial-gradient(ellipse at 74% 40%,var(--glow),transparent 65%),linear-gradient(145deg,var(--sky),var(--night) 85%)}
+.s01{--sky:#242341;--glow:#3b334d}.s02{--sky:#152930;--glow:#394236}.s03{--sky:#262033;--glow:#4a3332}.s04{--sky:#25202c;--glow:#46342b}.s05{--sky:#1e1f30;--glow:#4b3b38}.s06{--sky:#2d2330;--glow:#61412a}
+.scene-art{position:absolute;inset:0;z-index:-2;pointer-events:none;overflow:hidden}.scene-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.85}.shade{position:absolute;inset:0;background:linear-gradient(90deg,rgba(16,15,34,.85),rgba(16,15,34,.2)),linear-gradient(0deg,rgba(16,15,34,.8),transparent 60%,rgba(16,15,34,.25))}.scene.right .shade{background:linear-gradient(270deg,rgba(16,15,34,.84),rgba(16,15,34,.18)),linear-gradient(0deg,rgba(16,15,34,.8),transparent 65%)}
+.stars{position:absolute;inset:0;background-image:radial-gradient(circle at 13% 18%,#f8ead3 0 1px,transparent 1.6px),radial-gradient(circle at 61% 12%,#dfb47b 0 1px,transparent 1.6px),radial-gradient(circle at 39% 38%,#dfb47b 0 .8px,transparent 1.5px),radial-gradient(circle at 87% 30%,#f8ead3 0 1px,transparent 1.8px),radial-gradient(circle at 76% 58%,#dfb47b 0 1px,transparent 1.5px),radial-gradient(circle at 28% 65%,#dfb47b 0 1px,transparent 1.6px);background-size:530px 430px;animation:flicker 7s ease-in-out infinite alternate;opacity:.6}.stars.second{transform:rotate(180deg);animation-delay:-4s;opacity:.25}
+.moon{position:absolute;right:22%;top:15%;width:94px;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle at 40% 35%,#fff5df,#dfb47b);box-shadow:0 0 70px 20px #dfb47b18;opacity:.85}.moon:after{content:"";position:absolute;inset:-25px;border:1px solid #dfb47b18;border-radius:50%}
+.arch{position:absolute;right:10%;bottom:-11%;width:37%;height:86%;border:1px solid #dfb47b35;border-radius:48% 48% 0 0;box-shadow:inset 0 0 70px #dfb47b06,0 0 0 17px #dfb47b03,0 0 0 18px #dfb47b13}.arch:before{content:"";position:absolute;inset:25px 30px -10px;border:1px solid #dfb47b20;border-radius:48% 48% 0 0;background:linear-gradient(90deg,transparent 49.8%,#dfb47b25 50%,transparent 50.2%)}.arch:after{content:"";position:absolute;width:160%;height:120px;left:-30%;bottom:14%;border-top:1px solid #dfb47b27;transform:perspective(150px) rotateX(55deg);background:repeating-linear-gradient(0deg,transparent 0 25px,#dfb47b12 26px 27px)}.right .arch{right:auto;left:8%}.s02 .arch{height:42%;width:65%;left:-16%;border-radius:50%;transform:rotate(-18deg)}.s03 .arch{width:28%;right:16%;height:77%}.s04 .arch{width:70%;right:15%;height:100%;opacity:.5}.s05 .arch{height:66%;width:43%;border-radius:0;transform:skewY(-17deg)}.s05 .arch:before{border-radius:0;background:repeating-linear-gradient(0deg,transparent 0 47px,#dfb47b30 48px 49px)}.s06 .arch{border-radius:50% 50% 0 0;width:70%;left:-15%;height:110%;opacity:.6}.s06 .arch:after{height:160px;bottom:17%;transform:none;background:repeating-linear-gradient(90deg,transparent 0 55px,#dfb47b27 56px 58px);border-bottom:1px solid #dfb47b27}
+.orbs{position:absolute;inset:0}.orb{position:absolute;left:71%;top:43%;width:115px;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,#ffe2a3bb 0 2%,#dfad6455 5%,#dfb47b12 24%,transparent 68%);animation:drift 13s ease-in-out infinite alternate}.orb:nth-child(2){left:84%;top:70%;width:70px;animation-delay:-6s;animation-duration:17s}.orb:nth-child(3){left:16%;top:68%;width:88px;animation-delay:-10s;animation-duration:19s}.mist{position:absolute;bottom:-16%;left:-25%;width:150%;height:48%;background:radial-gradient(ellipse at 30% 60%,#f8ead319,transparent 55%),radial-gradient(ellipse at 70% 80%,#e6dbe822,transparent 60%);animation:mist 24s ease-in-out infinite alternate;will-change:transform}.mist.second{bottom:-22%;animation-delay:-12s;animation-duration:31s;opacity:.5}
+.scene-scroll{position:absolute;inset:100px 0 88px;overflow-y:auto;overflow-x:hidden;padding:26px 270px 36px 8vw;scrollbar-width:thin;scrollbar-color:var(--line) transparent;scroll-padding:24px}.content{width:100%;max-width:1030px;min-height:100%;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;margin-right:auto}.right .content{max-width:670px;margin-left:auto;margin-right:0}.eyebrow{font:400 11px/1.8 Georgia,serif;letter-spacing:.26em;color:var(--gold);margin-bottom:24px}.eyebrow .chapter{display:inline-block;margin-right:16px;padding-right:16px;border-right:1px solid var(--line)}.scene-title{font-size:clamp(29px,3.45vw,52px);line-height:1.7;letter-spacing:.07em;margin:0 0 23px;font-feature-settings:"palt"}.scene-title span{display:block;white-space:nowrap}.scene-title span+span{padding-left:.8em}.s01 .scene-title{font-size:clamp(30px,3.5vw,54px)}.lead{font-size:15px;line-height:2.2;letter-spacing:.06em;color:#e7dbc9}.lead span{display:block}.next{display:inline-flex;align-items:center;gap:30px;min-height:48px;margin-top:28px;text-decoration:none;font-size:13px;color:var(--gold);letter-spacing:.1em}.arrow{display:inline-block;width:70px;height:1px;background:var(--gold);position:relative;transition:transform .3s}.arrow:after{content:"";position:absolute;right:0;bottom:0;width:9px;height:1px;background:var(--gold);transform:rotate(35deg);transform-origin:right}.next:hover .arrow{transform:translateX(8px)}.room-note{color:var(--gold);font-size:11px;letter-spacing:.14em;margin:0 0 20px}.intro-sign{border-left:1px solid var(--line);padding-left:18px;margin-top:25px;font-size:11px;letter-spacing:.09em;color:#c7b9aa}
+.btn,.paybtn{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:48px;padding:14px 20px;border:1px solid var(--line);background:#161322a8;color:var(--cream);text-decoration:none;font-size:14px;line-height:1.7;transition:transform .25s;max-width:100%}.btn:hover,.paybtn:hover{border-color:var(--gold);transform:translateY(-2px)}.btn-gold{background:var(--gold);border-color:var(--gold);color:var(--night)}.tool-links{display:grid;gap:13px;width:min(100%,470px);margin-top:26px}.tool-links .btn small{font:10px Georgia,serif;letter-spacing:.15em}.tool-hint{font-size:12px;margin:14px 0 0;color:#d8c7b0;line-height:1.9}.text-link{color:var(--gold);min-height:44px;display:inline-flex;align-items:center;font-size:12px}
+.quiz{border:1px solid var(--line);padding:23px 26px;background:#100f22b8;width:min(100%,540px);margin-top:20px}.quiz-label{font:11px/1.5 Georgia,serif;letter-spacing:.18em;color:var(--gold);margin-bottom:16px}.quiz .q{font-size:15px;line-height:1.9;margin:0 0 17px}.chips{display:grid;gap:9px}.chip{border:1px solid var(--line);background:#dfb47b06;text-align:left;padding:11px 15px;min-height:46px;font-size:14px;line-height:1.65}.chip:before{content:"◇";color:var(--gold);margin-right:12px}.chip:hover{background:#dfb47b12;border-color:var(--gold)}.quiz .res{display:none}.quiz .big{font-size:20px;margin:16px 0;line-height:1.8}.quiz .big b{font-weight:500;color:var(--gold)}.tiny{font-size:13px}.again{display:block;min-height:44px;border:0;background:none;color:var(--gold);text-decoration:underline;text-underline-offset:5px;font-size:13px;margin-top:14px}.s02 .scene-title{margin-bottom:10px}
+.dense .content{justify-content:flex-start}.dense .scene-title{font-size:clamp(29px,3vw,43px);margin-bottom:18px}.dense .eyebrow{margin-bottom:12px}.dense .lead{font-size:13px}.menu{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:24px;width:100%}.mi{position:relative;border:1px solid var(--line);background:#100f22c2;padding:25px 23px;display:flex;flex-direction:column;scroll-margin:25px;min-width:0}.mi h3{font-size:20px;line-height:1.6;letter-spacing:.04em}.price{font-size:34px;color:var(--gold);font-variant-numeric:tabular-nums;line-height:1.5;margin-top:7px;letter-spacing:.03em}.price small{font-size:14px;margin-left:6px}.mi p{font-size:13px;line-height:2;margin:15px 0 0}.mi .availability{font-size:12px;color:#dccbb7}.morelink{color:var(--gold);font-size:12px;min-height:44px;padding:11px 0;line-height:1.9;margin-top:10px}.paybtn{display:none;font-size:12px;padding:12px 10px;margin-top:auto;justify-content:center}.paybtn.on{display:flex}.mi .morelink:last-of-type{margin-bottom:12px}.mi .availability+.paybtn{margin-top:18px}.tag{font-size:11px;color:var(--gold);margin-bottom:10px;letter-spacing:.08em}.hot{border-color:#dfb47b85}.pay-note{font-size:12px;line-height:2.1;border-left:1px solid var(--line);padding-left:17px;margin-top:24px;max-width:660px}.mi.flash{outline:2px solid var(--gold);outline-offset:3px}.nb{display:inline}.exlist{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 25px;width:100%;margin-top:23px}.exi{border-top:1px solid var(--line);padding:19px 0;font-size:13px;line-height:1.9}.exi b{display:block;font-size:17px;font-weight:500;color:var(--gold);margin-bottom:7px}.steps-label{font-size:18px;margin:26px 0 15px}.steps{width:100%;counter-reset:step;display:grid;gap:13px}.step{position:relative;padding:0 0 15px 47px;border-bottom:1px solid var(--line)}.step:before{counter-increment:step;content:"0" counter(step);position:absolute;left:0;top:0;color:var(--gold);font:21px/1.5 Georgia,serif}.step b{font-size:16px;font-weight:500;display:block;margin-bottom:5px}.step p{font-size:13px;line-height:1.9}.safe{display:flex;gap:12px;font-size:12px;line-height:2;margin-top:20px;border:1px solid var(--line);padding:18px}.safe>span{color:var(--gold)}
+.booking{width:100%;margin-top:25px}.booking-links{display:grid;grid-template-columns:1.6fr 1fr;gap:12px;align-items:stretch}.booking .reserve{min-height:78px;font-size:17px;padding:18px 22px}.booking .reserve small{display:block;font-size:10px;letter-spacing:.13em;margin-bottom:4px}.booking .line-btn{font-size:13px;justify-content:center}.availability{font-size:13px;line-height:2;margin-top:18px}.contact-copy{font-size:12px;color:#d8c7b0;margin-top:15px}footer{width:100%;margin-top:30px;border-top:1px solid var(--line);padding-top:14px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;font-size:10px;color:#cdbda8}footer a{min-height:44px;display:inline-flex;align-items:center}
+.edge-copy{position:fixed;right:24px;top:35%;writing-mode:vertical-rl;font:10px/1 Georgia,serif;letter-spacing:.27em;color:#dfb47b9c;z-index:10;pointer-events:none}.bottom-bar{position:fixed;z-index:20;bottom:0;inset-inline:0;height:82px;padding-bottom:env(safe-area-inset-bottom);background:linear-gradient(transparent,#100f22e6 55%);display:flex;justify-content:center;align-items:center;pointer-events:none}.progress{display:flex;gap:14px;align-items:center;font:13px/1 Georgia,serif;letter-spacing:.1em}.current{color:var(--gold);text-shadow:0 0 15px #dfb47b80}.total{color:#b8a692}.progress-track{width:105px;height:1px;background:var(--line);position:relative}.progress-fill{position:absolute;inset:0;background:var(--gold);transform:scaleX(var(--progress,.16667));transform-origin:left;transition:transform .6s}.scroll-hint{position:absolute;left:4vw;display:flex;gap:14px;align-items:center;font:9px Georgia,serif;letter-spacing:.16em;color:#cfb698}.scroll-hint:before{content:"";height:24px;width:1px;background:var(--gold);animation:scroll-hint 2.4s ease-in-out infinite}.scene-nav{position:fixed;right:35px;top:145px;z-index:12;display:grid;gap:1px}.scene-nav a{display:grid;place-items:center;width:30px;height:27px;text-decoration:none}.scene-nav a:before{content:"";width:4px;height:4px;background:#dfb47b60;border-radius:50%}.scene-nav a[aria-current=true]:before{background:var(--gold);box-shadow:0 0 10px var(--gold)}
+.guide{position:fixed;right:59px;bottom:69px;z-index:15;width:145px;pointer-events:none}.guide-halo{position:absolute;inset:0 -60% -5%;border-radius:50%;background:radial-gradient(ellipse,#dfb47b2b,transparent 66%);animation:flicker 6s ease-in-out infinite alternate}.guide-float{position:relative;animation:guide-float 5.5s ease-in-out infinite}.guide-jump{position:relative}.guide picture{display:block}.guide img{display:block;width:100%;height:auto;filter:drop-shadow(0 12px 18px #0006)}.speech{position:absolute;right:0;bottom:calc(100% + 10px);width:190px;padding:12px 15px;border:1px solid #dfb47b73;background:#100f22ef;font-size:12px;line-height:1.8;letter-spacing:.05em}.speech:after{content:"";position:absolute;right:44px;bottom:-5px;width:8px;height:8px;border-right:1px solid #dfb47b73;border-bottom:1px solid #dfb47b73;background:var(--night);transform:rotate(45deg)}.guide-star{position:absolute;color:var(--gold);font-size:19px;left:-15px;top:38%;animation:flicker 3s ease-in-out infinite alternate}.guide-star.two{left:auto;right:-13px;top:68%;font-size:12px;animation-delay:-2s}.guide-jump.hop{animation:guide-hop .65s ease-in-out}
+@keyframes mist{from{transform:translateX(-6%) translateY(2%)}to{transform:translateX(7%) translateY(-5%)}}@keyframes drift{from{transform:translate3d(-10px,12px,0);opacity:.45}to{transform:translate3d(17px,-24px,0);opacity:.95}}@keyframes flicker{0%,100%{opacity:.35}45%{opacity:.8}65%{opacity:.55}}@keyframes guide-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}@keyframes guide-hop{0%,100%{transform:translateY(0) rotate(0)}45%{transform:translateY(-12px) rotate(-3deg)}}@keyframes scroll-hint{0%,100%{transform:translateY(-4px);opacity:.3}50%{transform:translateY(4px);opacity:1}}
+/* 非表示の場面はGPU上でも休ませる。全アニメーションはtransform/opacityだけ。 */
+.scene:not(.is-active) *,body.motion-paused *,body.motion-paused *:before,body.motion-paused *:after{animation-play-state:paused!important}.scene:not(.is-active) .mist,body.motion-paused .mist{will-change:auto}body.motion-paused *{transition:none!important}
+@media(min-width:1450px){.menu{grid-template-columns:repeat(3,minmax(0,1fr))}.scene-scroll{padding-right:300px;padding-left:10vw}.right .content{margin-right:3vw}}
+@media(max-width:1000px){.scene-scroll{padding-left:6vw;padding-right:225px}.scene-title,.s01 .scene-title{font-size:34px;letter-spacing:.025em}.guide{right:40px;width:125px}.speech{width:175px}.booking-links{grid-template-columns:1fr}.booking .reserve{min-height:72px}.menu{grid-template-columns:1fr}.edge-copy{right:15px}.scene-nav{right:17px}}
+@media(max-width:700px){.site-header{padding:14px 19px;align-items:center}.brand{gap:8px}.brand-mark{font-size:24px}.brand small{font-size:7px;letter-spacing:.13em}.brand strong{font-size:10px;letter-spacing:.02em}.controls{gap:5px}.control{padding:7px 8px;font-size:10px;min-height:40px}.control-dot{width:4px;height:4px;margin-right:5px}.scene-scroll{inset:79px 0 calc(203px + env(safe-area-inset-bottom));padding:12px 26px 24px 23px}.content,.right .content{max-width:none;min-height:100%;margin:0}.eyebrow{font-size:9px;letter-spacing:.17em;margin-bottom:20px}.eyebrow .chapter{margin-right:10px;padding-right:10px}.scene-title,.s01 .scene-title,.dense .scene-title{font-size:clamp(22px,6.45vw,39px);line-height:1.8;letter-spacing:.02em;margin-bottom:19px}.scene-title span+span{padding-left:.35em}.lead{font-size:13px;line-height:2.2;letter-spacing:.015em}.next{font-size:12px;gap:24px;margin-top:24px;min-height:46px}.arrow{width:53px}.intro-sign{font-size:10px;margin-top:21px;padding-left:13px}.room-note{font-size:10px;margin-bottom:13px}.quiz{margin-top:17px;padding:18px 16px}.quiz .q{font-size:13px;margin-bottom:12px}.chip{font-size:13px;padding:10px 12px;min-height:44px}.chips{gap:8px}.quiz .big{font-size:18px}.quiz-label{font-size:10px;margin-bottom:12px}.s02 .content{justify-content:flex-start}.tool-links{margin-top:20px;gap:11px}.btn{font-size:13px;padding:13px 15px}.tool-hint{font-size:11px}.menu{grid-template-columns:1fr;gap:16px;margin-top:20px}.mi{padding:23px 20px}.mi h3{font-size:20px}.mi p{font-size:14px}.mi .availability{font-size:12px}.morelink,.paybtn{font-size:12px}.pay-note{font-size:12px}.exlist{grid-template-columns:1fr;margin-top:17px}.exi{padding:17px 0;font-size:13px}.exi b{font-size:17px}.step p{font-size:13px}.safe{padding:15px;font-size:12px}.booking{margin-top:20px}.booking-links{grid-template-columns:1fr;gap:10px}.booking .reserve{min-height:81px;font-size:16px}.booking .line-btn{min-height:49px}.availability{font-size:12px;line-height:2}.s06 .content{justify-content:flex-start}.contact-copy{font-size:11px}footer{margin-top:23px;gap:0 16px}.guide{width:78px;right:33px;bottom:calc(61px + env(safe-area-inset-bottom))}.speech{width:112px;right:-7px;padding:8px 9px;font-size:10px;line-height:1.6;bottom:calc(100% + 6px)}.speech:after{right:37px}.guide-star{font-size:13px;left:-12px}.guide-star.two{right:-12px;font-size:10px}.guide-halo{inset:-25% -60% -5%}.guide img{filter:drop-shadow(0 8px 13px #0006)}.bottom-bar{height:calc(57px + env(safe-area-inset-bottom))}.scroll-hint{font-size:7px;left:22px;letter-spacing:.1em;gap:8px}.scroll-hint:before{height:17px}.progress{font-size:11px;gap:10px}.progress-track{width:61px}.edge-copy{right:10px;top:auto;bottom:calc(235px + env(safe-area-inset-bottom));font-size:8px;letter-spacing:.2em}.scene-nav{top:auto;right:auto;left:23px;bottom:calc(92px + env(safe-area-inset-bottom));display:flex;gap:5px}.scene-nav a{width:25px;height:32px}.moon{width:68px;right:15%;top:19%}.arch{width:75%;right:-22%;height:74%;opacity:.65}.right .arch{left:-30%;width:85%}.s03 .arch{right:-15%;width:65%}.s04 .arch{width:110%;right:-20%}.s05 .arch{width:90%;right:-40%}.s06 .arch{width:150%;left:-70%}.orb{left:66%;width:90px}.shade,.scene.right .shade{background:linear-gradient(0deg,#100f2299,transparent 70%),linear-gradient(90deg,#100f2277,#100f2233)}
+}
+@media(max-height:650px) and (max-width:700px){.scene-scroll{inset-block:70px 151px}.guide{width:56px;bottom:51px}.speech{width:110px;font-size:9px;padding:6px 8px}.scene-nav{bottom:72px}.edge-copy{bottom:180px}.scene-title,.s01 .scene-title,.dense .scene-title{font-size:24px}.bottom-bar{height:48px}.eyebrow{margin-bottom:12px}.intro-sign{margin-top:15px}}
+/* 吹き出しの上端まで場面の読み取り領域から外し、スクロール途中のCTAも重ねない。 */
+@media(max-width:700px){.scene-scroll{bottom:calc(230px + env(safe-area-inset-bottom))}}
+@media(max-height:650px) and (max-width:700px){.scene-scroll{bottom:calc(185px + env(safe-area-inset-bottom))}}
+@media(prefers-reduced-motion:reduce){body:not(.motion-enabled) *,body:not(.motion-enabled) *:before,body:not(.motion-enabled) *:after{animation-play-state:paused!important;transition:none!important}}
+</style>
+<!-- TODO: CLARITY_ID を実IDに差し替える -->
+<script type="text/javascript">
+  (function(c,l,a,r,i,t,y){
+    if(i === "CLARITY_ID") return; // TODO: 実ID設定後に計測開始。プレビューでは送信しない。
+    c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+    t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+    y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+  })(window, document, "clarity", "script", "CLARITY_ID");
+</script>
+</head>
+<body>
+<a class="skip" href="#scene-06">予約・相談へ進む</a>
+<header class="site-header"><a class="brand" href="/" aria-label="Hitotsu Company ホーム"><span class="brand-mark" aria-hidden="true">＊</span><span><small>HITOTSU COMPANY</small><strong>ひとつ ／ 夜のAI相談室</strong></span></a><div class="controls"><button class="control" id="auto-tour" type="button" aria-pressed="false"><span class="control-dot" aria-hidden="true"></span><span id="auto-label">自動で案内</span></button><button class="control" id="motion-toggle" type="button" aria-pressed="false">動きを止める</button></div></header>
+<main class="tour" id="tour" aria-label="6つの場面をめぐる夜のAI相談室" tabindex="-1">
+<section id="scene-01" class="scene s01  is-active" aria-labelledby="title-01">
+<div class="scene-art" aria-hidden="true">
+<!-- 後日 assets/scene-01.webp を配置。推奨 1920×1440、WebP。中央がスマホで切り出されます。 -->
+<img class="scene-photo" hidden onload="this.hidden=false" onerror="this.remove()" src="assets/scene-01.webp" alt="" fetchpriority="high" decoding="async">
+<div class="shade"></div><div class="stars"></div><div class="stars second"></div><div class="moon"></div><div class="arch"></div><div class="orbs"><i class="orb"></i><i class="orb"></i><i class="orb"></i></div><div class="mist"></div><div class="mist second"></div></div>
+<div class="scene-scroll" tabindex="0" role="region" aria-label="入口の内容。長い場面はこの中をスクロールできます"><div class="content">
+<p class="eyebrow"><span class="chapter">01 / 入口</span>A NIGHT FOR YOUR WORK</p>
+<h1 id="title-01" class="scene-title"><span>今夜、</span><span>面倒な仕事を手放して。</span></h1>
+<p class="room-note">鹿児島から、あなたの仕事へ。</p><p class="lead"><span>鹿児島のAIコンサルタント「ひとつ」。</span><span>夜9時から、Zoomで相談できます。</span><span>今夜は、仕事のこれからを少しだけ。</span></p><p class="intro-sign">日々の事務作業の自動化から、<br>アプリ・ホームページの制作まで。</p>
+<a class="next" href="#scene-02"><span>門を開く</span><i class="arrow" aria-hidden="true"></i></a>
+</div></div></section>
+<section id="scene-02" class="scene s02 right" aria-labelledby="title-02">
+<div class="scene-art" aria-hidden="true">
+<!-- 後日 assets/scene-02.webp を配置。推奨 1920×1440、WebP。中央がスマホで切り出されます。 -->
+<img class="scene-photo" hidden onload="this.hidden=false" onerror="this.remove()" src="assets/scene-02.webp" alt="" loading="lazy" decoding="async">
+<div class="shade"></div><div class="stars"></div><div class="stars second"></div><div class="arch"></div><div class="orbs"><i class="orb"></i><i class="orb"></i><i class="orb"></i></div><div class="mist"></div><div class="mist second"></div></div>
+<div class="scene-scroll" tabindex="0" role="region" aria-label="庭の内容。長い場面はこの中をスクロールできます"><div class="content">
+<p class="eyebrow"><span class="chapter">02 / 庭</span>THE 10-SECOND GARDEN</p>
+<h2 id="title-02" class="scene-title"><span>灯りが、</span><span>道しるべ。</span></h2>
+<p class="lead"><span>何から始めるか、迷ったら。</span><span>10秒診断で、今のあなたに合う入口へ。</span><span>2回タップすると、おすすめが出ます。</span></p>  <div class="quiz" aria-live="polite">
+    <div id="q1">
+      <p class="q">Q1. AIは、いまどれくらい使っていますか？</p>
+      <div class="chips">
+        <button class="chip" data-q1="0">まだ触っていない</button>
+        <button class="chip" data-q1="1">ChatGPTくらいは</button>
+        <button class="chip" data-q1="2">毎日つかっている</button>
+      </div>
+    </div>
+    <div id="q2" style="display:none">
+      <p class="q">Q2. いちばん欲しいのは？</p>
+      <div class="chips">
+        <button class="chip" data-q2="soudan">相談できる相手</button>
+        <button class="chip" data-q2="app">仕事がラクになる道具</button>
+        <button class="chip" data-q2="hito">代わりに働く人手</button>
+        <button class="chip" data-q2="web">お店の紹介ページ</button>
+      </div>
+    </div>
+    <div class="res" id="qres"></div>
+  </div>
+
+<a class="next" href="#scene-03"><span>もう少し、奥へ</span><i class="arrow" aria-hidden="true"></i></a>
+</div></div></section>
+<section id="scene-03" class="scene s03 " aria-labelledby="title-03">
+<div class="scene-art" aria-hidden="true">
+<!-- 後日 assets/scene-03.webp を配置。推奨 1920×1440、WebP。中央がスマホで切り出されます。 -->
+<img class="scene-photo" hidden onload="this.hidden=false" onerror="this.remove()" src="assets/scene-03.webp" alt="" loading="lazy" decoding="async">
+<div class="shade"></div><div class="stars"></div><div class="stars second"></div><div class="arch"></div><div class="orbs"><i class="orb"></i><i class="orb"></i><i class="orb"></i></div><div class="mist"></div><div class="mist second"></div></div>
+<div class="scene-scroll" tabindex="0" role="region" aria-label="扉の内容。長い場面はこの中をスクロールできます"><div class="content">
+<p class="eyebrow"><span class="chapter">03 / 扉</span>THE FREE TOOLBOX</p>
+<h2 id="title-03" class="scene-title"><span>扉の向こうは、</span><span>無料の道具箱。</span></h2>
+<p class="lead"><span>まずは、小さな道具をひとつ。</span><span>3つは、登録なしで開きます。</span><span>仕事が軽くなる感覚を、ここから。</span></p><div class="tool-links"><a class="btn btn-gold" href="https://hitotsu-company.com/apps/"><span>無料の道具箱を開く</span><span aria-hidden="true">↗</span></a><a class="btn" href="https://line.me/R/ti/p/@188jocyd"><span>公式LINEで残りの道具を受け取る</span><span aria-hidden="true">↗</span></a></div><p class="tool-hint">公式LINEに「道具箱」と送ると、残りが開きます。</p>
+<a class="next" href="#scene-04"><span>扉を開ける</span><i class="arrow" aria-hidden="true"></i></a>
+</div></div></section>
+<section id="scene-04" class="scene s04 dense" aria-labelledby="title-04">
+<div class="scene-art" aria-hidden="true">
+<!-- 後日 assets/scene-04.webp を配置。推奨 1920×1440、WebP。中央がスマホで切り出されます。 -->
+<img class="scene-photo" hidden onload="this.hidden=false" onerror="this.remove()" src="assets/scene-04.webp" alt="" loading="lazy" decoding="async">
+<div class="shade"></div><div class="stars"></div><div class="stars second"></div><div class="arch"></div><div class="orbs"><i class="orb"></i><i class="orb"></i><i class="orb"></i></div><div class="mist"></div><div class="mist second"></div></div>
+<div class="scene-scroll" tabindex="0" role="region" aria-label="ホールの内容。長い場面はこの中をスクロールできます"><div class="content">
+<p class="eyebrow"><span class="chapter">04 / ホール</span>THE MENU HALL</p>
+<h2 id="title-04" class="scene-title"><span>ようこそ、</span><span>メニューと料金。</span></h2>
+<p class="lead"><span>小さな相談から、AIの部署づくりまで。</span><span>あなたの仕事に合うかたちを。</span><span>やることと、値段。これだけです。</span></p>  <div class="menu">
+
+    <div class="mi" id="m-soudan">
+      <h3>単発相談（60分）</h3>
+      <div class="price">5,000<small>円</small></div>
+      <p><span class="nb">「うちの仕事、AIで何ができる？」に</span><span class="nb">その場でお答えします。</span><span class="nb">対面でもZoomでも。</span><span class="nb">1回きりでもOKです。</span></p>
+      <a class="morelink" href="https://timerex.net/s/a.koooool.a_1933/c8e21ca2" target="_blank" rel="noopener">空き日程を見て予約する →</a>
+<p class="availability">受付枠：月・水・木・金の21:00〜23:00（60分）／2026年9月16日（水）から。日中はお仕事の方もご相談いただけます。</p>
+      <a class="paybtn" data-pay="soudan" href="#">ご相談済みの方：カード決済へ</a>
+    </div>
+
+    <div class="mi" id="m-app">
+      <h3>アプリ作成</h3>
+      <div class="price">10,000<small>円</small></div>
+      <p><span class="nb">予約受付・記録づけ・スタンプカードなど、</span><span class="nb">あなたの仕事専用の道具を1本作ります。</span><span class="nb">（1つの機能・修正2回まで。追加は別途）</span></p>
+      <a class="morelink" href="/apps/box-9f4a7c2e/">制作例の道具箱を見る →</a>
+      <a class="paybtn" data-pay="app" href="#">ご相談済みの方：カード決済へ</a>
+    </div>
+
+    <div class="mi" id="m-shain">
+      <h3>AI社員作り</h3>
+      <div class="price">30,000<small>円</small></div>
+      <p><span class="nb">あなたの仕事のやり方を覚えたAI社員を</span><span class="nb">1人作ります。</span><span class="nb">毎回おなじ説明をしなくても、</span><span class="nb">最後まで仕事をやってくれます。</span></p>
+      <a class="morelink" href="/card">Hitotsu Companyの名刺を見る →</a>
+      <a class="paybtn" data-pay="shain" href="#">ご相談済みの方：カード決済へ</a>
+    </div>
+
+    <div class="mi" id="m-web">
+      <h3>ホームページ制作</h3>
+      <div class="price">50,000<small>円</small></div>
+      <p><span class="nb">お店・サービスの紹介ページを1枚から。</span><span class="nb">スマホ対応・QRコード付きで納品します。</span></p>
+      <a class="morelink" href="/hp/">プランのくわしい説明を見る →</a>
+      <a class="paybtn" data-pay="web" href="#">ご相談済みの方：カード決済へ</a>
+    </div>
+
+    <div class="mi hot" id="m-soshiki">
+      <span class="tag">いちばん人気</span>
+      <h3>AI組織作り</h3>
+      <div class="price">100,000<small>円</small></div>
+      <p><span class="nb">AI社員を役割ごとにチームで揃えて、</span><span class="nb">あなたの会社の中に「AIの部署」を作ります。</span><span class="nb">事務・発信・書類づくりを</span><span class="nb">まとめて任せられる状態で納品します。</span></p>
+      <a class="morelink" href="/#org">当社のAI社員の組織図を見る →</a>
+      <a class="paybtn" data-pay="soshiki" href="#">ご相談済みの方：カード決済へ</a>
+    </div>
+
+  </div>
+  <p class="pay-note"><span class="nb">はじめての方は、まず下の</span><span class="nb">公式LINEか対面でご相談ください。</span><span class="nb">内容が決まった方は、</span><span class="nb">各カードのボタンからそのままカード決済できます</span><span class="nb">（銀行振込・PayPay・現金も対応）。</span></p>
+
+<a class="next" href="#scene-05"><span>階段を上る</span><i class="arrow" aria-hidden="true"></i></a>
+</div></div></section>
+<section id="scene-05" class="scene s05 dense" aria-labelledby="title-05">
+<div class="scene-art" aria-hidden="true">
+<!-- 後日 assets/scene-05.webp を配置。推奨 1920×1440、WebP。中央がスマホで切り出されます。 -->
+<img class="scene-photo" hidden onload="this.hidden=false" onerror="this.remove()" src="assets/scene-05.webp" alt="" loading="lazy" decoding="async">
+<div class="shade"></div><div class="stars"></div><div class="stars second"></div><div class="arch"></div><div class="orbs"><i class="orb"></i><i class="orb"></i><i class="orb"></i></div><div class="mist"></div><div class="mist second"></div></div>
+<div class="scene-scroll" tabindex="0" role="region" aria-label="階段の内容。長い場面はこの中をスクロールできます"><div class="content">
+<p class="eyebrow"><span class="chapter">05 / 階段</span>WORKS ON THE STAIRS</p>
+<h2 id="title-05" class="scene-title"><span>作って、</span><span>動いています。</span></h2>
+<p class="lead"><span>話すことから、つくることへ。</span><span>ひとつずつ、現場の仕事に寄り添って。</span><span>今日も、手元で働く道具たち。</span></p>  <div class="exlist">
+    <div class="exi"><b>音声日誌アプリ</b>　<span class="nb">話すだけで介護・福祉の記録が書き上がる</span></div>
+    <div class="exi"><b>半年分の日誌整理</b>　<span class="nb">溜まった記録をAIで一気に片付け</span></div>
+    <div class="exi"><b>AIエージェント研修</b>　<span class="nb">鹿児島で対面ハンズオンを開催</span></div>
+    <div class="exi"><b>業務ツール多数</b>　<span class="nb">毎日1本、仕事の悩みを解決する道具を制作・公開中</span></div>
+  </div>
+<h3 class="steps-label">進め方 — 3ステップで始まります。</h3>  <div class="steps">
+    <div class="step"><b>まず話す</b><p>LINEか対面で、いまの困りごとを聞かせてください。ここは無料です。</p></div>
+    <div class="step"><b>決めて、作る</b><p>やること・金額・期日を先に決めてから作ります。追加料金は出ません。</p></div>
+    <div class="step"><b>渡して、回す</b><p>使い方まで教えて納品。あとはあなたの手元で毎日働きます。</p></div>
+  </div>
+  <div class="safe"><span>✓</span><div><span class="nb">お客様の実データはお預かりしません。</span><span class="nb">作業はあなたの承認済みの環境で完結。</span><span class="nb">情報漏えいの心配がない進め方です。</span></div></div>
+
+<a class="next" href="#scene-06"><span>バルコニーへ</span><i class="arrow" aria-hidden="true"></i></a>
+</div></div></section>
+<section id="scene-06" class="scene s06 right" aria-labelledby="title-06">
+<div class="scene-art" aria-hidden="true">
+<!-- 後日 assets/scene-06.webp を配置。推奨 1920×1440、WebP。中央がスマホで切り出されます。 -->
+<img class="scene-photo" hidden onload="this.hidden=false" onerror="this.remove()" src="assets/scene-06.webp" alt="" loading="lazy" decoding="async">
+<div class="shade"></div><div class="stars"></div><div class="stars second"></div><div class="arch"></div><div class="orbs"><i class="orb"></i><i class="orb"></i><i class="orb"></i></div><div class="mist"></div><div class="mist second"></div></div>
+<div class="scene-scroll" tabindex="0" role="region" aria-label="バルコニーの内容。長い場面はこの中をスクロールできます"><div class="content">
+<p class="eyebrow"><span class="chapter">06 / バルコニー</span>THE 9PM BALCONY</p>
+<h2 id="title-06" class="scene-title"><span>夜9時、</span><span>Zoomでお会いしましょう。</span></h2>
+<p class="lead"><span>一日の仕事が、落ち着いたら。</span><span>気になっていたことを、ひとつ。</span><span>夜の相談室で、お聞かせください。</span></p><div class="booking"><div class="booking-links"><a class="btn btn-gold reserve" href="https://timerex.net/s/a.koooool.a_1933/c8e21ca2" target="_blank" rel="noopener"><span><small>21:00 — ONLINE CONSULTATION</small>空き日程を見て予約する</span><span aria-hidden="true">↗</span></a><a class="btn line-btn" href="https://line.me/R/ti/p/@188jocyd">公式LINEで相談する ↗</a></div><p class="availability">受付枠：月・水・木・金の21:00〜23:00（60分）／2026年9月16日（水）から。日中はお仕事の方もご相談いただけます。</p><p class="contact-copy">「相談したい」だけで大丈夫です。<br>売り込みの連絡はしません。</p></div><footer><a href="/tokusho">特定商取引法に基づく表記</a><span>© 2026 Hitotsu Company</span></footer>
+<a class="next" href="#scene-01"><span>入口に戻る</span><i class="arrow" aria-hidden="true"></i></a>
+</div></div></section>
+</main>
+<p class="edge-copy" aria-hidden="true">LET AI WORK. LET YOUR NIGHT BEGIN.</p>
+<nav class="scene-nav" aria-label="場面を選ぶ"><a href="#scene-01" aria-label="01 入口" aria-current="true"></a><a href="#scene-02" aria-label="02 庭"></a><a href="#scene-03" aria-label="03 扉"></a><a href="#scene-04" aria-label="04 ホール"></a><a href="#scene-05" aria-label="05 階段"></a><a href="#scene-06" aria-label="06 バルコニー"></a></nav>
+<aside class="guide" aria-label="案内役のひとつ"><div class="guide-halo" aria-hidden="true"></div><p class="speech" id="guide-speech" role="status" aria-live="polite">ようこそ。夜の相談室です</p><span class="guide-star" aria-hidden="true">✧</span><span class="guide-star two" aria-hidden="true">✦</span><div class="guide-float"><div class="guide-jump" id="guide-jump"><picture id="guide-picture"><source id="guide-source" srcset="assets/chara-main.webp" type="image/webp"><img id="guide-image" src="assets/chara-main.png" width="479" height="640" alt="茶髪に黒パーカー、オレンジの＊カードを持った案内役のひとつ" decoding="async" fetchpriority="high"></picture></div></div></aside>
+<div class="bottom-bar"><p class="scroll-hint" aria-hidden="true">SCROLL TO EXPLORE</p><div class="progress" aria-label="全6場面の1番目" id="progress"><span class="current" id="current">01</span><span class="progress-track" aria-hidden="true"><span class="progress-fill" id="progress-fill"></span></span><span class="total">06</span></div></div>
+<noscript><style>.controls{display:none}</style></noscript>
+<script>
+(function(){
+  'use strict';
+  const tour=document.getElementById('tour'), scenes=Array.from(document.querySelectorAll('.scene'));
+  const panes=scenes.map(s=>s.querySelector('.scene-scroll'));
+  const motionQuery=matchMedia('(prefers-reduced-motion: reduce)');
+  const mobileQuery=matchMedia('(max-width:700px)');
+  const autoButton=document.getElementById('auto-tour'),autoLabel=document.getElementById('auto-label');
+  const motionButton=document.getElementById('motion-toggle');
+  const speech=document.getElementById('guide-speech'),jump=document.getElementById('guide-jump');
+  const phrases=['ようこそ。夜の相談室です','2回タップで、おすすめが出ます','3つは登録なしで開きます','値段はこれだけです','作って、動いています','夜9時、お待ちしています'];
+  let current=0,paused=motionQuery.matches,auto=false,autoTimer=0,frame=0,resizeFrame=0,pendingFocus=null;
+  let altLoaded=false,altRequested=false;
+  const source=document.getElementById('guide-source'),guideImage=document.getElementById('guide-image');
+  function guideArt(){
+    source.srcset=current===5&&altLoaded?'assets/chara-alt.webp':'assets/chara-main.webp';
+    if(current===5&&!altRequested){
+      altRequested=true;
+      const alt=new Image();
+      alt.onload=()=>{altLoaded=true;if(current===5)source.srcset='assets/chara-alt.webp'};
+      alt.onerror=()=>{altLoaded=false}; // 素材がない場合は現在のキャラのまま。
+      alt.src='assets/chara-alt.webp';
+    }
+  }
+  guideImage.onerror=()=>{source.removeAttribute('srcset');guideImage.onerror=null;guideImage.src='assets/chara-main.png'};
+  function hop(){if(paused)return;jump.classList.remove('hop');void jump.offsetWidth;jump.classList.add('hop')}
+  jump.addEventListener('animationend',()=>jump.classList.remove('hop'));
+  function stopAuto(){auto=false;clearTimeout(autoTimer);autoButton.setAttribute('aria-pressed','false');autoLabel.textContent='自動で案内'}
+  function schedule(){
+    clearTimeout(autoTimer);
+    if(!auto)return;
+    autoTimer=setTimeout(()=>{if(current>=5){stopAuto();return}go(current+1,false)},6000);
+  }
+  function setCurrent(index){
+    const changed=current!==index;current=index;
+    scenes.forEach((s,i)=>{s.classList.toggle('is-active',i===index);s.inert=i!==index});
+    document.querySelectorAll('.scene-nav a').forEach((a,i)=>{if(i===index)a.setAttribute('aria-current','true');else a.removeAttribute('aria-current')});
+    document.getElementById('current').textContent=String(index+1).padStart(2,'0');
+    document.getElementById('progress-fill').style.setProperty('--progress',(index+1)/6);
+    document.getElementById('progress').setAttribute('aria-label','全6場面の'+(index+1)+'番目');
+    if(changed){speech.textContent=phrases[index];guideArt();if(mobileQuery.matches)hop();if(auto)schedule()}
+    if(pendingFocus&&pendingFocus.index===index){const node=pendingFocus.node;pendingFocus=null;node.focus({preventScroll:true})}
+  }
+  function go(index,user=true,focus=false){
+    if(user)stopAuto();
+    index=Math.max(0,Math.min(5,index));
+    pendingFocus=focus?{index,node:focus===true?panes[index]:focus}:null;
+    scenes[index].inert=false;
+    panes[index].scrollTo({top:0,behavior:'instant'});
+    tour.scrollTo({top:scenes[index].offsetTop,behavior:paused?'instant':'smooth'});
+    if(paused||current===index)setCurrent(index);
+  }
+  function updateMotion(){
+    document.body.classList.toggle('motion-paused',paused);
+    document.body.classList.toggle('motion-enabled',!paused);
+    motionButton.setAttribute('aria-pressed',String(paused));
+    motionButton.textContent=paused?'動きを再開する':'動きを止める';
+    if(paused){jump.classList.remove('hop');stopAuto();tour.scrollTo({top:scenes[current].offsetTop,behavior:'instant'})}
+  }
+  motionButton.addEventListener('click',()=>{paused=!paused;updateMotion()});
+  motionQuery.addEventListener('change',e=>{paused=e.matches;updateMotion()});
+  autoButton.addEventListener('click',()=>{
+    if(auto){stopAuto();return}
+    auto=true;autoButton.setAttribute('aria-pressed','true');autoLabel.textContent='案内を止める';
+    if(current===5)go(0,false);
+    schedule();
+  });
+  // 手動入力だけで自動案内を解除。プログラムによるscrollイベントとは区別する。
+  ['wheel','touchstart','pointerdown'].forEach(type=>tour.addEventListener(type,stopAuto,{passive:true}));
+  document.addEventListener('visibilitychange',()=>{if(document.hidden)stopAuto()});
+  tour.addEventListener('focusin',stopAuto);
+  tour.addEventListener('scroll',()=>{if(frame)return;frame=requestAnimationFrame(()=>{frame=0;setCurrent(Math.max(0,Math.min(5,Math.round(tour.scrollTop/tour.clientHeight))))})},{passive:true});
+  document.addEventListener('click',e=>{
+    const link=e.target.closest('a[href^="#scene-"]');if(!link)return;
+    const index=scenes.findIndex(s=>'#'+s.id===link.getAttribute('href'));if(index<0)return;
+    e.preventDefault();go(index,true,true);
+  });
+  document.addEventListener('keydown',e=>{
+    if(e.altKey||e.ctrlKey||e.metaKey||e.shiftKey||e.target.closest('input,textarea,select,[contenteditable="true"]'))return;
+    if(e.key==='Escape'){stopAuto();return}
+    const direction=['ArrowDown','PageDown'].includes(e.key)?1:['ArrowUp','PageUp'].includes(e.key)?-1:0;
+    if(!direction)return;
+    e.preventDefault();go(current+direction,true,true);
+  });
+  // 診断で選ばれた商品を、ホール内の読み取り領域の先頭へ案内する。
+  window.tourCard=function(card){
+    card.tabIndex=-1;go(3,true,card);const pane=panes[3];
+    pane.scrollTo({top:card.getBoundingClientRect().top-pane.getBoundingClientRect().top+pane.scrollTop-24,behavior:paused?'instant':'smooth'});
+  };
+  document.querySelectorAll('a[href^="https://timerex.net/"]').forEach(a=>{a.addEventListener('pointerenter',hop);a.addEventListener('focus',hop)});
+  window.addEventListener('resize',()=>{cancelAnimationFrame(resizeFrame);resizeFrame=requestAnimationFrame(()=>tour.scrollTo({top:scenes[current].offsetTop,behavior:'instant'}))});
+  updateMotion();setCurrent(0);
+  const initial=scenes.findIndex(s=>'#'+s.id===location.hash);
+  if(initial>=0){tour.scrollTo({top:scenes[initial].offsetTop,behavior:'instant'});setCurrent(initial)}
+})();
+</script>
+<script>
+(function(){
+  // 10秒診断
+  var q1v=0;
+  var MAP={
+    soudan:['m-soudan','単発相談（60分）','5,000円','まずは1時間、話すのが近道です。'],
+    app:['m-app','アプリ作成','10,000円','毎日の面倒は、道具にして片付けましょう。'],
+    web:['m-web','ホームページ制作','50,000円','このページのようなサイトを、あなたのお店にも。'],
+    shain:['m-shain','AI社員作り','30,000円','あなたの仕事を覚えたAIを、まず1人。'],
+    soshiki:['m-soshiki','AI組織作り','100,000円','毎日使っているなら、次はチームで任せる番です。']
+  };
+  var q1=document.getElementById('q1'),q2=document.getElementById('q2'),res=document.getElementById('qres');
+  q1.querySelectorAll('.chip').forEach(function(b){b.onclick=function(){
+    q1v=+b.dataset.q1;q1.style.display='none';q2.style.display='block';q2.querySelector('.chip').focus({preventScroll:true});
+  }});
+  q2.querySelectorAll('.chip').forEach(function(b){b.onclick=function(){
+    var k=b.dataset.q2;if(k==='hito')k=(q1v===2)?'soshiki':'shain';
+    var m=MAP[k];
+    q2.style.display='none';res.style.display='block';
+    res.innerHTML='<p class="q" style="margin:0">あなたへのおすすめは…</p>'
+      +'<p class="big"><b>'+m[1]+'</b>　'+m[2]+'</p>'
+      +'<p class="tiny muted" style="margin:6px 0 0">'+m[3]+'</p>'
+      +'<button class="again" id="qagain">もう一度診断する</button>';
+    document.getElementById('qagain').onclick=function(){
+      res.style.display='none';q1.style.display='block';q1.querySelector('.chip').focus({preventScroll:true});
+    };
+    var card=document.getElementById(m[0]);
+    setTimeout(function(){
+      window.tourCard(card);
+      card.classList.remove('flash');void card.offsetWidth;card.classList.add('flash');
+    },600);
+  }});
+})();
+</script>
+<script>
+// Stripe決済リンク。URLを入れたメニューだけ決済ボタンが表示される
+(function(){
+  var PAY={
+    soudan:'https://buy.stripe.com/00wcN4as94SnaQIga66EU00',
+    app:'https://buy.stripe.com/eVq3cu8k12Kf4sk3nk6EU01',
+    shain:'https://buy.stripe.com/00w9AScAhbgL3og3nk6EU02',
+    web:'https://buy.stripe.com/dRm4gy6bT1Gb9MEbTQ6EU03',
+    soshiki:'https://buy.stripe.com/9B6bJ0dEl70vgb27DA6EU04'
+  };
+  document.querySelectorAll('.paybtn').forEach(function(b){
+    var url=PAY[b.dataset.pay];
+    if(url){b.href=url;b.classList.add('on')}
+  });
+})();
+</script>
+</body>
+</html>
