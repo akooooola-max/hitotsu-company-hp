@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="事業のことを3つ答えるだけで、あなた専用のAI社員チームの組織図と、各役職のCLAUDE.md（キット）ができます。無料・登録不要。">
+<title>AI社員 組織図メーカー</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, "Hiragino Sans", "Yu Gothic", sans-serif;
+  background: #f5f7fa;
+  color: #2c3e50;
+  line-height: 1.7;
+  padding: 16px;
+}
+.container {
+  max-width: 760px;
+  margin: 0 auto;
+  background: #fff;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+h1 { font-size: 22px; margin-bottom: 8px; color: #1a365d; }
+.lead { font-size: 14px; color: #555; margin-bottom: 20px; padding-bottom: 14px; border-bottom: 2px solid #eef2f7; }
+.step { margin-bottom: 18px; padding: 16px; background: #f9fbfd; border-radius: 10px; border: 1px solid #e6ecf3; }
+.step h2 { font-size: 15px; color: #1a365d; margin-bottom: 8px; }
+.step p.hint { font-size: 12px; color: #7a8a99; margin-bottom: 8px; }
+textarea, input[type=text], input[type=password], select {
+  width: 100%; font: inherit; font-size: 14px; padding: 10px 12px;
+  border: 1px solid #cfd8e3; border-radius: 8px; background: #fff; color: #2c3e50;
+}
+textarea { min-height: 72px; resize: vertical; }
+textarea:focus, input:focus, select:focus { outline: none; border-color: #D97757; box-shadow: 0 0 0 3px rgba(217,119,87,0.15); }
+.row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.row > * { flex: 1 1 200px; }
+button {
+  font: inherit; font-size: 15px; font-weight: 700; padding: 12px 18px;
+  border: none; border-radius: 10px; cursor: pointer; transition: transform .05s, opacity .2s;
+}
+button:active { transform: translateY(1px); }
+button:disabled { opacity: .5; cursor: not-allowed; }
+.btn-main { background: #D97757; color: #fff; width: 100%; margin-top: 6px; }
+.btn-sub { background: #eef2f7; color: #1a365d; }
+.btn-line { background: #fff; color: #1a365d; border: 1px solid #cfd8e3; }
+.mode { display: flex; gap: 8px; margin-bottom: 10px; }
+.mode label {
+  flex: 1; display: flex; gap: 8px; align-items: flex-start; padding: 10px 12px;
+  border: 1px solid #cfd8e3; border-radius: 8px; cursor: pointer; font-size: 13px; background: #fff;
+}
+.mode label:has(input:checked) { border-color: #D97757; background: #fff7f3; }
+.mode input { margin-top: 4px; }
+.mode b { display: block; font-size: 14px; }
+#keyBox { display: none; margin-top: 8px; }
+#keyBox.show { display: block; }
+.small { font-size: 12px; color: #7a8a99; }
+#status { font-size: 13px; color: #1a365d; margin: 10px 0; min-height: 20px; }
+#result { display: none; }
+#result.show { display: block; }
+.chart-wrap { overflow-x: auto; background: #0e0e0e; border-radius: 12px; padding: 12px; margin: 12px 0; }
+svg { display: block; margin: 0 auto; font-family: -apple-system, "Hiragino Sans", "Yu Gothic", sans-serif; }
+.roles { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; margin: 12px 0; }
+.role {
+  border: 1px solid #e6ecf3; border-radius: 10px; padding: 12px; background: #fff; cursor: pointer;
+}
+.role:hover { border-color: #D97757; }
+.role .tag { font-size: 11px; color: #D97757; font-weight: 700; letter-spacing: .04em; }
+.role .name { font-size: 15px; font-weight: 700; color: #1a365d; }
+.role .mission { font-size: 12px; color: #555; margin-top: 4px; }
+.role.open { grid-column: 1 / -1; cursor: default; }
+.role pre {
+  display: none; white-space: pre-wrap; font-family: ui-monospace, Menlo, monospace; font-size: 12px;
+  background: #f4f6f9; border-radius: 8px; padding: 12px; margin-top: 10px; max-height: 360px; overflow: auto;
+}
+.role.open pre { display: block; }
+.actions { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0; }
+.actions button { flex: 1 1 180px; }
+.cta {
+  margin-top: 22px; padding: 16px; border-radius: 12px; background: #1a365d; color: #fff;
+}
+.cta b { display: block; font-size: 15px; margin-bottom: 4px; }
+.cta p { font-size: 13px; opacity: .9; }
+.cta a { display: inline-block; margin-top: 10px; padding: 10px 16px; background: #D97757; color: #fff; border-radius: 8px; font-weight: 700; text-decoration: none; font-size: 14px; }
+.foot { margin-top: 18px; font-size: 12px; color: #7a8a99; text-align: center; }
+.foot a { color: #7a8a99; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>AI社員 組織図メーカー</h1>
+  <p class="lead">事業のことを3つ答えると、あなた専用の<b>AI社員チームの組織図</b>と、各役職の<b>CLAUDE.md（役割定義書）</b>ができます。そのままClaude Codeに入れれば、明日から社員が動きます。無料・登録不要。</p>
+
+  <div class="step">
+    <h2>1. どんな事業ですか</h2>
+    <p class="hint">何を、誰に。一言で。例：「鹿児島で放課後等デイサービスを運営」「個人でWeb制作とSNS運用」</p>
+    <textarea id="q1" placeholder="例：鹿児島でフットサルコートを運営し、社会人向けの大会も主催している"></textarea>
+  </div>
+
+  <div class="step">
+    <h2>2. いま、自分で抱えている作業は</h2>
+    <p class="hint">週にやっていること。思いつく順に。例：「予約の返信、SNS投稿、請求書、チラシ作り、日程調整」</p>
+    <textarea id="q2" placeholder="例：LINEの問い合わせ返信、Instagramの投稿、大会の申込受付、参加費の請求、告知チラシ"></textarea>
+  </div>
+
+  <div class="step">
+    <h2>3. AI社員に任せたいこと・ほしい役職</h2>
+    <p class="hint">なければ空欄でOK。例：「発信を全部任せたい」「経理係がほしい」</p>
+    <textarea id="q3" placeholder="例：告知と発信を任せたい。大会の運営マニュアルも作ってほしい"></textarea>
+  </div>
+
+  <div class="step">
+    <h2>4. 作り方を選ぶ</h2>
+    <div class="mode">
+      <label><input type="radio" name="mode" value="template" checked><span><b>雛形で作る（鍵なし）</b>キーワードから役職を選び、雛形の役割定義書を出します。10秒。</span></label>
+      <label><input type="radio" name="mode" value="ai"><span><b>AIに書かせる（自分のAPIキー）</b>あなたの事業に合わせて、役職名・仕事・判断基準まで書きます。</span></label>
+    </div>
+    <div id="keyBox">
+      <div class="row">
+        <input type="password" id="apiKey" placeholder="sk-ant-... （Anthropic APIキー）" autocomplete="off">
+        <select id="model">
+          <option value="claude-opus-5">claude-opus-5（推奨・賢い）</option>
+          <option value="claude-sonnet-5">claude-sonnet-5（安い）</option>
+        </select>
+      </div>
+      <p class="small">キーはこの端末（ブラウザ）にだけ保存され、Anthropic以外には送られません。料金はあなたのキーに数円〜数十円かかります。<a href="https://console.anthropic.com/" target="_blank" rel="noopener">キーの発行はこちら</a></p>
+    </div>
+    <button class="btn-main" id="makeBtn">組織図を作る</button>
+    <div id="status"></div>
+  </div>
+
+  <div id="result">
+    <div class="step">
+      <h2 id="companyTitle">あなたのAI社員チーム</h2>
+      <p class="hint">役職をタップすると、その社員のCLAUDE.md（役割定義書）が開きます。</p>
+      <div class="chart-wrap"><div id="chart"></div></div>
+      <div class="roles" id="roles"></div>
+      <div class="actions">
+        <button class="btn-sub" id="pngBtn">組織図を画像で保存</button>
+        <button class="btn-sub" id="zipBtn">キットをzipでダウンロード</button>
+        <button class="btn-line" id="promptBtn">Claude Codeに貼る導入文をコピー</button>
+      </div>
+      <p class="small">zipの中身：受付係のCLAUDE.md／members/各役職/CLAUDE.md／README_導入手順.md。Claude Codeで「このフォルダを読んで、番号で社員を起動できるようにして」と言えば動きます。</p>
+    </div>
+
+    <div class="cta">
+      <b>これを作った人の作業場では、毎週こういう道具が増えています。</b>
+      <p>AI社員室は、55名のAI社員と自動化15本で6つの事業を回している人が、今週作ったもの（アプリ・キット・設計図）をそのまま届ける部屋です。</p>
+      <a href="https://note.com/hitotsu_ai/membership" target="_blank" rel="noopener">AI社員室（毎週作ったものが届く部屋）を見る →</a>
+    </div>
+  </div>
+
+  <p class="foot">Hitotsu Company の道具箱 ／ <a href="index.html">ほかの道具を見る</a></p>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script>
+const $ = id => document.getElementById(id);
+
+// ---------- 役職カタログ（雛形モード） ----------
+const CATALOG = [
+  { id: 'leader',    name: 'リーダー',     tag: '司令塔',   always: true,
+    mission: '毎朝、今日やることを3つに絞って提案し、他の社員に指示を出す。',
+    keys: [],
+    tasks: ['毎朝の朝礼：昨日の実績・今日の提案3つ・詰まりの報告', '他の社員への指示出しと成果物のとりまとめ', '判断に迷う時は「売上と利益につながるか」で決める'],
+    rules: ['指示待ちにせず、提案で返す', '報告は3行以内。結論→理由→次の一手', '分からないことは推測せず、オーナーに聞く'] },
+  { id: 'writer',    name: 'ライター',     tag: '発信',     keys: ['発信','投稿','sns','instagram','インスタ','x','threads','note','ブログ','記事','メルマガ','line','告知','文章','お知らせ','チラシ'],
+    mission: '発信物・お知らせ・文章をすべて書く。オーナーの言葉で、短く、明るく。',
+    tasks: ['SNS投稿・お知らせ・案内文の下書き', '既存の文章のリライトと誤字チェック', '告知の型（見出し→本文→行動の一言）を守る'],
+    rules: ['1投稿1メッセージ', '敬語・簡潔・明るさを崩さない', '固有名詞と数字は原文どおり。創作しない'] },
+  { id: 'designer',  name: 'デザイナー',   tag: '見た目',   keys: ['デザイン','画像','バナー','チラシ','サムネ','ロゴ','写真','動画','リール','資料','スライド'],
+    mission: 'バナー・チラシ・スライド・画像の案を出し、画像生成用のプロンプトまで用意する。',
+    tasks: ['用途とターゲットを聞いて3案のラフを出す', '画像生成のプロンプトを完成形で渡す', '既存素材のトーンに合わせる'],
+    rules: ['必ず3案。1案で終わらない', '文字は少なく、余白は多く', '他人の著作物は使わない'] },
+  { id: 'sales',     name: '営業・受付',   tag: 'お客さま', keys: ['問い合わせ','返信','予約','受付','申込','顧客','お客','営業','見積','商談','line','メール','dm'],
+    mission: '問い合わせ・予約・申込への返信文を作り、対応の記録を残す。送信はオーナーが行う。',
+    tasks: ['問い合わせへの返信文の下書き（3パターン）', '申込・予約の受付リストの整理', 'よくある質問の型を育てる'],
+    rules: ['送信はしない。下書きまで', '個人情報は台帳に残さない', '返信は24時間以内を前提に優先順位を付ける'] },
+  { id: 'ops',       name: '事務・経理',   tag: 'お金と書類', keys: ['請求','経理','会計','入金','支払','領収','書類','契約','日程','スケジュール','調整','事務','シフト','名簿'],
+    mission: '請求書・書類・日程調整・名簿など、事務仕事を型にして片づける。',
+    tasks: ['請求書・見積書の下書き', '日程調整の候補出しと確定連絡文', '名簿・一覧の整理（個人情報は預からない）'],
+    rules: ['数字は必ず元データと突き合わせる', '締切がある仕事は締切から逆算して並べる', '判断が要るものは勝手に決めず、選択肢で聞く'] },
+  { id: 'planner',   name: 'プランナー',   tag: '企画',     keys: ['企画','イベント','大会','セミナー','講座','研修','キャンペーン','新商品','メニュー','計画'],
+    mission: 'イベント・企画・新商品を、目的→段取り→役割分担→当日進行まで一枚にする。',
+    tasks: ['企画書1枚（目的・対象・日程・予算・段取り）', '当日の進行表と持ち物リスト', '終了後のふりかえり（数字と次回の改善3つ）'],
+    rules: ['目的が一言で言えない企画は止める', '段取りは締切から逆算', '当日の役割は名前まで書く'] },
+  { id: 'researcher', name: 'リサーチャー', tag: '調べもの', keys: ['調査','リサーチ','比較','競合','相場','市場','情報収集','ニュース','トレンド','検討','選定'],
+    mission: '比較・相場・競合・制度を調べて、結論と根拠を1枚にまとめる。',
+    tasks: ['比較表（候補・価格・条件・向き不向き）', '結論→根拠→確認事項の順で報告', '出典と日付を必ず残す'],
+    rules: ['断定と推測を分けて書く', '3件以上の情報源で裏を取る', '古い情報は日付を添える'] },
+  { id: 'manual',    name: 'マニュアル係', tag: '手順書',   keys: ['マニュアル','手順','引き継ぎ','教育','新人','ルール','規程','仕組み','自動化'],
+    mission: '繰り返す仕事を手順書にして、誰でも（AIでも）できる形に残す。',
+    tasks: ['作業を聞き取って手順書に起こす（番号つき・1行1動作）', '手順書のテンプレ化と更新', '自動化できる作業の洗い出し'],
+    rules: ['1行1動作。主語と目的語を省かない', '例外は手順の最後に「困った時」としてまとめる', '更新日を必ず書く'] },
+];
+
+// ---------- 雛形モード：役職の選定 ----------
+function pickRoles(q1, q2, q3) {
+  // 3問目（任せたいこと）の一致は重く、1・2問目は軽く数える
+  const lo = s => (s || '').toLowerCase();
+  const t12 = lo(q1 + ' ' + q2), t3 = lo(q3);
+  const order = ['leader','writer','sales','ops','designer','planner','researcher','manual'];
+  const scored = order.map((id, i) => {
+    const r = CATALOG.find(x => x.id === id);
+    const s3 = r.keys.filter(k => t3.includes(k)).length * 3;
+    const s12 = r.keys.filter(k => t12.includes(k)).length;
+    return { r, score: (r.always ? 999 : 0) + s3 + s12, i };
+  });
+  const hit = scored.filter(x => x.score > 0).sort((a, b) => b.score - a.score || a.i - b.i);
+  const list = hit.slice(0, 6).map(x => x.r);
+  // 最低3名
+  for (const x of scored) if (list.length < 3 && !list.includes(x.r)) list.push(x.r);
+  // 表示順はリーダーを先頭に、あとは定番の並び
+  list.sort((a, b) => order.indexOf(a.id) - order.indexOf(b.id));
+  return list.map(r => ({ id: r.id, name: r.name, tag: r.tag, mission: r.mission, tasks: r.tasks, rules: r.rules }));
+}
+
+function guessCompany(q1) {
+  const s = q1.trim().replace(/\s+/g, ' ');
+  if (!s) return 'あなたの事業';
+  // 「〜を」「、」「。」の手前までを事業名として使う
+  const cut = s.split(/[、。]|を/)[0].trim();
+  const name = cut || s;
+  return name.length > 16 ? name.slice(0, 16) + '…' : name;
+}
+
+// ---------- CLAUDE.md の生成 ----------
+function roleMd(company, r) {
+  return `# ${r.name}（${r.id}）
+
+事業：${company}
+
+## 役割
+${r.mission}
+
+## 主な仕事
+${r.tasks.map(t => '- ' + t).join('\n')}
+
+## 判断基準
+${r.rules.map(t => '- ' + t).join('\n')}
+
+## 報告の型
+- 結論 → 理由 → 次の一手 の3行
+- 成果物はそのまま貼る。前置きは書かない
+- 分からないことは推測せず、選択肢を出して聞く
+
+## やらないこと
+- 外部への送信・公開（下書きまで。送信はオーナー）
+- 個人情報・お客さまの実データを扱うこと
+- 勝手に値段や約束を決めること
+`;
+}
+
+function receptionMd(company, roles) {
+  return `# 受付係 ── ${company} のAI社員チーム
+
+## 言語・応答スタイル
+- 日本語・敬語・簡潔に
+- 足すな、削れ。シンプルisベスト
+- 指示待ちにせず、提案で返す
+
+## 起動フロー
+オーナーが番号を入力したら、その社員として起動する：
+${roles.map((r, i) => `- ${i + 1} → 「${r.name}として起動しました」と言い、members/${r.id}/CLAUDE.md を読んでその役割を担う`).join('\n')}
+
+## 毎朝の合言葉
+「朝礼」→ リーダーが、昨日の実績・今日の提案3つ・詰まりを報告し、オーナーが選ぶ。
+
+## 全社共通の心得
+1. AIのミスはプロンプトエラー。失敗したらこのファイルか各社員のCLAUDE.mdを直す
+2. 成果物の量ではなく、売上と利益につながったかが仕事
+3. 外部への送信・公開・支払いはオーナーがやる。AIは下書きまで
+4. お客さまの実データ・個人情報はこの作業場に置かない
+`;
+}
+
+function readmeMd(company, roles) {
+  return `# 導入手順（Claude Codeに貼るだけ）
+
+1. このzipを展開して、フォルダ名を好きな名前にする（例：my-company）
+2. Claude Code をそのフォルダで開く
+3. 下の文をそのまま貼る
+
+---
+このフォルダにAI社員チームの雛形が入っています。CLAUDE.md（受付係）と members/ 配下の各社員のCLAUDE.md を読んで、
+番号を入力したらその社員として起動できるようにしてください。読み終わったら「準備できました。番号を入力してください」と言ってください。
+---
+
+4. 「1」と入力するとリーダーが起動します。「朝礼」と言うと今日の提案が出ます
+
+## 社員一覧
+${roles.map((r, i) => `${i + 1}. ${r.name}（members/${r.id}/）── ${r.mission}`).join('\n')}
+
+## 育て方
+- 気に入らない返事が来たら、その社員のCLAUDE.mdの「判断基準」を1行直す
+- 新しい社員がほしくなったら、members/ に同じ形のフォルダを1つ足して、受付係の起動フローに1行足す
+
+作成：AI社員 組織図メーカー（https://hitotsu-company.com/apps/ai-shain-soshikizu-maker.html）
+`;
+}
+
+// ---------- AIモード ----------
+async function generateWithAI(q1, q2, q3, key, model) {
+  const system = `あなたは「1人社長のAI社員チーム」を設計する専門家です。ユーザーの事業に合わせて、AI社員（Claude Codeで動く役職）を3〜6名設計し、JSONだけを返してください。前置き・説明・コードフェンスは不要です。
+
+出力JSONの形：
+{"company":"事業の短い呼び名（12文字以内）","roles":[{"id":"英小文字1語","name":"役職名（日本語・6文字以内）","tag":"一言（4文字以内）","mission":"役割を1文で","tasks":["主な仕事1","主な仕事2","主な仕事3"],"rules":["判断基準1","判断基準2","判断基準3"]}]}
+
+設計のルール：
+- 1人目は必ず id "leader"（リーダー・司令塔。毎朝の朝礼で提案3つを出し、他の社員に指示を出す）
+- 残りは、ユーザーが自分で抱えている作業のうち「AIに任せると時間が浮くもの」から役職を切る。作業の羅列ではなく、一言で目的が言える単位にする
+- 役職名はその事業の言葉で（例：フットサルなら「大会運営部」、飲食なら「メニュー係」）
+- tasks と rules は具体的に。その事業でしか通用しない言葉を入れる
+- 外部への送信・公開・支払いはオーナーがやる。個人情報は扱わない。この2つは rules のどこかに必ず入れる
+- 日本語。敬語ではなく簡潔な体言止めでよい`;
+  const user = `【事業】${q1}\n【自分で抱えている作業】${q2}\n【任せたいこと・ほしい役職】${q3 || '（指定なし）'}`;
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json',
+      'x-api-key': key,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true'
+    },
+    body: JSON.stringify({ model, max_tokens: 4000, system, messages: [{ role: 'user', content: user }] })
+  });
+  const data = await res.json();
+  if (data.error) throw new Error(data.error.message || 'APIエラー');
+  if (data.stop_reason === 'refusal') throw new Error('この内容は生成できませんでした。表現を変えてお試しください。');
+  const text = (data.content || []).filter(b => b.type === 'text').map(b => b.text).join('');
+  const m = text.match(/\{[\s\S]*\}/);
+  if (!m) throw new Error('JSONが取り出せませんでした。もう一度お試しください。');
+  const obj = JSON.parse(m[0]);
+  if (!obj.roles || !obj.roles.length) throw new Error('役職が空でした。もう一度お試しください。');
+  obj.roles = obj.roles.slice(0, 6).map((r, i) => ({
+    id: (i === 0 ? 'leader' : String(r.id || 'member' + i).toLowerCase().replace(/[^a-z0-9_-]/g, '')) || 'member' + i,
+    name: r.name || '社員', tag: r.tag || '', mission: r.mission || '',
+    tasks: Array.isArray(r.tasks) ? r.tasks : [], rules: Array.isArray(r.rules) ? r.rules : []
+  }));
+  return obj;
+}
+
+// ---------- 組織図SVG ----------
+function buildSvg(company, roles) {
+  const W = Math.max(560, roles.length * 150 + 40);
+  const H = 300;
+  const cx = W / 2;
+  const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  let s = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">`;
+  s += `<rect width="${W}" height="${H}" fill="#0e0e0e"/>`;
+  s += `<text x="${cx}" y="26" text-anchor="middle" font-size="13" fill="#9a9a9a">${esc(company)} ── AI社員チーム</text>`;
+  // owner
+  s += `<rect x="${cx-70}" y="40" width="140" height="44" rx="10" fill="#D97757"/>`;
+  s += `<text x="${cx}" y="60" text-anchor="middle" font-size="12" fill="#fff">オーナー</text>`;
+  s += `<text x="${cx}" y="76" text-anchor="middle" font-size="11" fill="#fff" opacity=".9">あなた（決める人）</text>`;
+  // reception
+  s += `<line x1="${cx}" y1="84" x2="${cx}" y2="110" stroke="#444" stroke-width="2"/>`;
+  s += `<rect x="${cx-60}" y="110" width="120" height="34" rx="8" fill="#1a1a1a" stroke="#333"/>`;
+  s += `<text x="${cx}" y="132" text-anchor="middle" font-size="12" fill="#ededed">受付係（CLAUDE.md）</text>`;
+  // bus line
+  const n = roles.length;
+  const gap = 150;
+  const startX = cx - ((n - 1) * gap) / 2;
+  s += `<line x1="${cx}" y1="144" x2="${cx}" y2="172" stroke="#444" stroke-width="2"/>`;
+  if (n > 1) s += `<line x1="${startX}" y1="172" x2="${startX + (n-1)*gap}" y2="172" stroke="#444" stroke-width="2"/>`;
+  roles.forEach((r, i) => {
+    const x = startX + i * gap;
+    const isLeader = r.id === 'leader';
+    s += `<line x1="${x}" y1="172" x2="${x}" y2="196" stroke="#444" stroke-width="2"/>`;
+    s += `<rect x="${x-64}" y="196" width="128" height="70" rx="10" fill="${isLeader ? '#2a1c16' : '#161616'}" stroke="${isLeader ? '#D97757' : '#262626'}"/>`;
+    s += `<text x="${x}" y="218" text-anchor="middle" font-size="10" fill="#D97757">${esc(r.tag || '')}</text>`;
+    s += `<text x="${x}" y="238" text-anchor="middle" font-size="14" font-weight="700" fill="#ededed">${esc(r.name)}</text>`;
+    s += `<text x="${x}" y="256" text-anchor="middle" font-size="10" fill="#9a9a9a">${esc(r.id)}</text>`;
+  });
+  s += `<text x="${W-10}" y="${H-8}" text-anchor="end" font-size="9" fill="#5a5a5a">hitotsu-company.com/apps</text>`;
+  s += `</svg>`;
+  return s;
+}
+
+// ---------- 画面 ----------
+let current = null;
+
+function render(obj) {
+  current = obj;
+  $('companyTitle').textContent = `${obj.company} のAI社員チーム（${obj.roles.length}名）`;
+  $('chart').innerHTML = buildSvg(obj.company, obj.roles);
+  const wrap = $('roles');
+  wrap.innerHTML = '';
+  obj.roles.forEach((r, i) => {
+    const d = document.createElement('div');
+    d.className = 'role';
+    d.innerHTML = `<div class="tag">${i + 1}. ${r.tag || ''}</div><div class="name">${r.name}</div><div class="mission">${r.mission}</div><pre></pre>`;
+    d.querySelector('pre').textContent = roleMd(obj.company, r);
+    d.addEventListener('click', e => { if (e.target.tagName !== 'PRE') d.classList.toggle('open'); });
+    wrap.appendChild(d);
+  });
+  $('result').classList.add('show');
+  $('result').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+document.querySelectorAll('input[name=mode]').forEach(el => el.addEventListener('change', () => {
+  $('keyBox').classList.toggle('show', document.querySelector('input[name=mode]:checked').value === 'ai');
+}));
+try {
+  const saved = localStorage.getItem('anthropic_key_soshikizu');
+  if (saved) $('apiKey').value = saved;
+} catch (_) {}
+
+$('makeBtn').addEventListener('click', async () => {
+  const q1 = $('q1').value.trim(), q2 = $('q2').value.trim(), q3 = $('q3').value.trim();
+  if (!q1) { $('status').textContent = '1の「どんな事業か」を書いてください。'; $('q1').focus(); return; }
+  const mode = document.querySelector('input[name=mode]:checked').value;
+  $('makeBtn').disabled = true;
+  try {
+    if (mode === 'template') {
+      $('status').textContent = '雛形から組んでいます…';
+      const roles = pickRoles(q1, q2, q3);
+      render({ company: guessCompany(q1), roles });
+      $('status').textContent = '✅ できました。役職をタップすると役割定義書が開きます。';
+    } else {
+      const key = $('apiKey').value.trim();
+      if (!key) { $('status').textContent = 'APIキーを入れてください。'; $('apiKey').focus(); return; }
+      try { localStorage.setItem('anthropic_key_soshikizu', key); } catch (_) {}
+      $('status').textContent = 'AIが設計中…（20〜60秒かかります）';
+      const obj = await generateWithAI(q1, q2, q3, key, $('model').value);
+      render(obj);
+      $('status').textContent = '✅ できました。役職をタップすると役割定義書が開きます。';
+    }
+  } catch (err) {
+    const msg = String(err.message || err);
+    $('status').textContent = '⚠️ ' + (/authentication|invalid x-api-key/i.test(msg) ? 'APIキーが正しくないようです。' : msg);
+  } finally {
+    $('makeBtn').disabled = false;
+  }
+});
+
+$('pngBtn').addEventListener('click', () => {
+  if (!current) return;
+  const svgText = $('chart').innerHTML;
+  const svgEl = $('chart').querySelector('svg');
+  const w = +svgEl.getAttribute('width'), h = +svgEl.getAttribute('height');
+  const img = new Image();
+  const blob = new Blob([svgText], { type: 'image/svg+xml;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  img.onload = () => {
+    const c = document.createElement('canvas');
+    c.width = w * 2; c.height = h * 2;
+    const ctx = c.getContext('2d');
+    ctx.scale(2, 2);
+    ctx.drawImage(img, 0, 0);
+    URL.revokeObjectURL(url);
+    const a = document.createElement('a');
+    a.download = 'ai-shain-soshikizu.png';
+    a.href = c.toDataURL('image/png');
+    a.click();
+  };
+  img.src = url;
+});
+
+$('zipBtn').addEventListener('click', async () => {
+  if (!current) return;
+  const zip = new JSZip();
+  const root = zip.folder('ai-shain-team');
+  root.file('CLAUDE.md', receptionMd(current.company, current.roles));
+  root.file('README_導入手順.md', readmeMd(current.company, current.roles));
+  current.roles.forEach(r => {
+    const f = root.folder('members/' + r.id);
+    f.file('CLAUDE.md', roleMd(current.company, r));
+    f.folder('inbox');
+  });
+  const blob = await zip.generateAsync({ type: 'blob' });
+  const a = document.createElement('a');
+  a.download = 'ai-shain-team.zip';
+  a.href = URL.createObjectURL(blob);
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+});
+
+$('promptBtn').addEventListener('click', async () => {
+  if (!current) return;
+  const text = readmeMd(current.company, current.roles).split('---')[1].trim();
+  try { await navigator.clipboard.writeText(text); $('status').textContent = '✅ 導入文をコピーしました。zipを展開したフォルダでClaude Codeを開いて貼ってください。'; }
+  catch (_) { prompt('コピーしてください', text); }
+});
+</script>
+</body>
+</html>

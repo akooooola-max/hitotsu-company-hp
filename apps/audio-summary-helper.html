@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="通勤中の資料インプット。聞き逃さず要点だけ耳で回収する準備を整える">
+<title>資料の耳インプット準備ノート</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic", sans-serif;
+    margin: 0; padding: 0;
+    background: #f4f6f8;
+    color: #222;
+    line-height: 1.6;
+  }
+  header {
+    background: #2c5282;
+    color: white;
+    padding: 20px 16px;
+    text-align: center;
+  }
+  header h1 { margin: 0; font-size: 1.3rem; }
+  header p { margin: 6px 0 0; font-size: 0.85rem; opacity: 0.9; }
+  .container {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 16px;
+  }
+  .card {
+    background: white;
+    border-radius: 10px;
+    padding: 18px;
+    margin-bottom: 16px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  }
+  .card h2 {
+    font-size: 1.05rem;
+    margin: 0 0 12px;
+    color: #2c5282;
+    border-left: 4px solid #2c5282;
+    padding-left: 10px;
+  }
+  label {
+    display: block;
+    font-size: 0.9rem;
+    margin-bottom: 6px;
+    color: #444;
+  }
+  input[type="text"], textarea, select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccd;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    font-family: inherit;
+    margin-bottom: 12px;
+  }
+  textarea { resize: vertical; min-height: 80px; }
+  button {
+    background: #2c5282;
+    color: white;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    cursor: pointer;
+    margin-right: 6px;
+    margin-bottom: 6px;
+  }
+  button:hover { background: #2a4a72; }
+  button.sub {
+    background: #eef;
+    color: #2c5282;
+    border: 1px solid #ccd;
+  }
+  button.danger {
+    background: #e53e3e;
+  }
+  .checklist li {
+    list-style: none;
+    padding: 8px 0;
+    border-bottom: 1px dashed #eee;
+    display: flex;
+    align-items: flex-start;
+  }
+  .checklist ul { padding: 0; margin: 0; }
+  .checklist input[type="checkbox"] {
+    margin-right: 10px;
+    margin-top: 4px;
+    transform: scale(1.2);
+  }
+  .checklist label { margin: 0; flex: 1; cursor: pointer; }
+  .item {
+    background: #f9fafc;
+    border: 1px solid #e2e6ea;
+    border-radius: 6px;
+    padding: 12px;
+    margin-bottom: 10px;
+  }
+  .item-title { font-weight: bold; margin-bottom: 4px; }
+  .item-meta { font-size: 0.8rem; color: #666; margin-bottom: 6px; }
+  .item-focus { font-size: 0.88rem; color: #333; background: #fffbea; padding: 6px 8px; border-radius: 4px; }
+  .status {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 0.75rem;
+    margin-right: 6px;
+  }
+  .status.wait { background: #fed7aa; color: #7c2d12; }
+  .status.done { background: #c6f6d5; color: #22543d; }
+  .empty {
+    color: #999;
+    text-align: center;
+    padding: 20px;
+    font-size: 0.9rem;
+  }
+  .tip {
+    background: #fffbea;
+    border-left: 3px solid #d69e2e;
+    padding: 10px 12px;
+    font-size: 0.85rem;
+    border-radius: 4px;
+    margin-bottom: 12px;
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>🎧 資料の耳インプット準備ノート</h1>
+  <p>読む時間がない資料を、通勤中に耳で回収するための下準備</p>
+</header>
+
+<div class="container">
+
+  <div class="card">
+    <h2>① 準備チェックリスト</h2>
+    <div class="tip">初回だけ確認。次回以降はスキップOK。</div>
+    <div class="checklist">
+      <ul id="checklist"></ul>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>② 聞きたい資料を登録</h2>
+    <div class="tip">音声化する前に「何を知りたいか」を1行決めておくと、聞くとき集中できます。</div>
+    <label>資料タイトル</label>
+    <input type="text" id="title" placeholder="例: 中期経営計画2025">
+    
+    <label>種類</label>
+    <select id="kind">
+      <option>社内資料</option>
+      <option>業界レポート</option>
+      <option>勉強・書籍</option>
+      <option>Web記事</option>
+      <option>その他</option>
+    </select>
+    
+    <label>この資料から知りたいこと（1〜2行）</label>
+    <textarea id="focus" placeholder="例: 来期の重点施策と、自部署に関係する箇所"></textarea>
+    
+    <label>いつ聞く？</label>
+    <select id="when">
+      <option>通勤中</option>
+      <option>家事の合間</option>
+      <option>就寝前</option>
+      <option>運動中</option>
+      <option>その他の隙間時間</option>
+    </select>
+    
+    <button onclick="addItem()">＋ 登録する</button>
+  </div>
+
+  <div class="card">
+    <h2>③ 音声化待ちリスト</h2>
+    <div id="items"></div>
+  </div>
+
+  <div class="card">
+    <h2>💡 聞くときのコツ</h2>
+    <ul style="padding-left: 20px; font-size: 0.9rem;">
+      <li>1.5倍速で聞くと10分の音声が約7分に短縮できます</li>
+      <li>気になった箇所は「今の話メモして」と口頭でスマホにメモ</li>
+      <li>2回目は等速で、気になったパートだけ聞き直す</li>
+      <li>週末にまとめて音声化→平日は聞くだけ、が続けやすい</li>
+    </ul>
+  </div>
+
+  <div style="text-align: center; margin: 20px 0;">
+    <button class="sub" onclick="exportData()">📤 データを書き出す</button>
+    <button class="danger" onclick="resetAll()">全データ削除</button>
+  </div>
+
+</div>
+
+<script>
+const CHECK_ITEMS = [
+  "音声概要が使えるAIノートツールにアクセスした",
+  "アカウントでログインした",
+  "音声化したい資料（PDF・URL・テキスト）を手元に用意した",
+  "スマホで音声を聞ける環境を確認した（イヤホン・再生アプリ）"
+];
+
+function loadChecks() {
+  const saved = JSON.parse(localStorage.getItem('audio_checks') || '{}');
+  const ul = document.getElementById('checklist');
+  ul.innerHTML = '';
+  CHECK_ITEMS.forEach((text, i) => {
+    const li = document.createElement('li');
+    const id = 'chk' + i;
+    li.innerHTML = `<input type="checkbox" id="${id}" ${saved[i] ? 'checked' : ''} onchange="saveCheck(${i}, this.checked)"><label for="${id}">${text}</label>`;
+    ul.appendChild(li);
+  });
+}
+
+function saveCheck(i, val) {
+  const saved = JSON.parse(localStorage.getItem('audio_checks') || '{}');
+  saved[i] = val;
+  localStorage.setItem('audio_checks', JSON.stringify(saved));
+}
+
+function getItems() {
+  return JSON.parse(localStorage.getItem('audio_items') || '[]');
+}
+
+function saveItems(items) {
+  localStorage.setItem('audio_items', JSON.stringify(items));
+}
+
+function addItem() {
+  const title = document.getElementById('title').value.trim();
+  const focus = document.getElementById('focus').value.trim();
+  if (!title) { alert('資料タイトルを入力してください'); return; }
+  const items = getItems();
+  items.unshift({
+    id: Date.now(),
+    title,
+    kind: document.getElementById('kind').value,
+    focus,
+    when: document.getElementById('when').value,
+    done: false,
+    created: new Date().toLocaleDateString('ja-JP')
+  });
+  saveItems(items);
+  document.getElementById('title').value = '';
+  document.getElementById('focus').value = '';
+  renderItems();
+}
+
+function toggleDone(id) {
+  const items = getItems();
+  const item = items.find(x => x.id === id);
+  if (item) item.done = !item.done;
+  saveItems(items);
+  renderItems();
+}
+
+function deleteItem(id) {
+  if (!confirm('削除しますか？')) return;
+  saveItems(getItems().filter(x => x.id !== id));
+  renderItems();
+}
+
+function renderItems() {
+  const items = getItems();
+  const box = document.getElementById('items');
+  if (items.length === 0) {
+    box.innerHTML = '<div class="empty">まだ登録がありません。上のフォームから追加してください。</div>';
+    return;
+  }
+  box.innerHTML = items.map(item => `
+    <div class="item">
+      <div>
+        <span class="status ${item.done ? 'done' : 'wait'}">${item.done ? '聞き終わった' : '未聴取'}</span>
+        <span style="font-size:0.75rem; color:#888;">${item.kind} / ${item.when} / ${item.created}</span>
+      </div>
+      <div class="item-title">${escapeHtml(item.title)}</div>
+      ${item.focus ? `<div class="item-focus">🎯 ${escapeHtml(item.focus)}</div>` : ''}
+      <div style="margin-top:10px;">
+        <button class="sub" onclick="toggleDone(${item.id})">${item.done ? '未聴取に戻す' : '聞き終わった'}</button>
+        <button class="sub" onclick="deleteItem(${item.id})">削除</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function escapeHtml(s) {
+  return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function exportData() {
+  const items = getItems();
+  if (items.length === 0) { alert('書き出すデータがありません'); return; }
+  let text = '# 資料の耳インプットリスト\n\n';
+  items.forEach(item => {
+    text += `## ${item.title}\n`;
+    text += `- 状態: ${item.done ? '聞き終わった' : '未聴取'}\n`;
+    text += `- 種類: ${item.kind}\n`;
+    text += `- 聞くタイミング: ${item.when}\n`;
+    if (item.focus) text += `- 知りたいこと: ${item.focus}\n`;
+    text += `- 登録日: ${item.created}\n\n`;
+  });
+  const blob = new Blob([text], {type: 'text/plain'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'audio-list.txt';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function resetAll() {
+  if (!confirm('チェックと登録リストをすべて削除します。よろしいですか？')) return;
+  localStorage.removeItem('audio_checks');
+  localStorage.removeItem('audio_items');
+  loadChecks();
+  renderItems();
+}
+
+loadChecks();
+renderItems();
+</script>
+</body>
+</html>
