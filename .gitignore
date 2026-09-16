@@ -1,1 +1,13 @@
 .wrangler/
+.dev.vars
+node_modules/
+
+# 統制室の中身は git に入れない。
+# このリポジトリは public なので、コミットした時点で外から読めてしまう。
+# 下書きは手元のディスクに置き、wrangler deploy で合言葉ゲートの内側に配信する。
+control/drafts/
+control/queue.json
+control/clients/*
+!control/clients/README.md
+!control/clients/_template.md
+__pycache__/
