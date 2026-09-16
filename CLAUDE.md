@@ -1,6 +1,6 @@
 # Hitotsu Company HP
 
-屋号 Hitotsu Company のコーポレートサイト。Cloudflare Workers（静的アセット＋統制室ゲート）で
+屋号 Hitotsu Company のコーポレートサイト。Cloudflare Workers の静的アセットとして
 `hitotsu-company.com` に配信しています。ビルドはありません。HTMLを書けばそれが本番です。
 
 ## 構成
@@ -14,14 +14,11 @@
 | `hp/` | ホームページ制作プラン |
 | `apps/` | 道具箱。毎朝1本増える無料ツール群 |
 | `card.html` `books.html` `tokusho.html` `tool-order.html` | 名刺・著書・特商法・福祉ツール注文 |
-| `control/` | **法人統制室**（合言葉ゲートの内側。承認待ちと下書き置き場） |
-| `jobs/` `scripts/` | 夜間工場（毎晩7本）。→ `jobs/README.md` |
 | `docs/blueprints/` | AI社員の設計図。AI社員室（月額）の週1配信の在庫 |
 | `docs/automation/` `docs/posts/` | 週次の自動下書きと投稿案 |
-| `src/gate.js` | 統制室の合言葉ゲート（Worker） |
 | `docs/` | 事業計画・提案書 |
 
-`.assetsignore` に入っているもの（`src/` `jobs/` `scripts/` `docs/` など）は配信されません。
+`.assetsignore` に入っているもの（`docs/` など）は配信されません。
 
 ## 書き方のきまり
 
@@ -46,17 +43,11 @@
 
 ## さわるときに気をつけること
 
-- **`control/` は社外に出せない中身です。** 承認前の原稿・顧問先のレポート・仕入れ候補が入ります。
-  ここへのリンクを公開ページに置かないでください。
-- **`control/drafts/` `control/queue.json` `control/clients/*` は `.gitignore` に入っています。**
-  外さないでください。承認前の原稿と顧問先のレポートは、リポジトリの private / public に
-  関わらず git に入れない方針です（合言葉ゲートが守るのは Web の入口だけで、git は別の出口）。
-  下書きは `wrangler deploy` でゲートの内側にだけ配信します。
 - **`docs/blueprints/` は会員特典（AI社員室 2,980円/月 の週1配信）の原稿です。**
   サイトからは配信されませんが、リポジトリが public のあいだは GitHub から誰でも読めます。
   **private にする方針が決まっています**（→ `docs/blueprints/README.md` の冒頭）。
-  切り替わったら、3か所の注意書きを消してください。
-- **`apps/` の道具は夜間工場が毎朝足します。** 手で直すときは
+  切り替わったら、ここと `docs/blueprints/README.md` `docs/automation/weekly-drafts.md` の注意書きを消してください。
+- **`apps/` の道具は自動で毎朝1本増えます**（コミットは「apps: 道具箱を更新（自動）」）。手で直すときは
   `apps/index.html` と `apps/box-9f4a7c2e/index.html` の両方（件数と日付も）を揃えること。
 - **決済リンク**は `consul/index.html` の `PAY` にまとまっています。
   URLが空のプランは、申し込みボタンが出ません（`komon` と `busho` が未設定）。
@@ -66,7 +57,5 @@
 
 ```sh
 python3 -m http.server 8000     # 見た目の確認はこれで足りる
-npx wrangler dev                # ゲートまで含めて確認するとき
 npx wrangler deploy             # 本番へ
-npx wrangler secret put CONTROL_KEY   # 統制室の合言葉（1回だけ）
 ```

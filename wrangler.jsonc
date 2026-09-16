@@ -1,6 +1,5 @@
 {
   "name": "hitotsu-company-hp",
-  "main": "src/gate.js",
   "compatibility_date": "2026-08-01",
   "workers_dev": true,
   "routes": [
@@ -8,9 +7,6 @@
     { "pattern": "www.hitotsu-company.com", "custom_domain": true }
   ],
   "assets": {
-    "directory": ".",
-    "binding": "ASSETS",
-    // 統制室だけ Worker を先に通す（合言葉ゲート）。他のページは今までどおり静的配信。
-    "run_worker_first": ["/control", "/control/*"]
+    "directory": "."
   }
 }
