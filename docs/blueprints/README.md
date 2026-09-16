@@ -9,8 +9,8 @@ AI社員室（2,980円/月）の会員特典「毎週1通の設計図」の原�
 >
 > **決めたこと（2026-09-16）：リポジトリを private にする。**
 > GitHub → Settings → 最下部 Danger Zone → Change repository visibility → Private。
-> 済んだらこの注意書きを消してください（`docs/automation/weekly-drafts.md` と
-> `CLAUDE.md` にも同じ注意書きがあります）。
+> 済んだらこの注意書きを消してください（`docs/automation/weekly-drafts.md` にも
+> 同じ注意書きがあります）。
 >
 > それまでは、**設計図を1本足すたびに無料で読める本数が増えます。**
 
