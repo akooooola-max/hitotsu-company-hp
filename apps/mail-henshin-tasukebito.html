@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="メール返信。要約と下書きを一発で用意して迷わない">
+<title>メール返信 たすけ人</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, "Hiragino Kaku Gothic ProN", "Yu Gothic", Meiryo, sans-serif;
+    margin: 0;
+    padding: 0;
+    background: #f4f6f9;
+    color: #222;
+    line-height: 1.6;
+  }
+  header {
+    background: #2c5282;
+    color: #fff;
+    padding: 16px 20px;
+  }
+  header h1 { margin: 0; font-size: 20px; }
+  header p { margin: 4px 0 0; font-size: 13px; opacity: 0.9; }
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 16px;
+  }
+  .card {
+    background: #fff;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 16px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  }
+  h2 {
+    font-size: 16px;
+    margin: 0 0 12px;
+    padding-left: 10px;
+    border-left: 4px solid #2c5282;
+  }
+  label {
+    display: block;
+    font-size: 13px;
+    font-weight: bold;
+    margin-bottom: 6px;
+    color: #444;
+  }
+  textarea, select, input[type=text] {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #cbd5e0;
+    border-radius: 4px;
+    font-size: 14px;
+    font-family: inherit;
+    resize: vertical;
+  }
+  textarea { min-height: 120px; }
+  .row {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+  }
+  .row > div { flex: 1; min-width: 200px; }
+  button {
+    background: #2c5282;
+    color: #fff;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+    font-weight: bold;
+  }
+  button:hover { background: #2a4a70; }
+  button.sub {
+    background: #718096;
+    padding: 6px 12px;
+    font-size: 12px;
+    font-weight: normal;
+  }
+  button.sub:hover { background: #5a6778; }
+  button.danger { background: #c53030; }
+  .output {
+    background: #f7fafc;
+    border: 1px dashed #a0aec0;
+    padding: 12px;
+    border-radius: 4px;
+    margin-top: 12px;
+    white-space: pre-wrap;
+    font-size: 13px;
+    min-height: 60px;
+  }
+  .btn-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-top: 10px;
+  }
+  .tpl-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 10px;
+    border: 1px solid #e2e8f0;
+    border-radius: 4px;
+    margin-bottom: 6px;
+    font-size: 13px;
+  }
+  .tpl-item .name { flex: 1; font-weight: bold; }
+  .tpl-item .actions { display: flex; gap: 6px; }
+  .steps {
+    background: #fffbea;
+    border: 1px solid #f6e05e;
+    padding: 12px;
+    border-radius: 4px;
+    font-size: 13px;
+    margin-bottom: 16px;
+  }
+  .steps ol { margin: 6px 0 0 20px; padding: 0; }
+  .msg { font-size: 12px; color: #38a169; margin-left: 10px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>📧 メール返信 たすけ人</h1>
+  <p>受信メールをAIに渡す「依頼文」を作って、返信の下書きまで一気に用意します</p>
+</header>
+
+<div class="container">
+
+  <div class="steps">
+    <b>使い方（3ステップ）</b>
+    <ol>
+      <li>下に受信メールを貼り付け、返信の方向性を選ぶ</li>
+      <li>「依頼文を作る」を押して、生成された文をコピー</li>
+      <li>お使いのAIチャットに貼り付けて送信 → 出た下書きをメールに反映</li>
+    </ol>
+  </div>
+
+  <!-- 依頼文作成 -->
+  <div class="card">
+    <h2>1. 受信メールから「AIへの依頼文」を作る</h2>
+
+    <label for="mail">受信メール本文（コピーして貼り付け）</label>
+    <textarea id="mail" placeholder="例：お世話になっております。株式会社○○の△△です。先日ご相談した件ですが……"></textarea>
+
+    <div class="row" style="margin-top:12px">
+      <div>
+        <label for="mode">やってほしいこと</label>
+        <select id="mode">
+          <option value="summary">3行で要約する</option>
+          <option value="reply">返信の下書きを作る</option>
+          <option value="both">要約と返信の両方</option>
+          <option value="forward">上司への転送メモを作る</option>
+        </select>
+      </div>
+      <div>
+        <label for="tone">返信のトーン（返信を選んだとき）</label>
+        <select id="tone">
+          <option value="teinei">丁寧に承諾する</option>
+          <option value="kotowaru">丁寧に断る</option>
+          <option value="shitsumon">追加で質問する</option>
+          <option value="hokoku">状況を報告する</option>
+          <option value="orei">お礼を伝える</option>
+          <option value="chosei">日程調整をお願いする</option>
+        </select>
+      </div>
+    </div>
+
+    <label for="extra">補足したいこと（任意・自由記入）</label>
+    <input type="text" id="extra" placeholder="例：来週水曜の午後は空いています／予算の都合で今回は難しい 等">
+
+    <div class="btn-row">
+      <button onclick="generate()">依頼文を作る</button>
+      <button class="sub" onclick="clearAll()">入力をクリア</button>
+    </div>
+
+    <label style="margin-top:16px">👇 このままAIチャットに貼り付けてください</label>
+    <div class="output" id="output">ここに依頼文が表示されます</div>
+    <div class="btn-row">
+      <button class="sub" onclick="copyOutput()">コピーする</button>
+      <span class="msg" id="copyMsg"></span>
+    </div>
+  </div>
+
+  <!-- テンプレート -->
+  <div class="card">
+    <h2>2. よく使う返信パターンを保存</h2>
+    <p style="font-size:13px;color:#555;margin-top:0">
+      「日程調整の断り方」など、いつも書く文をここに保存しておけば、コピーしてすぐ使えます。
+    </p>
+
+    <label for="tplName">テンプレート名</label>
+    <input type="text" id="tplName" placeholder="例：資料送付のお礼">
+
+    <label for="tplBody" style="margin-top:10px">本文</label>
+    <textarea id="tplBody" placeholder="例：先日は資料をお送りいただき、誠にありがとうございました。"></textarea>
+
+    <div class="btn-row">
+      <button onclick="saveTemplate()">保存する</button>
+      <span class="msg" id="tplMsg"></span>
+    </div>
+
+    <div id="tplList" style="margin-top:14px"></div>
+  </div>
+
+</div>
+
+<script>
+  const STORAGE_KEY = 'mail_templates_v1';
+
+  function generate() {
+    const mail = document.getElementById('mail').value.trim();
+    const mode = document.getElementById('mode').value;
+    const tone = document.getElementById('tone').value;
+    const extra = document.getElementById('extra').value.trim();
+
+    if (!mail) {
+      alert('受信メール本文を貼り付けてください。');
+      return;
+    }
+
+    const toneMap = {
+      teinei: '丁寧に承諾する',
+      kotowaru: '丁寧にお断りする（相手の気分を害さないよう配慮）',
+      shitsumon: '不明点を丁寧に質問する',
+      hokoku: '現在の状況を分かりやすく報告する',
+      orei: '感謝の気持ちを伝える',
+      chosei: '日程調整をお願いする'
+    };
+
+    let instruction = '';
+
+    if (mode === 'summary') {
+      instruction = '以下のメールを、日本語で3行に要約してください。「誰が」「何を」「いつまでに」求めているかが分かるようにお願いします。';
+    } else if (mode === 'reply') {
+      instruction = '以下のメールに対して、日本語のビジネスメールとして返信の下書きを作ってください。方針は「' + toneMap[tone] + '」です。宛名・本文・締めの挨拶まで含めてください。';
+    } else if (mode === 'both') {
+      instruction = '以下のメールについて、次の2つを日本語で作ってください。\n【1】3行での要約（誰が・何を・いつまでに）\n【2】返信の下書き（方針：' + toneMap[tone] + '、宛名から締めまで含む）';
+    } else if (mode === 'forward') {
+      instruction = '以下のメールを、上司に共有するための転送メモとしてまとめてください。次の項目を含めてください。\n・差出人と件名の要点\n・依頼／連絡の内容\n・期限や重要な数字\n・こちらで対応すべきこと（あれば）';
+    }
+
+    if (extra) {
+      instruction += '\n\n【こちらの状況・補足】\n' + extra;
+    }
+
+    const prompt = instruction + '\n\n【メール本文ここから】\n' + mail + '\n【メール本文ここまで】';
+
+    document.getElementById('output').textContent = prompt;
+    document.getElementById('copyMsg').textContent = '';
+  }
+
+  function copyOutput() {
+    const text = document.getElementById('output').textContent;
+    if (!text || text === 'ここに依頼文が表示されます') {
+      alert('先に依頼文を作ってください。');
+      return;
+    }
+    navigator.clipboard.writeText(text).then(() => {
+      document.getElementById('copyMsg').textContent = '✓ コピーしました';
+      setTimeout(() => { document.getElementById('copyMsg').textContent = ''; }, 2000);
+    }).catch(() => {
+      // フォールバック
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      document.getElementById('copyMsg').textContent = '✓ コピーしました';
+      setTimeout(() => { document.getElementById('copyMsg').textContent = ''; }, 2000);
+    });
+  }
+
+  function clearAll() {
+    document.getElementById('mail').value = '';
+    document.getElementById('extra').value = '';
+    document.getElementById('output').textContent = 'ここに依頼文が表示されます';
+  }
+
+  // テンプレート機能
+  function loadTemplates() {
+    try {
+      return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+    } catch(e) { return []; }
+  }
+
+  function saveTemplates(list) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+  }
+
+  function saveTemplate() {
+    const name = document.getElementById('tplName').value.trim();
+    const body = document.getElementById('tplBody').value.trim();
+    if (!name || !body) {
+      alert('テンプレート名と本文の両方を入力してください。');
+      return;
+    }
+    const list = loadTemplates();
+    list.push({ name, body, id: Date.now() });
+    saveTemplates(list);
+    document.getElementById('tplName').value = '';
+    document.getElementById('tplBody').value = '';
+    document.getElementById('tplMsg').textContent = '✓ 保存しました';
+    setTimeout(() => { document.getElementById('tplMsg').textContent = ''; }, 2000);
+    renderTemplates();
+  }
+
+  function deleteTemplate(id) {
+    if (!confirm('このテンプレートを削除しますか？')) return;
+    const list = loadTemplates().filter(t => t.id !== id);
+    saveTemplates(list);
+    renderTemplates();
+  }
+
+  function copyTemplate(id) {
+    const t = loadTemplates().find(t => t.id === id);
+    if (!t) return;
+    navigator.clipboard.writeText(t.body).then(() => {
+      alert('「' + t.name + '」をコピーしました');
+    }).catch(() => {
+      const ta = document.createElement('textarea');
+      ta.value = t.body;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      alert('「' + t.name + '」をコピーしました');
+    });
+  }
+
+  function renderTemplates() {
+    const list = loadTemplates();
+    const container = document.getElementById('tplList');
+    if (list.length === 0) {
+      container.innerHTML = '<p style="font-size:13px;color:#888">まだ保存されたテンプレートはありません。</p>';
+      return;
+    }
+    container.innerHTML = list.map(t =>
+      '<div class="tpl-item">' +
+        '<div class="name">' + escapeHtml(t.name) + '</div>' +
+        '<div class="actions">' +
+          '<button class="sub" onclick="copyTemplate(' + t.id + ')">コピー</button>' +
+          '<button class="sub danger" onclick="deleteTemplate(' + t.id + ')">削除</button>' +
+        '</div>' +
+      '</div>'
+    ).join('');
+  }
+
+  function escapeHtml(s) {
+    return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+
+  renderTemplates();
+</script>
+</body>
+</html>

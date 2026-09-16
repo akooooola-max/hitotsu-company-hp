@@ -15,9 +15,11 @@
 | `apps/` | 道具箱。毎朝1本増える無料ツール群 |
 | `card.html` `books.html` `tokusho.html` `tool-order.html` | 名刺・著書・特商法・福祉ツール注文 |
 | `control/` | **法人統制室**（合言葉ゲートの内側。承認待ちと下書き置き場） |
-| `jobs/` `scripts/` | 夜間工場。→ `jobs/README.md` |
+| `jobs/` `scripts/` | 夜間工場（毎晩7本）。→ `jobs/README.md` |
+| `docs/blueprints/` | AI社員の設計図。AI社員室（月額）の週1配信の在庫 |
+| `docs/automation/` `docs/posts/` | 週次の自動下書きと投稿案 |
 | `src/gate.js` | 統制室の合言葉ゲート（Worker） |
-| `docs/` | 事業提案書 |
+| `docs/` | 事業計画・提案書 |
 
 `.assetsignore` に入っているもの（`src/` `jobs/` `scripts/` `docs/` など）は配信されません。
 
@@ -40,6 +42,7 @@
 - 煽らない。断定を避けない。長くしない。
 - 価格は必ず税込で、どのページでも同じ数字にする。変えるときは
   `consul/` `kenshu/` `index.html` `houkago/` `tokusho.html` を揃えて直す。
+  いまの月額は AI社員室 2,980円／顧問プラン 19,800円／AI部署プラン 59,800円〜。
 
 ## さわるときに気をつけること
 
@@ -51,7 +54,7 @@
 - **`apps/` の道具は夜間工場が毎朝足します。** 手で直すときは
   `apps/index.html` と `apps/box-9f4a7c2e/index.html` の両方（件数と日付も）を揃えること。
 - **決済リンク**は `consul/index.html` の `PAY` にまとまっています。
-  空のプランは申し込みボタンがLINEに落ちます（導線を切らないため）。
+  URLが空のプランは、申し込みボタンが出ません（`komon` と `busho` が未設定）。
 - 価格や解約条件を変えたら、`tokusho.html`（特定商取引法に基づく表記）も必ず直すこと。
 
 ## 動かす

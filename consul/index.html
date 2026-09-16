@@ -2,10 +2,10 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0b1020">
 <title>AIコンサルタント ひとつ｜メニューと料金</title>
-<meta name="description" content="AIコンサルタント（Hitotsu Company）のメニューと料金。単発相談・アプリ作成・AI社員作り・ホームページ制作・AI組織作り。実データはお預かりしない安心設計です。">
+<meta name="description" content="AIコンサルタント（Hitotsu Company）のメニューと料金。単発相談・アプリ作成・ホームページ制作。AI社員とAI部署は「1回つくって終わり」と「毎月そだてる」から選べます。実データはお預かりしない安心設計です。">
 <meta property="og:type" content="website">
 <meta property="og:title" content="AIコンサルタント ひとつ｜メニューと料金">
-<meta property="og:description" content="単発相談・アプリ作成・AI社員作り・ホームページ制作・AI組織作り。メニューと料金の一覧です。">
+<meta property="og:description" content="単発相談・アプリ作成・ホームページ制作・AI社員・AI部署。単発と月額から選べる、メニューと料金の一覧です。">
 <meta property="og:site_name" content="Hitotsu Company">
 <style>
 :root{--bg:#0b1020;--bg2:#101833;--panel:#131d3c;--ink:#f0f4ff;--muted:#95a3c6;
@@ -46,12 +46,6 @@ p{margin:14px 0}
 .mi .price{font-size:clamp(30px,9vw,38px);font-weight:900;letter-spacing:-.03em;line-height:1.2;margin-top:8px}
 .mi .price small{font-size:15px;font-weight:800;color:var(--muted);margin-left:4px}
 .mi p{margin:8px 0 0;font-size:14.5px;color:var(--muted)}
-.mi .f{list-style:none;margin:12px 0 0;padding:0}
-.mi .f li{position:relative;padding-left:20px;font-size:14px;color:var(--muted);margin-top:6px}
-.mi .f li:before{content:"✓";position:absolute;left:0;color:var(--green);font-weight:900}
-.mi .sub{display:inline-block;background:rgba(52,217,119,.14);border:1px solid rgba(52,217,119,.45);
- color:var(--green);font-size:11.5px;font-weight:900;padding:3px 11px;border-radius:999px;margin-bottom:10px}
-.teiki{background:var(--bg2)}
 
 .steps{counter-reset:s;margin-top:28px}
 .step{position:relative;padding:0 0 26px 52px;border-left:2px solid var(--line);margin-left:15px}
@@ -99,12 +93,40 @@ p{margin:14px 0}
  border-radius:12px;padding:14px 20px;font-size:15px;font-weight:900;text-decoration:none;
  box-shadow:0 8px 22px rgba(255,138,0,.28)}
 .paybtn.on{display:flex}
-.paybtn.ghost{background:none;color:var(--acc);border:1.5px solid var(--acc);box-shadow:none}
 .paybtn:active{transform:scale(.98)}
 
 .safe{display:flex;gap:13px;background:var(--bg2);border:1px solid var(--line);border-radius:14px;
  padding:16px 18px;font-size:15px;margin-top:14px}
 .safe span{color:var(--green);font-weight:900;flex-shrink:0}
+
+/* 月額プラン */
+.mi .price .per{font-size:15px;font-weight:800;color:var(--muted);margin-left:2px}
+.mi.sub{border-color:rgba(52,217,119,.45)}
+.mi.sub.hot{border-color:var(--acc)}
+.mi .incl{list-style:none;margin:12px 0 0;padding:0;font-size:14.5px}
+.mi .incl li{display:flex;gap:8px;align-items:flex-start;margin:5px 0}
+.mi .incl li i{font-style:normal;color:var(--green);font-weight:900;flex-shrink:0}
+.mi .first{margin-top:12px;font-size:13px;color:var(--muted);border-top:1px dashed var(--line);padding-top:10px}
+.mi .first b{color:var(--ink)}
+.applybtn{display:flex;align-items:center;justify-content:center;margin-top:12px;
+ background:rgba(52,217,119,.14);border:1px solid rgba(52,217,119,.5);color:var(--green);
+ border-radius:12px;padding:13px 20px;font-size:15px;font-weight:900;text-decoration:none}
+.applybtn:active{transform:scale(.98)}
+.dual{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.dual .opt{background:var(--bg2);border:1px solid var(--line);border-radius:13px;padding:13px 14px;display:flex;flex-direction:column}
+.dual .opt.pick{border-color:var(--acc);background:linear-gradient(180deg,rgba(255,176,32,.10),transparent)}
+.dual .lb{font-size:12px;font-weight:900;color:var(--muted);line-height:1.5}
+.dual .opt.pick .lb{color:var(--acc)}
+.dual .pr{font-size:24px;font-weight:900;letter-spacing:-.02em;margin-top:4px;line-height:1.25}
+.dual .pr small{font-size:13px;font-weight:800}
+.dual .ds{font-size:12.5px;color:var(--muted);margin-top:6px;line-height:1.65;flex:1}
+.paybtn.mini,.applybtn.mini{margin-top:10px;padding:11px 12px;font-size:13.5px;border-radius:10px;box-shadow:none}
+@media(max-width:420px){.dual{grid-template-columns:1fr}}
+
+.subnote{margin-top:10px;font-size:13px;color:var(--muted)}
+.subnote a{color:var(--acc);font-weight:800;text-decoration:none}
+.compare{margin-top:22px;background:var(--bg2);border:1px solid var(--line);border-radius:14px;padding:16px 18px;font-size:14.5px}
+.compare b{color:var(--acc)}
 
 footer{padding:36px 0 46px;border-top:1px solid var(--line);text-align:center}
 
@@ -129,7 +151,7 @@ footer{padding:36px 0 46px;border-top:1px solid var(--line);text-align:center}
 </style></head><body>
 
 <header class="hero"><div class="wrap">
-  <div class="badges"><span class="bd">鹿児島</span><span class="bd">事業者の方むけ</span><span class="bd">まずは相談から</span></div>
+  <div class="badges"><span class="bd">鹿児島</span><span class="bd">事業者の方むけ</span><span class="bd">まずは相談から</span><span class="bd">月額プランあり</span></div>
   <h1><span class="nb">面倒な仕事は、</span><br><span class="y">AIにやらせましょう。</span></h1>
   <p class="lead"><span class="nb">AIコンサルタントの「ひとつ」です。</span><span class="nb">日々の事務作業の自動化から、</span><span class="nb">アプリ・ホームページの制作まで。</span><span class="nb">あなたの仕事に合わせて、</span><span class="nb">AIが働く仕組みをつくります。</span></p>
   <div class="term" aria-label="AI受付のごあいさつ">
@@ -157,16 +179,16 @@ footer{padding:36px 0 46px;border-top:1px solid var(--line);text-align:center}
         <button class="chip" data-q2="app">仕事がラクになる道具</button>
         <button class="chip" data-q2="hito">代わりに働く人手</button>
         <button class="chip" data-q2="web">お店の紹介ページ</button>
-        <button class="chip" data-q2="teiki">ずっと続けて任せたい</button>
       </div>
     </div>
     <div class="res" id="qres"></div>
   </div>
 </div></section>
 
-<section><div class="wrap">
+<section id="monthly"><div class="wrap">
   <p class="eyebrow">メニューと料金</p>
   <h2>やることと、値段。<br>これだけです。</h2>
+  <p class="muted"><span class="nb">AI社員とAI部署は、</span><span class="nb">「1回つくって終わり」と</span><span class="nb">「毎月そだてる」から選べます。</span><span class="nb">月額はいつでも解約できます。</span></p>
   <div class="menu">
 
     <div class="mi" id="m-soudan">
@@ -185,90 +207,91 @@ footer{padding:36px 0 46px;border-top:1px solid var(--line);text-align:center}
       <a class="paybtn" data-pay="app" href="#">ご相談済みの方：カード決済へ</a>
     </div>
 
-    <div class="mi" id="m-shain">
-      <h3>AI社員作り</h3>
-      <div class="price">30,000<small>円</small></div>
-      <p><span class="nb">あなたの仕事のやり方を覚えたAI社員を</span><span class="nb">1人作ります。</span><span class="nb">毎回おなじ説明をしなくても、</span><span class="nb">最後まで仕事をやってくれます。</span></p>
-      <a class="morelink" href="/card">Hitotsu Companyの名刺を見る →</a>
-      <a class="paybtn" data-pay="shain" href="#">ご相談済みの方：カード決済へ</a>
-    </div>
-
     <div class="mi" id="m-web">
       <h3>ホームページ制作</h3>
       <div class="price">50,000<small>円</small></div>
-      <p><span class="nb">お店・サービスの紹介ページを1枚から。</span><span class="nb">スマホ対応・QRコード付きで納品します。</span></p>
+      <p><span class="nb">お店・サービスの紹介ページを1枚から。</span><span class="nb">スマホ対応・QRコード付きで納品します。</span><span class="nb">公開後の更新代行が必要な方には、</span><span class="nb">おまかせ保守（5,000円／月）もあります。</span></p>
       <a class="morelink" href="/hp/">プランのくわしい説明を見る →</a>
       <a class="paybtn" data-pay="web" href="#">ご相談済みの方：カード決済へ</a>
     </div>
 
+    <div class="mi" id="m-shain">
+      <h3>AI社員</h3>
+      <p><span class="nb">あなたの仕事のやり方を覚えたAI社員を</span><span class="nb">1人つくります。</span><span class="nb">毎回おなじ説明をしなくても、</span><span class="nb">最後まで仕事をやってくれます。</span></p>
+      <div class="dual">
+        <div class="opt">
+          <div class="lb">1回つくって終わり</div>
+          <div class="pr">30,000<small>円</small></div>
+          <div class="ds">つくって納品。あとはご自身で使い続けます。</div>
+          <a class="paybtn mini" data-pay="shain" href="#">カード決済へ</a>
+        </div>
+        <div class="opt pick">
+          <div class="lb">★ 毎月そだてる（顧問プラン）</div>
+          <div class="pr">19,800<small>円/月</small></div>
+          <div class="ds">初月に上の「AI社員づくり（30,000円）」を含みます。</div>
+          <a class="applybtn mini" href="https://line.me/R/ti/p/@188jocyd">申し込む・相談する</a>
+          <a class="paybtn mini" data-pay="komon" href="#">カード決済へ</a>
+        </div>
+      </div>
+      <ul class="incl">
+        <li><i>✓</i><span>毎月：AI社員の改善1回 ＋ 専用ツール1本まで作成</span></li>
+        <li><i>✓</i><span>毎月1日：「AI社員 稼働レポート」をお届け</span></li>
+        <li><i>✓</i><span>LINEでいつでも質問（AI社員が一次回答、翌営業日までにひとつが確認）</span></li>
+        <li><i>✓</i><span>月1回 30分のZoomまたは対面</span></li>
+      </ul>
+      <a class="morelink" href="/card">Hitotsu Companyの名刺を見る →</a>
+    </div>
+
     <div class="mi hot" id="m-soshiki">
       <span class="tag">いちばん人気</span>
-      <h3>AI組織作り</h3>
-      <div class="price">100,000<small>円</small></div>
-      <p><span class="nb">AI社員を役割ごとにチームで揃えて、</span><span class="nb">あなたの会社の中に「AIの部署」を作ります。</span><span class="nb">事務・発信・書類づくりを</span><span class="nb">まとめて任せられる状態で納品します。</span></p>
+      <h3>AI部署</h3>
+      <p><span class="nb">AI社員を役割ごとにチームで揃えて、</span><span class="nb">あなたの会社の中に「AIの部署」をつくります。</span><span class="nb">事務・発信・書類づくりを</span><span class="nb">まとめて任せられる状態にします。</span></p>
+      <div class="dual">
+        <div class="opt">
+          <div class="lb">1回つくって終わり</div>
+          <div class="pr">100,000<small>円</small></div>
+          <div class="ds">AIチームを構築して納品。運用はご自身で。</div>
+          <a class="paybtn mini" data-pay="soshiki" href="#">カード決済へ</a>
+        </div>
+        <div class="opt pick">
+          <div class="lb">★ 毎月そだてる（AI部署プラン）</div>
+          <div class="pr">59,800<small>円/月〜</small></div>
+          <div class="ds">初月に上の「AI部署づくり（100,000円）」を含みます。</div>
+          <a class="applybtn mini" href="https://line.me/R/ti/p/@188jocyd">申し込む・相談する</a>
+          <a class="paybtn mini" data-pay="busho" href="#">カード決済へ</a>
+        </div>
+      </div>
+      <ul class="incl">
+        <li><i>✓</i><span>毎月：業務自動化の追加・AIメンバーの追加</span></li>
+        <li><i>✓</i><span>毎月：経営者向けの月次レポート</span></li>
+        <li><i>✓</i><span>顧問プランの内容をすべて含む</span></li>
+        <li><i>✓</i><span>3か月に1回、対面での見直し会</span></li>
+      </ul>
       <a class="morelink" href="/#org">当社のAI社員の組織図を見る →</a>
-      <a class="paybtn" data-pay="soshiki" href="#">ご相談済みの方：カード決済へ</a>
     </div>
 
   </div>
   <p class="tiny muted" style="margin-top:18px;text-align:center"><span class="nb">はじめての方は、まず下の</span><span class="nb">公式LINEか対面でご相談ください。</span><span class="nb">内容が決まった方は、</span><span class="nb">各カードのボタンからそのままカード決済できます</span><span class="nb">（銀行振込・PayPay・現金も対応）。</span></p>
 </div></section>
 
-<section class="teiki" id="teiki"><div class="wrap">
-  <p class="eyebrow">月額プラン ／ AI社員室</p>
-  <h2>続けて任せたい方は、<br>月額で。</h2>
-  <p class="muted"><span class="nb">当社のAI社員54名が実際に使っている</span><span class="nb">手順書・判断基準・テンプレを、</span><span class="nb">「読む・使う・任せる」の3段階でお届けします。</span><span class="nb">いつでも解約できます。</span></p>
+<section><div class="wrap">
+  <p class="eyebrow">自分でつくれるようになりたい方へ</p>
+  <h2>AI社員室。<br>設計図を、毎週1通。</h2>
   <div class="menu">
-
-    <div class="mi" id="m-tsushin">
-      <span class="sub">読む</span>
-      <h3>AI社員室・通信</h3>
-      <div class="price">980<small>円／月</small></div>
-      <p><span class="nb">AI社員の手順書が、毎週1本届きます。</span><span class="nb">読むだけで、あなたのAIの頼み方が変わります。</span></p>
-      <ul class="f">
-        <li>週1本：AI社員の手順書（そのまま使える形）</li>
-        <li>統制室日誌：実際の承認と判断の記録</li>
-        <li>道具箱の作り方</li>
+    <div class="mi sub" id="m-shitsu">
+      <h3>AI社員室</h3>
+      <div class="price">2,980<small>円</small><span class="per">/月</span></div>
+      <p><span class="nb">つくるのを任せるのではなく、</span><span class="nb">自分でつくれるようになりたい方の部屋です。</span><span class="nb">当社54名のAI社員の「設計図」を、</span><span class="nb">毎週1通お届けします。</span></p>
+      <ul class="incl">
+        <li><i>✓</i><span>毎週1通、AI社員の設計図（役割・判断基準・プロンプト）</span></li>
+        <li><i>✓</i><span>毎朝更新の道具箱の「作り方」を読み放題</span></li>
+        <li><i>✓</i><span>月1回のハンズオン（オンライン／鹿児島）</span></li>
+        <li><i>✓</i><span>質問はLINEで。AI社員が一次回答、ひとつが確認</span></li>
       </ul>
-      <a class="morelink" href="https://note.com/hitotsu_ai">noteで中身を見る →</a>
-      <a class="paybtn" data-pay="tsushin" data-fallback="LINEで申し込む" href="#">このプランに申し込む</a>
+      <a class="applybtn" href="https://note.com/hitotsu_ai/membership" rel="noopener">noteメンバーシップで申し込む</a>
     </div>
-
-    <div class="mi hot" id="m-kobo">
-      <span class="tag">いちばん人気</span>
-      <span class="sub">使う</span>
-      <h3>AI社員室・工房</h3>
-      <div class="price">2,980<small>円／月</small></div>
-      <p><span class="nb">自分の仕事を任せるAI社員を、</span><span class="nb">集まって実際に手を動かしてつくる部屋です。</span><span class="nb">いつでも退会できます。</span></p>
-      <ul class="f">
-        <li>自分専用のAI社員をつくる（月1回のハンズオン）</li>
-        <li>つまずいたらその場で質問できる</li>
-        <li>作り方とプロンプトは記事で読み放題</li>
-        <li>「大人の放課後」への入部（無料）が必要です</li>
-      </ul>
-      <a class="morelink" href="/houkago/#ai">AI社員室のようすを見る →</a>
-      <a class="paybtn" data-pay="kobo" href="#">このプランに申し込む</a>
-    </div>
-
-    <div class="mi" id="m-komon">
-      <span class="sub">任せる</span>
-      <h3>法人統制室・顧問</h3>
-      <div class="price">50,000<small>円〜／月</small></div>
-      <p><span class="nb">あなたの会社の中に「AIの部署」を作り、</span><span class="nb">そのまま運用までお預かりします。</span><span class="nb">社長は、承認するだけの立場になります。</span></p>
-      <ul class="f">
-        <li>AI部署の設計と常駐運用</li>
-        <li>週次レポート（AIが自動で作成）</li>
-        <li>月1回：統制室ミーティング（対面 / Zoom）</li>
-        <li>受付は5社まで。6社目は順番待ちです</li>
-      </ul>
-      <a class="morelink" href="/#room">法人統制室のしくみを見る →</a>
-      <a class="paybtn" data-pay="komon" data-fallback="まず相談する（LINE）" href="#">このプランに申し込む</a>
-    </div>
-
   </div>
-  <p class="tiny muted" style="margin-top:18px;text-align:center"><span class="nb">単発のご依頼から始めて、</span><span class="nb">あとから月額に切り替えるのが一番スムーズです。</span><span class="nb">「AI組織作り」（10万円）でAIの部署を作り、</span><span class="nb">その運用を「法人統制室・顧問」で続ける方が多いです。</span></p>
-  <p class="tiny muted" style="margin-top:14px;text-align:center"><span class="nb">月額プランは1ヶ月ごとの自動更新です。</span><span class="nb">最低利用期間はなく、いつでも解約できます。</span><span class="nb">解約の受付は次回更新日の前日までです。</span><br><a href="/tokusho" style="color:var(--acc)">支払い時期・解約方法（特定商取引法に基づく表記）→</a></p>
-  <p style="margin-top:20px"><a class="btn btn-acc" href="https://line.me/R/ti/p/@188jocyd">まずLINEで相談する</a></p>
+  <div class="compare"><span class="nb"><b>どれを選べばいい？</b></span><br><span class="nb">自分でつくれるようになりたい → AI社員室。</span><span class="nb">つくるのは任せて、毎月そだてたい → AI社員の顧問プラン。</span><span class="nb">事務・発信・書類をまとめて任せたい → AI部署プラン。</span><br><span class="nb">迷ったらLINEで「どれがいい？」とだけ送ってください。</span></div>
 </div></section>
 
 <section class="ex"><div class="wrap">
@@ -352,20 +375,16 @@ footer{padding:36px 0 46px;border-top:1px solid var(--line);text-align:center}
     soudan:['m-soudan','単発相談（60分）','5,000円','まずは1時間、話すのが近道です。'],
     app:['m-app','アプリ作成','10,000円','毎日の面倒は、道具にして片付けましょう。'],
     web:['m-web','ホームページ制作','50,000円','このページのようなサイトを、あなたのお店にも。'],
-    shain:['m-shain','AI社員作り','30,000円','あなたの仕事を覚えたAIを、まず1人。'],
-    soshiki:['m-soshiki','AI組織作り','100,000円','毎日使っているなら、次はチームで任せる番です。'],
-    tsushin:['m-tsushin','AI社員室・通信','980円／月','まずは週1本、読むところから。'],
-    kobo:['m-kobo','AI社員室・工房','2,980円／月','集まって、自分専用のAI社員をつくる部屋です。'],
-    komon:['m-komon','法人統制室・顧問','50,000円〜／月','部署ごと、まるごとお預かりします。']
+    shain:['m-shain','AI社員','30,000円 または 19,800円/月','まず1人。毎月そだてるなら顧問プランです。'],
+    soshiki:['m-soshiki','AI部署','100,000円 または 59,800円/月〜','毎日使っているなら、部署ごと任せる番です。'],
+    shitsu:['m-shitsu','AI社員室','2,980円/月','自分でつくれるようになりたい方はこちら。']
   };
   var q1=document.getElementById('q1'),q2=document.getElementById('q2'),res=document.getElementById('qres');
   q1.querySelectorAll('.chip').forEach(function(b){b.onclick=function(){
     q1v=+b.dataset.q1;q1.style.display='none';q2.style.display='block';
   }});
   q2.querySelectorAll('.chip').forEach(function(b){b.onclick=function(){
-    var k=b.dataset.q2;
-    if(k==='hito')k=(q1v===2)?'soshiki':'shain';
-    if(k==='teiki')k=(q1v===2)?'komon':(q1v===1?'kobo':'tsushin');
+    var k=b.dataset.q2;if(k==='hito')k=(q1v===2)?'soshiki':'shain';
     var m=MAP[k];
     q2.style.display='none';res.style.display='block';
     res.innerHTML='<p class="q" style="margin:0">あなたへのおすすめは…</p>'
@@ -392,21 +411,12 @@ footer{padding:36px 0 46px;border-top:1px solid var(--line);text-align:center}
     shain:'https://buy.stripe.com/00w9AScAhbgL3og3nk6EU02',
     web:'https://buy.stripe.com/dRm4gy6bT1Gb9MEbTQ6EU03',
     soshiki:'https://buy.stripe.com/9B6bJ0dEl70vgb27DA6EU04',
-    // 月額プラン。「工房」は既存のnoteメンバーシップで受付中。
-    // 「通信」「顧問」はStripeの定期課金リンク（またはnoteの新プラン）を作ったらここに貼る。
-    // 空のあいだは申し込みボタンは表示されず、LINE相談の導線だけが出る。
-    tsushin:'',
-    kobo:'https://note.com/hitotsu_ai/membership',
-    komon:''
+    komon:'',   // 月額プランのStripe決済リンク（サブスク）を作ったらここに入れる
+    busho:''
   };
-  var LINE='https://line.me/R/ti/p/@188jocyd';
   document.querySelectorAll('.paybtn').forEach(function(b){
     var url=PAY[b.dataset.pay];
-    if(url){b.href=url;b.classList.add('on');return}
-    // 決済リンクがまだ無いプランは、申し込み先をLINEにする（導線を切らさない）
-    if(b.dataset.fallback){
-      b.href=LINE; b.textContent=b.dataset.fallback; b.classList.add('on','ghost');
-    }
+    if(url){b.href=url;b.classList.add('on')}
   });
 })();
 </script>
