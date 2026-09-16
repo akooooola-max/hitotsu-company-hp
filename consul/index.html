@@ -99,6 +99,7 @@ p{margin:14px 0}
  border-radius:12px;padding:14px 20px;font-size:15px;font-weight:900;text-decoration:none;
  box-shadow:0 8px 22px rgba(255,138,0,.28)}
 .paybtn.on{display:flex}
+.paybtn.ghost{background:none;color:var(--acc);border:1.5px solid var(--acc);box-shadow:none}
 .paybtn:active{transform:scale(.98)}
 
 .safe{display:flex;gap:13px;background:var(--bg2);border:1px solid var(--line);border-radius:14px;
@@ -230,7 +231,7 @@ footer{padding:36px 0 46px;border-top:1px solid var(--line);text-align:center}
         <li>道具箱の作り方</li>
       </ul>
       <a class="morelink" href="https://note.com/hitotsu_ai">noteで中身を見る →</a>
-      <a class="paybtn" data-pay="tsushin" href="#">このプランに申し込む</a>
+      <a class="paybtn" data-pay="tsushin" data-fallback="LINEで申し込む" href="#">このプランに申し込む</a>
     </div>
 
     <div class="mi hot" id="m-kobo">
@@ -261,11 +262,12 @@ footer{padding:36px 0 46px;border-top:1px solid var(--line);text-align:center}
         <li>受付は5社まで。6社目は順番待ちです</li>
       </ul>
       <a class="morelink" href="/#room">法人統制室のしくみを見る →</a>
-      <a class="paybtn" data-pay="komon" href="#">このプランに申し込む</a>
+      <a class="paybtn" data-pay="komon" data-fallback="まず相談する（LINE）" href="#">このプランに申し込む</a>
     </div>
 
   </div>
   <p class="tiny muted" style="margin-top:18px;text-align:center"><span class="nb">単発のご依頼から始めて、</span><span class="nb">あとから月額に切り替えるのが一番スムーズです。</span><span class="nb">「AI組織作り」（10万円）でAIの部署を作り、</span><span class="nb">その運用を「法人統制室・顧問」で続ける方が多いです。</span></p>
+  <p class="tiny muted" style="margin-top:14px;text-align:center"><span class="nb">月額プランは1ヶ月ごとの自動更新です。</span><span class="nb">最低利用期間はなく、いつでも解約できます。</span><span class="nb">解約の受付は次回更新日の前日までです。</span><br><a href="/tokusho" style="color:var(--acc)">支払い時期・解約方法（特定商取引法に基づく表記）→</a></p>
   <p style="margin-top:20px"><a class="btn btn-acc" href="https://line.me/R/ti/p/@188jocyd">まずLINEで相談する</a></p>
 </div></section>
 
@@ -397,9 +399,14 @@ footer{padding:36px 0 46px;border-top:1px solid var(--line);text-align:center}
     kobo:'https://note.com/hitotsu_ai/membership',
     komon:''
   };
+  var LINE='https://line.me/R/ti/p/@188jocyd';
   document.querySelectorAll('.paybtn').forEach(function(b){
     var url=PAY[b.dataset.pay];
-    if(url){b.href=url;b.classList.add('on')}
+    if(url){b.href=url;b.classList.add('on');return}
+    // 決済リンクがまだ無いプランは、申し込み先をLINEにする（導線を切らさない）
+    if(b.dataset.fallback){
+      b.href=LINE; b.textContent=b.dataset.fallback; b.classList.add('on','ghost');
+    }
   });
 })();
 </script>

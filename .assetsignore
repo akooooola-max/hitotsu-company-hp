@@ -9,3 +9,4 @@ docs/**
 jobs/**
 scripts/**
 node_modules/**
+CLAUDE.md
