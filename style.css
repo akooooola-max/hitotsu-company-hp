@@ -613,37 +613,6 @@ a { color: inherit; }
 
 .owner-node .who { font-size: 0.78rem; color: var(--text-soft); }
 
-.control-node {
-  background: var(--panel-2);
-  border: 1px dashed var(--accent);
-  border-radius: 12px;
-  padding: 0.9rem 1.8rem;
-  text-align: center;
-  max-width: 480px;
-}
-
-.control-node .k {
-  font-family: var(--mono);
-  font-size: 0.58rem;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--accent);
-}
-
-.control-node .cn {
-  font-family: var(--mono);
-  font-size: 1rem;
-  font-weight: 600;
-  margin-top: 0.2rem;
-}
-
-.control-node .cd {
-  font-size: 0.68rem;
-  color: var(--text-soft);
-  line-height: 1.7;
-  margin-top: 0.3rem;
-}
-
 .stem { width: 1px; height: 30px; background: var(--line); }
 .branch-bar { width: min(92%, 960px); height: 1px; background: var(--line); }
 
