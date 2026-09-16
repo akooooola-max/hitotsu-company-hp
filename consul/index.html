@@ -46,6 +46,12 @@ p{margin:14px 0}
 .mi .price{font-size:clamp(30px,9vw,38px);font-weight:900;letter-spacing:-.03em;line-height:1.2;margin-top:8px}
 .mi .price small{font-size:15px;font-weight:800;color:var(--muted);margin-left:4px}
 .mi p{margin:8px 0 0;font-size:14.5px;color:var(--muted)}
+.mi .f{list-style:none;margin:12px 0 0;padding:0}
+.mi .f li{position:relative;padding-left:20px;font-size:14px;color:var(--muted);margin-top:6px}
+.mi .f li:before{content:"✓";position:absolute;left:0;color:var(--green);font-weight:900}
+.mi .sub{display:inline-block;background:rgba(52,217,119,.14);border:1px solid rgba(52,217,119,.45);
+ color:var(--green);font-size:11.5px;font-weight:900;padding:3px 11px;border-radius:999px;margin-bottom:10px}
+.teiki{background:var(--bg2)}
 
 .steps{counter-reset:s;margin-top:28px}
 .step{position:relative;padding:0 0 26px 52px;border-left:2px solid var(--line);margin-left:15px}
@@ -150,6 +156,7 @@ footer{padding:36px 0 46px;border-top:1px solid var(--line);text-align:center}
         <button class="chip" data-q2="app">仕事がラクになる道具</button>
         <button class="chip" data-q2="hito">代わりに働く人手</button>
         <button class="chip" data-q2="web">お店の紹介ページ</button>
+        <button class="chip" data-q2="teiki">ずっと続けて任せたい</button>
       </div>
     </div>
     <div class="res" id="qres"></div>
@@ -204,6 +211,62 @@ footer{padding:36px 0 46px;border-top:1px solid var(--line);text-align:center}
 
   </div>
   <p class="tiny muted" style="margin-top:18px;text-align:center"><span class="nb">はじめての方は、まず下の</span><span class="nb">公式LINEか対面でご相談ください。</span><span class="nb">内容が決まった方は、</span><span class="nb">各カードのボタンからそのままカード決済できます</span><span class="nb">（銀行振込・PayPay・現金も対応）。</span></p>
+</div></section>
+
+<section class="teiki" id="teiki"><div class="wrap">
+  <p class="eyebrow">月額プラン ／ AI社員室</p>
+  <h2>続けて任せたい方は、<br>月額で。</h2>
+  <p class="muted"><span class="nb">当社のAI社員54名が実際に使っている</span><span class="nb">手順書・判断基準・テンプレを、</span><span class="nb">「読む・使う・任せる」の3段階でお届けします。</span><span class="nb">いつでも解約できます。</span></p>
+  <div class="menu">
+
+    <div class="mi" id="m-tsushin">
+      <span class="sub">読む</span>
+      <h3>AI社員室・通信</h3>
+      <div class="price">980<small>円／月</small></div>
+      <p><span class="nb">AI社員の手順書が、毎週1本届きます。</span><span class="nb">読むだけで、あなたのAIの頼み方が変わります。</span></p>
+      <ul class="f">
+        <li>週1本：AI社員の手順書（そのまま使える形）</li>
+        <li>統制室日誌：実際の承認と判断の記録</li>
+        <li>道具箱の作り方</li>
+      </ul>
+      <a class="morelink" href="https://note.com/hitotsu_ai">noteで中身を見る →</a>
+      <a class="paybtn" data-pay="tsushin" href="#">このプランに申し込む</a>
+    </div>
+
+    <div class="mi hot" id="m-kobo">
+      <span class="tag">いちばん人気</span>
+      <span class="sub">使う</span>
+      <h3>AI社員室・工房</h3>
+      <div class="price">2,980<small>円／月</small></div>
+      <p><span class="nb">自分の仕事を任せるAI社員を、</span><span class="nb">集まって実際に手を動かしてつくる部屋です。</span><span class="nb">いつでも退会できます。</span></p>
+      <ul class="f">
+        <li>自分専用のAI社員をつくる（月1回のハンズオン）</li>
+        <li>つまずいたらその場で質問できる</li>
+        <li>作り方とプロンプトは記事で読み放題</li>
+        <li>「大人の放課後」への入部（無料）が必要です</li>
+      </ul>
+      <a class="morelink" href="/houkago/#ai">AI社員室のようすを見る →</a>
+      <a class="paybtn" data-pay="kobo" href="#">このプランに申し込む</a>
+    </div>
+
+    <div class="mi" id="m-komon">
+      <span class="sub">任せる</span>
+      <h3>法人統制室・顧問</h3>
+      <div class="price">50,000<small>円〜／月</small></div>
+      <p><span class="nb">あなたの会社の中に「AIの部署」を作り、</span><span class="nb">そのまま運用までお預かりします。</span><span class="nb">社長は、承認するだけの立場になります。</span></p>
+      <ul class="f">
+        <li>AI部署の設計と常駐運用</li>
+        <li>週次レポート（AIが自動で作成）</li>
+        <li>月1回：統制室ミーティング（対面 / Zoom）</li>
+        <li>受付は5社まで。6社目は順番待ちです</li>
+      </ul>
+      <a class="morelink" href="/#room">法人統制室のしくみを見る →</a>
+      <a class="paybtn" data-pay="komon" href="#">このプランに申し込む</a>
+    </div>
+
+  </div>
+  <p class="tiny muted" style="margin-top:18px;text-align:center"><span class="nb">単発のご依頼から始めて、</span><span class="nb">あとから月額に切り替えるのが一番スムーズです。</span><span class="nb">「AI組織作り」（10万円）でAIの部署を作り、</span><span class="nb">その運用を「法人統制室・顧問」で続ける方が多いです。</span></p>
+  <p style="margin-top:20px"><a class="btn btn-acc" href="https://line.me/R/ti/p/@188jocyd">まずLINEで相談する</a></p>
 </div></section>
 
 <section class="ex"><div class="wrap">
@@ -288,14 +351,19 @@ footer{padding:36px 0 46px;border-top:1px solid var(--line);text-align:center}
     app:['m-app','アプリ作成','10,000円','毎日の面倒は、道具にして片付けましょう。'],
     web:['m-web','ホームページ制作','50,000円','このページのようなサイトを、あなたのお店にも。'],
     shain:['m-shain','AI社員作り','30,000円','あなたの仕事を覚えたAIを、まず1人。'],
-    soshiki:['m-soshiki','AI組織作り','100,000円','毎日使っているなら、次はチームで任せる番です。']
+    soshiki:['m-soshiki','AI組織作り','100,000円','毎日使っているなら、次はチームで任せる番です。'],
+    tsushin:['m-tsushin','AI社員室・通信','980円／月','まずは週1本、読むところから。'],
+    kobo:['m-kobo','AI社員室・工房','2,980円／月','集まって、自分専用のAI社員をつくる部屋です。'],
+    komon:['m-komon','法人統制室・顧問','50,000円〜／月','部署ごと、まるごとお預かりします。']
   };
   var q1=document.getElementById('q1'),q2=document.getElementById('q2'),res=document.getElementById('qres');
   q1.querySelectorAll('.chip').forEach(function(b){b.onclick=function(){
     q1v=+b.dataset.q1;q1.style.display='none';q2.style.display='block';
   }});
   q2.querySelectorAll('.chip').forEach(function(b){b.onclick=function(){
-    var k=b.dataset.q2;if(k==='hito')k=(q1v===2)?'soshiki':'shain';
+    var k=b.dataset.q2;
+    if(k==='hito')k=(q1v===2)?'soshiki':'shain';
+    if(k==='teiki')k=(q1v===2)?'komon':(q1v===1?'kobo':'tsushin');
     var m=MAP[k];
     q2.style.display='none';res.style.display='block';
     res.innerHTML='<p class="q" style="margin:0">あなたへのおすすめは…</p>'
@@ -321,7 +389,13 @@ footer{padding:36px 0 46px;border-top:1px solid var(--line);text-align:center}
     app:'https://buy.stripe.com/eVq3cu8k12Kf4sk3nk6EU01',
     shain:'https://buy.stripe.com/00w9AScAhbgL3og3nk6EU02',
     web:'https://buy.stripe.com/dRm4gy6bT1Gb9MEbTQ6EU03',
-    soshiki:'https://buy.stripe.com/9B6bJ0dEl70vgb27DA6EU04'
+    soshiki:'https://buy.stripe.com/9B6bJ0dEl70vgb27DA6EU04',
+    // 月額プラン。「工房」は既存のnoteメンバーシップで受付中。
+    // 「通信」「顧問」はStripeの定期課金リンク（またはnoteの新プラン）を作ったらここに貼る。
+    // 空のあいだは申し込みボタンは表示されず、LINE相談の導線だけが出る。
+    tsushin:'',
+    kobo:'https://note.com/hitotsu_ai/membership',
+    komon:''
   };
   document.querySelectorAll('.paybtn').forEach(function(b){
     var url=PAY[b.dataset.pay];

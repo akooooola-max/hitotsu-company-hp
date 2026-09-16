@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>法人統制室 | Hitotsu Company</title>
+<meta name="theme-color" content="#0e0e0e">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Noto+Sans+JP:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0e0e0e; --panel:#161616; --panel2:#1a1a1a; --line:#262626;
+  --text:#ededed; --soft:#9a9a9a; --faint:#5a5a5a;
+  --acc:#D97757; --ok:#4FBF8B; --warn:#F0B429;
+  --mono:'JetBrains Mono',ui-monospace,Menlo,monospace;
+  --sans:'Noto Sans JP',system-ui,sans-serif;
+}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-weight:300;line-height:1.8;
+  -webkit-font-smoothing:antialiased;padding:0 0 64px}
+.wrap{max-width:760px;margin:0 auto;padding:0 clamp(1rem,4vw,1.6rem)}
+a{color:var(--acc)}
+
+header{border-bottom:1px solid var(--line);padding:22px 0 20px;margin-bottom:26px;background:var(--panel)}
+.brand{font-family:var(--mono);font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:var(--acc)}
+h1{font-family:var(--mono);font-size:clamp(1.3rem,4.5vw,1.8rem);font-weight:700;margin-top:.2rem}
+.sub{font-size:.78rem;color:var(--soft);margin-top:.3rem}
+.today{font-family:var(--mono);font-size:.7rem;color:var(--faint);margin-top:.5rem}
+
+.bar{display:flex;align-items:center;gap:12px;background:var(--panel);border:1px solid var(--line);
+  border-radius:12px;padding:14px 16px;margin-bottom:20px;flex-wrap:wrap}
+.meter{flex:1;min-width:140px;height:7px;background:#0a0a0a;border-radius:20px;overflow:hidden}
+.meter i{display:block;height:100%;width:0;background:var(--acc);transition:width .3s ease}
+.count{font-family:var(--mono);font-size:.75rem;color:var(--soft);white-space:nowrap}
+.timer{font-family:var(--mono);font-size:1rem;font-weight:700;letter-spacing:.04em}
+.tbtn{font-family:var(--mono);font-size:.68rem;background:transparent;color:var(--acc);
+  border:1px solid var(--line);border-radius:20px;padding:5px 12px;cursor:pointer}
+.tbtn:hover{border-color:var(--acc)}
+
+h2{font-family:var(--mono);font-size:.95rem;font-weight:600;margin:30px 0 4px;display:flex;
+  align-items:center;gap:10px}
+h2::after{content:"";flex:1;height:1px;background:var(--line)}
+.lead{font-size:.76rem;color:var(--soft);margin-bottom:14px}
+
+.job{background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--accent,#D97757);
+  border-radius:12px;padding:14px 16px;margin-bottom:10px;transition:opacity .2s}
+.job.done{opacity:.45}
+.job.done .jt{text-decoration:line-through}
+.jhead{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.jn{font-family:var(--mono);font-size:.62rem;color:var(--accent,#D97757);font-weight:600}
+.jt{font-size:.92rem;font-weight:400}
+.jteam{font-family:var(--mono);font-size:.58rem;color:var(--faint);margin-left:auto}
+.jd{font-size:.74rem;color:var(--soft);margin-top:.25rem}
+.acts{display:flex;gap:8px;margin-top:11px;flex-wrap:wrap}
+.acts button{font-family:var(--mono);font-size:.68rem;border-radius:20px;padding:6px 14px;
+  cursor:pointer;border:1px solid var(--line);background:#0a0a0a;color:var(--soft)}
+.acts button:hover{border-color:var(--soft);color:var(--text)}
+.acts button.on.ok{background:rgba(79,191,139,.14);border-color:var(--ok);color:var(--ok)}
+.acts button.on.ng{background:rgba(240,180,41,.14);border-color:var(--warn);color:var(--warn)}
+.acts button.on.skip{background:rgba(255,255,255,.06);border-color:var(--soft);color:var(--text)}
+.state{font-family:var(--mono);font-size:.6rem;color:var(--faint);align-self:center;margin-left:auto}
+
+.check{display:flex;gap:11px;align-items:flex-start;background:var(--panel);border:1px solid var(--line);
+  border-radius:10px;padding:12px 14px;margin-bottom:8px;cursor:pointer}
+.check input{margin-top:.45rem;accent-color:var(--acc);flex:none}
+.check b{font-size:.86rem;font-weight:400;display:block}
+.check span{font-size:.72rem;color:var(--soft)}
+.check.done b{text-decoration:line-through;color:var(--soft)}
+
+textarea{width:100%;background:var(--panel);color:var(--text);border:1px solid var(--line);
+  border-radius:10px;padding:12px 14px;font-family:var(--sans);font-size:.85rem;min-height:92px;resize:vertical}
+textarea:focus{outline:none;border-color:var(--acc)}
+
+.foot{display:flex;gap:10px;margin-top:22px;flex-wrap:wrap}
+.foot button{font-family:var(--mono);font-size:.7rem;border-radius:20px;padding:9px 18px;cursor:pointer;
+  border:1px solid var(--line);background:var(--panel);color:var(--soft)}
+.foot button:hover{border-color:var(--acc);color:var(--acc)}
+.saved{font-family:var(--mono);font-size:.64rem;color:var(--ok);opacity:0;transition:opacity .3s}
+.saved.on{opacity:1}
+
+.rule{border:1px dashed var(--line);border-radius:12px;padding:14px 16px;margin-top:26px;
+  font-size:.74rem;color:var(--soft)}
+.rule b{color:var(--text);font-weight:400}
+.note{font-family:var(--mono);font-size:.62rem;color:var(--faint);margin-top:26px;line-height:1.9}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <div class="brand">Control Room</div>
+    <h1>法人統制室</h1>
+    <p class="sub">決めるのはひとつ、働くのは54人。ここでは作業をしません。承認・却下・優先順位だけを決めます。</p>
+    <p class="today" id="today"></p>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <div class="bar">
+    <span class="count" id="count">0 / 0 処理</span>
+    <span class="meter"><i id="meter"></i></span>
+    <span class="timer" id="timer">25:00</span>
+    <button class="tbtn" id="tstart">開始</button>
+    <button class="tbtn" id="treset">リセット</button>
+  </div>
+
+  <h2>朝の統制室</h2>
+  <p class="lead">夜間工場が作った成果物です。承認したものだけが公開・送信されます。差し戻しは一言だけ書いて返します。</p>
+  <div id="jobs"></div>
+
+  <h2>夕方の統制室</h2>
+  <p class="lead">25分。返信の確認と、明日の優先順位を1行で決めます。</p>
+  <div id="evening"></div>
+
+  <h2>今日の一行</h2>
+  <p class="lead">明日の夜間工場に渡す指示。長く書かないこと。</p>
+  <textarea id="memo" placeholder="例：通信の次号は「議事録AI社員の手順書」で。顧問A社のレポートは数字を先に。"></textarea>
+
+  <div class="foot">
+    <button id="copy">今日の統制ログをコピー</button>
+    <button id="clear">今日の記録をリセット</button>
+    <span class="saved" id="saved">保存しました</span>
+  </div>
+
+  <div class="rule">
+    <b>統制室の原則</b><br>
+    1. 作業はしない。承認・却下・優先順位だけを決める。<br>
+    2. 夜間工場の成果物は必ず下書きで止める。公開は朝の承認のみ。<br>
+    3. 迷ったら差し戻す。差し戻しは失敗ではなく、統制の仕事そのもの。<br>
+    4. 顧問は5社まで。6社目は順番待ちにする。<br>
+    5. 会食・旅費は目的と参加者を先に記録してから使う。私的な分は混ぜない。
+  </div>
+
+  <p class="note">
+    このページは社外に公開しません。noindex を入れていますが、URLを知られれば誰でも開けます。<br>
+    Cloudflare Access（合言葉ゲート）を /control/* に設定してから運用してください。<br>
+    記録はこの端末のブラウザにのみ保存されます（サーバーには送信されません）。
+  </p>
+
+</div>
+
+<script>
+(function(){
+  var JOBS=[
+    {id:'apps', n:'01', t:'道具箱 新作 1本', team:'ai-company / builder', accent:'#35B5C4',
+     d:'apps/ に1本追加済み。承認すると公開、差し戻すと明朝に作り直します。'},
+    {id:'note', n:'02', t:'note 下書き 1本', team:'book-company / note', accent:'#9B87E0',
+     d:'道具箱の解説＋有料部分に手順書。通信の今週分になります。'},
+    {id:'book', n:'03', t:'Kindle 3冊目 1章', team:'book-company / writer', accent:'#9B87E0',
+     d:'「ノウハウコレクターが最強」の原稿。章ごとに承認します。'},
+    {id:'komon', n:'04', t:'顧問先 週次レポート', team:'claude-company / analyst', accent:'#D97757',
+     d:'月〜金で5社分を分散。数字と、次の一手の提案まで入っています。'},
+    {id:'mark', n:'05', t:'MARK 仕入れ候補 10件', team:'MARK / seller・profit', accent:'#5B93E0',
+     d:'手数料・送料・真贋リスクを引いた利益計算つき。買う / 見送るを決めます。'},
+    {id:'houkago', n:'06', t:'大人の放課後 次回案内', team:'fukushi-company / planner', accent:'#4FBF8B',
+     d:'出欠集計・リマインド・会場候補。承認すると部室アプリとLINEに送られます。'},
+    {id:'brief', n:'07', t:'統制室ブリーフ', team:'ai-company / leader', accent:'#D97757',
+     d:'01〜06のまとめ。読み終えたら「確認」で閉じます。'}
+  ];
+  var EVENING=[
+    {id:'e1', t:'問い合わせ・LINE返信の下書きを確認', d:'DM担当が作成済み。直すのは一言だけ。'},
+    {id:'e2', t:'顧問先からの依頼をAI部署に振る', d:'leader に1行で渡す。自分では書かない。'},
+    {id:'e3', t:'経費の記録を確認', d:'会食・旅費があった日は、目的と参加者が入っているか見る。'},
+    {id:'e4', t:'明日の夜間工場の優先順位を決める', d:'下の「今日の一行」に書く。'}
+  ];
+  var LABEL={ok:'承認',ng:'差し戻し',skip:'見送り'};
+  var d=new Date();
+  var key='hitotsu-control-'+d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2);
+  var W=['日','月','火','水','木','金','土'];
+  document.getElementById('today').textContent=
+    d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2)+' ('+W[d.getDay()]+')';
+
+  var state={};
+  try{ state=JSON.parse(localStorage.getItem(key)||'{}') }catch(e){ state={} }
+
+  var savedEl=document.getElementById('saved'),tid;
+  function save(){
+    try{ localStorage.setItem(key,JSON.stringify(state)) }catch(e){}
+    savedEl.classList.add('on');
+    clearTimeout(tid); tid=setTimeout(function(){savedEl.classList.remove('on')},1400);
+    render();
+  }
+
+  var jobsEl=document.getElementById('jobs');
+  JOBS.forEach(function(j){
+    var el=document.createElement('div');
+    el.className='job'; el.style.setProperty('--accent',j.accent); el.dataset.id=j.id;
+    el.innerHTML='<div class="jhead"><span class="jn">'+j.n+'</span><span class="jt">'+j.t+'</span>'
+      +'<span class="jteam">'+j.team+'</span></div><p class="jd">'+j.d+'</p>'
+      +'<div class="acts">'
+      +'<button data-v="ok" class="ok">承認</button>'
+      +'<button data-v="ng" class="ng">差し戻し</button>'
+      +'<button data-v="skip" class="skip">見送り</button>'
+      +'<span class="state"></span></div>';
+    el.querySelectorAll('.acts button').forEach(function(b){
+      b.onclick=function(){
+        state[j.id]=(state[j.id]===b.dataset.v)?null:b.dataset.v;
+        save();
+      };
+    });
+    jobsEl.appendChild(el);
+  });
+
+  var evEl=document.getElementById('evening');
+  EVENING.forEach(function(e){
+    var l=document.createElement('label');
+    l.className='check'; l.dataset.id=e.id;
+    l.innerHTML='<input type="checkbox"><div><b>'+e.t+'</b><span>'+e.d+'</span></div>';
+    l.querySelector('input').onchange=function(){ state[e.id]=this.checked?'ok':null; save() };
+    evEl.appendChild(l);
+  });
+
+  var memo=document.getElementById('memo');
+  memo.value=state.memo||'';
+  memo.oninput=function(){ state.memo=memo.value; try{localStorage.setItem(key,JSON.stringify(state))}catch(e){} };
+
+  function render(){
+    var done=0;
+    JOBS.forEach(function(j){
+      var el=jobsEl.querySelector('[data-id="'+j.id+'"]'), v=state[j.id];
+      el.classList.toggle('done',!!v);
+      el.querySelector('.state').textContent=v?LABEL[v]:'';
+      el.querySelectorAll('.acts button').forEach(function(b){ b.classList.toggle('on',b.dataset.v===v) });
+      if(v)done++;
+    });
+    EVENING.forEach(function(e){
+      var l=evEl.querySelector('[data-id="'+e.id+'"]'), v=!!state[e.id];
+      l.querySelector('input').checked=v; l.classList.toggle('done',v);
+      if(v)done++;
+    });
+    var total=JOBS.length+EVENING.length;
+    document.getElementById('count').textContent=done+' / '+total+' 処理';
+    document.getElementById('meter').style.width=(done/total*100)+'%';
+  }
+  render();
+
+  // 25分タイマー
+  var left=25*60, run=null, tEl=document.getElementById('timer');
+  function paint(){ tEl.textContent=('0'+Math.floor(left/60)).slice(-2)+':'+('0'+(left%60)).slice(-2) }
+  document.getElementById('tstart').onclick=function(){
+    if(run){ clearInterval(run); run=null; this.textContent='再開'; return }
+    this.textContent='一時停止';
+    run=setInterval(function(){
+      left--; paint();
+      if(left<=0){ clearInterval(run); run=null; left=0; paint();
+        document.getElementById('tstart').textContent='開始'; }
+    },1000);
+  };
+  document.getElementById('treset').onclick=function(){
+    if(run){clearInterval(run);run=null}
+    left=25*60; paint(); document.getElementById('tstart').textContent='開始';
+  };
+
+  // ログのコピー
+  document.getElementById('copy').onclick=function(){
+    var L=['【統制ログ】'+document.getElementById('today').textContent,''];
+    JOBS.forEach(function(j){ L.push('・'+j.t+'：'+(state[j.id]?LABEL[state[j.id]]:'未処理')) });
+    L.push('');
+    EVENING.forEach(function(e){ L.push('・'+e.t+'：'+(state[e.id]?'済':'未')) });
+    if(state.memo){ L.push('', '【明日の一行】', state.memo) }
+    var txt=L.join('\n'), btn=this;
+    function done(){ btn.textContent='コピーしました'; setTimeout(function(){btn.textContent='今日の統制ログをコピー'},1600) }
+    if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(txt).then(done,fallback) }
+    else fallback();
+    function fallback(){
+      var ta=document.createElement('textarea'); ta.value=txt;
+      ta.style.position='fixed'; ta.style.opacity='0'; document.body.appendChild(ta);
+      ta.select(); try{document.execCommand('copy'); done()}catch(e){} document.body.removeChild(ta);
+    }
+  };
+
+  document.getElementById('clear').onclick=function(){
+    if(!confirm('今日の記録を消します。よろしいですか？'))return;
+    state={}; memo.value=''; save();
+  };
+})();
+</script>
+</body>
+</html>
