@@ -48,9 +48,14 @@
 
 - **`control/` は社外に出せない中身です。** 承認前の原稿・顧問先のレポート・仕入れ候補が入ります。
   ここへのリンクを公開ページに置かないでください。
-- **このリポジトリは public です。** `control/drafts/` `control/queue.json` `control/clients/*` は
-  `.gitignore` に入っています。外さないでください。合言葉ゲートが守るのは Web の入口だけで、
-  git にコミットすればそこから読まれます。下書きは `wrangler deploy` でゲートの内側にだけ配信します。
+- **`control/drafts/` `control/queue.json` `control/clients/*` は `.gitignore` に入っています。**
+  外さないでください。承認前の原稿と顧問先のレポートは、リポジトリの private / public に
+  関わらず git に入れない方針です（合言葉ゲートが守るのは Web の入口だけで、git は別の出口）。
+  下書きは `wrangler deploy` でゲートの内側にだけ配信します。
+- **`docs/blueprints/` は会員特典（AI社員室 2,980円/月 の週1配信）の原稿です。**
+  サイトからは配信されませんが、リポジトリが public のあいだは GitHub から誰でも読めます。
+  **private にする方針が決まっています**（→ `docs/blueprints/README.md` の冒頭）。
+  切り替わったら、3か所の注意書きを消してください。
 - **`apps/` の道具は夜間工場が毎朝足します。** 手で直すときは
   `apps/index.html` と `apps/box-9f4a7c2e/index.html` の両方（件数と日付も）を揃えること。
 - **決済リンク**は `consul/index.html` の `PAY` にまとまっています。
