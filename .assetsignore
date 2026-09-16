@@ -3,5 +3,9 @@
 .assetsignore
 wrangler.jsonc
 .wrangler/**
+.dev.vars
 src/**
 docs/**
+jobs/**
+scripts/**
+node_modules/**

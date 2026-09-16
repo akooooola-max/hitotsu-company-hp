@@ -79,6 +79,20 @@ textarea:focus{outline:none;border-color:var(--acc)}
 .saved{font-family:var(--mono);font-size:.64rem;color:var(--ok);opacity:0;transition:opacity .3s}
 .saved.on{opacity:1}
 
+.jlink{display:inline-block;margin-top:.5rem;font-family:var(--mono);font-size:.68rem;
+  color:var(--accent,#D97757);text-decoration:none;border-bottom:1px solid transparent}
+.jlink:hover{border-bottom-color:currentColor}
+.jman{font-size:.68rem;color:var(--faint);margin-top:.5rem;line-height:1.7}
+.jman b{color:var(--soft);font-weight:400}
+.empty{background:var(--panel);border:1px dashed var(--line);border-radius:12px;padding:22px 18px;
+  text-align:center;font-size:.8rem;color:var(--soft)}
+.src{font-family:var(--mono);font-size:.6rem;color:var(--faint);margin-bottom:12px}
+.src b{color:var(--warn);font-weight:400}
+.cmd{background:#0a0a0a;border:1px solid var(--line);border-radius:10px;padding:12px 14px;
+  margin-top:12px;font-family:var(--mono);font-size:.66rem;color:var(--soft);
+  overflow-x:auto;white-space:pre;display:none}
+.cmd.on{display:block}
+.foot button.primary{border-color:var(--acc);color:var(--acc)}
 .rule{border:1px dashed var(--line);border-radius:12px;padding:14px 16px;margin-top:26px;
   font-size:.74rem;color:var(--soft)}
 .rule b{color:var(--text);font-weight:400}
@@ -109,6 +123,7 @@ textarea:focus{outline:none;border-color:var(--acc)}
 
   <h2>朝の統制室</h2>
   <p class="lead">夜間工場が作った成果物です。承認したものだけが公開・送信されます。差し戻しは一言だけ書いて返します。</p>
+  <p class="src" id="src"></p>
   <div id="jobs"></div>
 
   <h2>夕方の統制室</h2>
@@ -120,10 +135,12 @@ textarea:focus{outline:none;border-color:var(--acc)}
   <textarea id="memo" placeholder="例：通信の次号は「議事録AI社員の手順書」で。顧問A社のレポートは数字を先に。"></textarea>
 
   <div class="foot">
+    <button id="pub" class="primary">公開コマンドをコピー</button>
     <button id="copy">今日の統制ログをコピー</button>
     <button id="clear">今日の記録をリセット</button>
     <span class="saved" id="saved">保存しました</span>
   </div>
+  <div class="cmd" id="cmdbox"></div>
 
   <div class="rule">
     <b>統制室の原則</b><br>
@@ -144,21 +161,23 @@ textarea:focus{outline:none;border-color:var(--acc)}
 
 <script>
 (function(){
-  var JOBS=[
-    {id:'apps', n:'01', t:'道具箱 新作 1本', team:'ai-company / builder', accent:'#35B5C4',
-     d:'apps/ に1本追加済み。承認すると公開、差し戻すと明朝に作り直します。'},
-    {id:'note', n:'02', t:'note 下書き 1本', team:'book-company / note', accent:'#9B87E0',
-     d:'道具箱の解説＋有料部分に手順書。通信の今週分になります。'},
-    {id:'book', n:'03', t:'Kindle 3冊目 1章', team:'book-company / writer', accent:'#9B87E0',
-     d:'「ノウハウコレクターが最強」の原稿。章ごとに承認します。'},
-    {id:'komon', n:'04', t:'顧問先 週次レポート', team:'claude-company / analyst', accent:'#D97757',
-     d:'月〜金で5社分を分散。数字と、次の一手の提案まで入っています。'},
-    {id:'mark', n:'05', t:'MARK 仕入れ候補 10件', team:'MARK / seller・profit', accent:'#5B93E0',
-     d:'手数料・送料・真贋リスクを引いた利益計算つき。買う / 見送るを決めます。'},
-    {id:'houkago', n:'06', t:'大人の放課後 次回案内', team:'fukushi-company / planner', accent:'#4FBF8B',
-     d:'出欠集計・リマインド・会場候補。承認すると部室アプリとLINEに送られます。'},
-    {id:'brief', n:'07', t:'統制室ブリーフ', team:'ai-company / leader', accent:'#D97757',
-     d:'01〜06のまとめ。読み終えたら「確認」で閉じます。'}
+  // 夜間工場が走っていない/届いていないときに見せるひな形。
+  // control/queue.json があれば、そちらの実データで置き換わる。
+  var TEMPLATE=[
+    {id:'apps', n:'01', title:'道具箱 新作 1本', team:'ai-company / builder', accent:'#35B5C4',
+     summary:'apps/ に1本追加済み。承認すると公開、差し戻すと明朝に作り直します。'},
+    {id:'note', n:'02', title:'note 下書き 1本', team:'book-company / note', accent:'#9B87E0',
+     summary:'道具箱の解説＋有料部分に手順書。通信の今週分になります。'},
+    {id:'book', n:'03', title:'Kindle 3冊目 1章', team:'book-company / writer', accent:'#9B87E0',
+     summary:'「ノウハウコレクターが最強」の原稿。章ごとに承認します。'},
+    {id:'komon', n:'04', title:'顧問先 週次レポート', team:'claude-company / analyst', accent:'#D97757',
+     summary:'月〜金で5社分を分散。数字と、次の一手の提案まで入っています。'},
+    {id:'mark', n:'05', title:'MARK 仕入れ候補 10件', team:'MARK / seller・profit', accent:'#5B93E0',
+     summary:'手数料・送料・真贋リスクを引いた利益計算つき。買う / 見送るを決めます。'},
+    {id:'houkago', n:'06', title:'大人の放課後 次回案内', team:'fukushi-company / planner', accent:'#4FBF8B',
+     summary:'出欠集計・リマインド・会場候補。承認すると部室アプリとLINEに送られます。'},
+    {id:'brief', n:'07', title:'統制室ブリーフ', team:'ai-company / leader', accent:'#D97757',
+     summary:'01〜06のまとめ。読み終えたら「確認」で閉じます。'}
   ];
   var EVENING=[
     {id:'e1', t:'問い合わせ・LINE返信の下書きを確認', d:'DM担当が作成済み。直すのは一言だけ。'},
@@ -167,16 +186,17 @@ textarea:focus{outline:none;border-color:var(--acc)}
     {id:'e4', t:'明日の夜間工場の優先順位を決める', d:'下の「今日の一行」に書く。'}
   ];
   var LABEL={ok:'承認',ng:'差し戻し',skip:'見送り'};
-  var d=new Date();
-  var key='hitotsu-control-'+d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2);
   var W=['日','月','火','水','木','金','土'];
-  document.getElementById('today').textContent=
-    d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2)+' ('+W[d.getDay()]+')';
 
-  var state={};
-  try{ state=JSON.parse(localStorage.getItem(key)||'{}') }catch(e){ state={} }
+  var jobsEl=document.getElementById('jobs'), evEl=document.getElementById('evening'),
+      srcEl=document.getElementById('src'), savedEl=document.getElementById('saved'),
+      memo=document.getElementById('memo'), cmdbox=document.getElementById('cmdbox');
+  var JOBS=[], live=false, date='', key='', state={}, tid;
 
-  var savedEl=document.getElementById('saved'),tid;
+  function esc(t){ return String(t==null?'':t).replace(/[&<>"]/g,function(c){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c] }) }
+  function ymd(d){ return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2) }
+
   function save(){
     try{ localStorage.setItem(key,JSON.stringify(state)) }catch(e){}
     savedEl.classList.add('on');
@@ -184,43 +204,49 @@ textarea:focus{outline:none;border-color:var(--acc)}
     render();
   }
 
-  var jobsEl=document.getElementById('jobs');
-  JOBS.forEach(function(j){
-    var el=document.createElement('div');
-    el.className='job'; el.style.setProperty('--accent',j.accent); el.dataset.id=j.id;
-    el.innerHTML='<div class="jhead"><span class="jn">'+j.n+'</span><span class="jt">'+j.t+'</span>'
-      +'<span class="jteam">'+j.team+'</span></div><p class="jd">'+j.d+'</p>'
-      +'<div class="acts">'
-      +'<button data-v="ok" class="ok">承認</button>'
-      +'<button data-v="ng" class="ng">差し戻し</button>'
-      +'<button data-v="skip" class="skip">見送り</button>'
-      +'<span class="state"></span></div>';
-    el.querySelectorAll('.acts button').forEach(function(b){
-      b.onclick=function(){
-        state[j.id]=(state[j.id]===b.dataset.v)?null:b.dataset.v;
-        save();
-      };
+  function buildJobs(){
+    jobsEl.innerHTML='';
+    if(!JOBS.length){
+      jobsEl.innerHTML='<div class="empty">今朝の承認待ちはありません。<br>夜間工場が何も出さなかった日か、すべて公開済みです。</div>';
+      return;
+    }
+    JOBS.forEach(function(j){
+      var el=document.createElement('div');
+      el.className='job'; el.style.setProperty('--accent', j.accent||'#D97757'); el.dataset.id=j.id;
+      var html='<div class="jhead"><span class="jn">'+esc(j.n)+'</span><span class="jt">'+esc(j.title)+'</span>'
+        +'<span class="jteam">'+esc(j.team)+'</span></div>'
+        +'<p class="jd">'+esc(j.summary)+'</p>';
+      if(j.preview) html+='<a class="jlink" href="'+esc(j.preview)+'" target="_blank" rel="noopener">中身を見る →</a>';
+      if(j.manual) html+='<p class="jman"><b>公開後にやること：</b>'+esc(j.manual)+'</p>';
+      html+='<div class="acts">'
+        +'<button data-v="ok" class="ok">承認</button>'
+        +'<button data-v="ng" class="ng">差し戻し</button>'
+        +'<button data-v="skip" class="skip">見送り</button>'
+        +'<span class="state"></span></div>';
+      el.innerHTML=html;
+      el.querySelectorAll('.acts button').forEach(function(b){
+        b.onclick=function(){
+          state[j.id]=(state[j.id]===b.dataset.v)?null:b.dataset.v;
+          save();
+        };
+      });
+      jobsEl.appendChild(el);
     });
-    jobsEl.appendChild(el);
-  });
+  }
 
-  var evEl=document.getElementById('evening');
   EVENING.forEach(function(e){
     var l=document.createElement('label');
     l.className='check'; l.dataset.id=e.id;
-    l.innerHTML='<input type="checkbox"><div><b>'+e.t+'</b><span>'+e.d+'</span></div>';
+    l.innerHTML='<input type="checkbox"><div><b>'+esc(e.t)+'</b><span>'+esc(e.d)+'</span></div>';
     l.querySelector('input').onchange=function(){ state[e.id]=this.checked?'ok':null; save() };
     evEl.appendChild(l);
   });
 
-  var memo=document.getElementById('memo');
-  memo.value=state.memo||'';
-  memo.oninput=function(){ state.memo=memo.value; try{localStorage.setItem(key,JSON.stringify(state))}catch(e){} };
-
   function render(){
     var done=0;
     JOBS.forEach(function(j){
-      var el=jobsEl.querySelector('[data-id="'+j.id+'"]'), v=state[j.id];
+      var el=jobsEl.querySelector('[data-id="'+j.id+'"]'); if(!el)return;
+      var v=state[j.id];
       el.classList.toggle('done',!!v);
       el.querySelector('.state').textContent=v?LABEL[v]:'';
       el.querySelectorAll('.acts button').forEach(function(b){ b.classList.toggle('on',b.dataset.v===v) });
@@ -233,9 +259,47 @@ textarea:focus{outline:none;border-color:var(--acc)}
     });
     var total=JOBS.length+EVENING.length;
     document.getElementById('count').textContent=done+' / '+total+' 処理';
-    document.getElementById('meter').style.width=(done/total*100)+'%';
+    document.getElementById('meter').style.width=(total?done/total*100:0)+'%';
   }
-  render();
+
+  function copyText(txt, btn, label){
+    function done(){ var o=btn.textContent; btn.textContent='コピーしました';
+      setTimeout(function(){btn.textContent=label||o},1600) }
+    function fallback(){
+      var ta=document.createElement('textarea'); ta.value=txt;
+      ta.style.position='fixed'; ta.style.opacity='0'; document.body.appendChild(ta);
+      ta.select(); try{document.execCommand('copy'); done()}catch(e){} document.body.removeChild(ta);
+    }
+    if(navigator.clipboard&&navigator.clipboard.writeText){
+      navigator.clipboard.writeText(txt).then(done,fallback);
+    } else fallback();
+  }
+
+  document.getElementById('copy').onclick=function(){
+    var L=['【統制ログ】'+date,''];
+    JOBS.forEach(function(j){ L.push('・'+j.title+'：'+(state[j.id]?LABEL[state[j.id]]:'未処理')) });
+    L.push('');
+    EVENING.forEach(function(e){ L.push('・'+e.t+'：'+(state[e.id]?'済':'未')) });
+    if(state.memo){ L.push('', '【明日の一行】', state.memo) }
+    copyText(L.join('\n'), this, '今日の統制ログをコピー');
+  };
+
+  document.getElementById('pub').onclick=function(){
+    var decided=JOBS.filter(function(j){ return state[j.id] });
+    if(!decided.length){
+      cmdbox.textContent='まだ何も決まっていません。承認 / 差し戻し / 見送り を押してから、もう一度どうぞ。';
+      cmdbox.classList.add('on'); return;
+    }
+    var cmd='python3 scripts/publish.py '+decided.map(function(j){ return j.id+':'+state[j.id] }).join(' ');
+    cmdbox.textContent=cmd+(live?'':'\n\n※ これはひな形です。夜間工場の承認待ち（control/queue.json）が届いてから使ってください。');
+    cmdbox.classList.add('on');
+    copyText(cmd, this, '公開コマンドをコピー');
+  };
+
+  document.getElementById('clear').onclick=function(){
+    if(!confirm('今日の記録を消します。よろしいですか？'))return;
+    state={}; memo.value=''; cmdbox.classList.remove('on'); save();
+  };
 
   // 25分タイマー
   var left=25*60, run=null, tEl=document.getElementById('timer');
@@ -254,28 +318,30 @@ textarea:focus{outline:none;border-color:var(--acc)}
     left=25*60; paint(); document.getElementById('tstart').textContent='開始';
   };
 
-  // ログのコピー
-  document.getElementById('copy').onclick=function(){
-    var L=['【統制ログ】'+document.getElementById('today').textContent,''];
-    JOBS.forEach(function(j){ L.push('・'+j.t+'：'+(state[j.id]?LABEL[state[j.id]]:'未処理')) });
-    L.push('');
-    EVENING.forEach(function(e){ L.push('・'+e.t+'：'+(state[e.id]?'済':'未')) });
-    if(state.memo){ L.push('', '【明日の一行】', state.memo) }
-    var txt=L.join('\n'), btn=this;
-    function done(){ btn.textContent='コピーしました'; setTimeout(function(){btn.textContent='今日の統制ログをコピー'},1600) }
-    if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(txt).then(done,fallback) }
-    else fallback();
-    function fallback(){
-      var ta=document.createElement('textarea'); ta.value=txt;
-      ta.style.position='fixed'; ta.style.opacity='0'; document.body.appendChild(ta);
-      ta.select(); try{document.execCommand('copy'); done()}catch(e){} document.body.removeChild(ta);
+  function start(queue){
+    if(queue && Array.isArray(queue.items)){
+      live=true; date=queue.date||ymd(new Date()); JOBS=queue.items;
+      var t=queue.generated_at?queue.generated_at.replace('T',' ').replace('Z',' UTC'):'';
+      srcEl.innerHTML='夜間工場 '+esc(date)+(t?'　生成 '+esc(t):'')+'　承認待ち '+JOBS.length+' 件';
+    }else{
+      live=false; date=ymd(new Date()); JOBS=TEMPLATE;
+      srcEl.innerHTML='<b>ひな形を表示しています。</b>　夜間工場の承認待ち（control/queue.json）がまだありません。';
     }
-  };
+    var d=new Date(date+'T00:00:00');
+    document.getElementById('today').textContent=
+      date+(isNaN(d)?'':' ('+W[d.getDay()]+')');
+    key='hitotsu-control-'+date;
+    try{ state=JSON.parse(localStorage.getItem(key)||'{}') }catch(e){ state={} }
+    memo.value=state.memo||'';
+    memo.oninput=function(){ state.memo=memo.value;
+      try{localStorage.setItem(key,JSON.stringify(state))}catch(e){} };
+    buildJobs(); render(); paint();
+  }
 
-  document.getElementById('clear').onclick=function(){
-    if(!confirm('今日の記録を消します。よろしいですか？'))return;
-    state={}; memo.value=''; save();
-  };
+  fetch('queue.json',{cache:'no-store'})
+    .then(function(r){ return r.ok?r.json():null })
+    .then(start)
+    .catch(function(){ start(null) });
 })();
 </script>
 </body>

@@ -1,0 +1,62 @@
+# 夜間工場（nightly factory）
+
+寝ているあいだに、AI社員が7本の仕事をします。
+どれも **下書きで止まります**。公開されるのは、朝の統制室でオーナーが承認したものだけです。
+
+```
+  夜 02:00   scripts/nightly.sh
+             └ jobs/01〜07 を順に実行（claude -p）
+               └ 成果物を control/drafts/<日付>/<ジョブID>/ に書く
+               └ 各ジョブが queue-item.json を書く
+             └ 全部まとめて control/queue.json を作る
+             └ git commit（下書きなので公開されない。統制室ゲートの内側）
+
+  朝 07:30   https://hitotsu-company.com/control/
+             └ 承認待ち一覧が出る。中身を見て 承認 / 差し戻し / 見送り
+             └ 「公開コマンドをコピー」を押す
+
+  その後     scripts/publish.py apps:ok note:ng ...
+             └ 承認したものだけを公開先へ移してコミット
+```
+
+## なぜ下書きで止めるのか
+
+誤配信を1回やると、取り返しがつかないからです。
+夜間工場は「作るところまで」。公開の判断は、必ず人間が朝に1回だけ行います。
+
+## ジョブ一覧
+
+| ID | 中身 | 担当 | 公開先 |
+|---|---|---|---|
+| `apps` | 道具箱の新作1本 | ai-company / builder | `apps/` に配置（自動） |
+| `note` | note下書き1本（通信の今週分） | book-company / note | noteに貼る（手動） |
+| `book` | Kindle 3冊目の1章 | book-company / writer | 原稿置き場（手動） |
+| `komon` | 顧問先の週次レポート | claude-company / analyst | 顧問先に送る（手動） |
+| `mark` | 電脳リサーチ 仕入れ候補10件 | MARK / seller・profit | 仕入れ判断（手動） |
+| `houkago` | 大人の放課後 次回案内 | fukushi-company / planner | LINE・部室アプリ（手動） |
+| `brief` | 統制室ブリーフ | ai-company / leader | 朝のLINE（自動・任意） |
+
+## 設定
+
+```sh
+# 1. 夜間工場を回す（cron から）
+0 2 * * *  cd /path/to/hitotsu-company-hp && ./scripts/nightly.sh >> /tmp/nightly.log 2>&1
+
+# 2. 統制室の合言葉（Cloudflare側。1回だけ）
+npx wrangler secret put CONTROL_KEY
+
+# 3. 任意：朝のブリーフを送る先（LINE Messaging APIのpush等）
+export CONTROL_WEBHOOK="https://..."
+```
+
+## ジョブの足し方
+
+`jobs/08-xxx.md` を作るだけです。先頭のメタ情報（`id` / `title` / `team` / `accent`）と、
+本文に指示を書きます。`scripts/nightly.sh` は `jobs/*.md` を番号順に全部実行します。
+
+## ジョブが守る約束
+
+1. 成果物は `control/drafts/<日付>/<ジョブID>/` の中にだけ書く。既存ファイルを直接書き換えない。
+2. 最後に `queue-item.json` を書く。書かないジョブは「今日はやることなし」とみなされる。
+3. 公開先を書き換える必要があるもの（道具箱のindexなど）は、書き換え後のファイルも下書きとして出す。
+   公開は `publish.py` がファイルを移すだけで済むようにする。

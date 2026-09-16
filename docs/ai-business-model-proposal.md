@@ -205,24 +205,69 @@
 
 ---
 
-## 付記：2026-09-16 時点の実装状況
+## 付記：実装状況（2026-09-16）
 
-本提案のうち、HP側は次のとおり実装済み（ブランチ `claude/ai-business-model-proposal-rxjcb2`）。
+本提案は、HP・統制室・夜間工場まで実装済み。ブランチ `claude/ai-business-model-proposal-rxjcb2`。
 
-| 実装したもの | 場所 |
+### できているもの
+
+| 実装 | 場所 |
 |---|---|
-| 組織図に「法人統制室」ノードを追加 | `index.html` #org |
-| 「05 AI社員室」セクション（3プラン） | `index.html` #room |
-| 月額プラン3枚＋10秒診断に「ずっと続けて任せたい」を追加 | `consul/index.html` #teiki |
-| 顧問プランの価格明記・月額プランへの導線 | `kenshu/index.html` |
+| 組織図に「法人統制室」ノード | `index.html` #org |
+| 「05 AI社員室」3プラン | `index.html` #room |
+| 月額プラン3枚＋10秒診断の分岐 | `consul/index.html` #teiki |
+| 顧問プランの価格明記・月額への導線 | `kenshu/index.html` |
 | 他プランへの案内 | `houkago/index.html` #ai |
-| 読了後の受け皿・名刺の導線 | `books.html` / `card.html` |
+| 読了後・名刺からの導線 | `books.html` / `card.html` |
 | 統制室ダッシュボード | `control/index.html` |
+| 統制室の合言葉ゲート（Cloudflare Worker） | `src/gate.js` / `wrangler.jsonc` |
+| 夜間工場（7ジョブ＋承認フロー） | `jobs/` / `scripts/` |
 
-**未了（オーナーの作業が必要）**
+### 夜間工場のしくみ
 
-1. 「通信」（980円／月）と「法人統制室・顧問」の決済リンク。`consul/index.html` の `PAY` に `tsushin` / `komon` の空欄があるので、Stripeの定期課金リンクかnoteの新プランURLを貼る。貼るまで申し込みボタンは表示されず、LINE相談の導線だけが出る。
-2. `/control/*` に Cloudflare Access（合言葉ゲート）を設定する。いまは noindex のみで、URLを知られれば開ける。
-3. 夜間工場のジョブ追加（現在は道具箱1本のみ）。
+```
+夜 02:00  scripts/nightly.sh
+          └ jobs/01〜07 を claude -p で実行
+          └ 成果物は control/drafts/<日付>/ に下書きとして置く（公開しない）
+          └ control/queue.json に承認待ち一覧を作る
+          └ git commit（統制室ゲートの内側なので外から見えない）
+          └ CONTROL_WEBHOOK があれば朝のブリーフを送信
 
-**価格について**：当初案では工房を4,980円としていたが、「大人の放課後」で 2,980円／月 のAI社員室がすでに稼働していたため、実価格の 2,980円 に合わせた。値上げするかどうかはオーナーの判断。上げる場合は既存会員の扱いを先に決めること。
+朝 07:30  https://hitotsu-company.com/control/
+          └ 承認待ちが並ぶ。中身を見て 承認 / 差し戻し / 見送り
+          └ 「公開コマンドをコピー」
+
+          scripts/publish.py apps:ok note:ng ...
+          └ 承認したものだけ公開先へ移してコミット
+          └ 差し戻したものはキューに残る（翌朝もう一度出る）
+```
+
+誤配信を防ぐため、夜間工場は必ず下書きで止まります。公開の判断は朝の1回だけです。
+くわしくは `jobs/README.md`。
+
+### 動かす前に必要な設定（3つ）
+
+```sh
+# 1. 統制室の合言葉（Cloudflare。1回だけ）
+npx wrangler secret put CONTROL_KEY
+npx wrangler deploy
+
+# 2. 夜間工場を毎晩回す
+crontab -e
+0 2 * * * cd /path/to/hitotsu-company-hp && ./scripts/nightly.sh >> /tmp/nightly.log 2>&1
+
+# 3. 任意：朝のブリーフの送り先
+export CONTROL_WEBHOOK="https://..."
+```
+
+まず `DRY_RUN=1 ./scripts/nightly.sh` で段取りだけ確認し、
+次に `./scripts/nightly.sh apps` で1ジョブだけ試すのが安全です。
+
+### 残っているもの（オーナーの判断が要る）
+
+1. **「通信」（980円）と「法人統制室・顧問」の決済リンク。**
+   `consul/index.html` の `PAY` に `tsushin` / `komon` の空欄がある。Stripeの定期課金リンクか
+   noteの新プランURLを貼れば、その場で申し込みボタンが出る。貼るまではLINE相談の導線だけが出る。
+2. **顧問先の情報。** `control/clients/` に顧問先を置くと、週次レポートのジョブが回り始める。
+3. **工房の値上げ判断。** 当初案は4,980円だったが、すでに2,980円で稼働しているため実価格に合わせた。
+   上げる場合は既存会員の扱いを先に決めること。
