@@ -3,17 +3,16 @@
 AI社員室（2,980円/月）の会員特典「毎週1通の設計図」の原稿置き場。
 ここにある Markdown を、毎週1本 note の会員限定記事として公開する。
 
-> **⚠ このフォルダは、いま誰でも読めます。**
+> **⚠ private 化するまで、このフォルダは誰でも読めます。**
 > リポジトリ `akooooola-max/hitotsu-company-hp` は public です。`.assetsignore` で
 > サイトからの配信は止めていますが、GitHub 上では会員でない人もそのまま読めます。
-> 会員特典として売っているものなので、次のどれかを決めてください。
 >
-> 1. リポジトリを private にする（いまの運用をそのまま続けられる。いちばん簡単）
-> 2. 設計図だけ別の private リポジトリに移す
-> 3. 下書きを git に置くのをやめ、`control/drafts/` に出して統制室（`/control/`）で承認する
->    （`control/` は `.gitignore` 済み。合言葉ゲートの内側なので会員にも見えない）
+> **決めたこと（2026-09-16）：リポジトリを private にする。**
+> GitHub → Settings → 最下部 Danger Zone → Change repository visibility → Private。
+> 済んだらこの注意書きを消してください（`docs/automation/weekly-drafts.md` と
+> `CLAUDE.md` にも同じ注意書きがあります）。
 >
-> 決まるまでのあいだ、**新しい設計図を足すたびに読める本数が増えます。**
+> それまでは、**設計図を1本足すたびに無料で読める本数が増えます。**
 
 ## 運用ルール
 - ファイル名: `NN-<division>-<name>.md`（NN は配信順）。
