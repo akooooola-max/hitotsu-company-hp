@@ -9,7 +9,7 @@
                └ 成果物を control/drafts/<日付>/<ジョブID>/ に書く
                └ 各ジョブが queue-item.json を書く
              └ 全部まとめて control/queue.json を作る
-             └ git commit（下書きなので公開されない。統制室ゲートの内側）
+             └ NIGHTLY_DEPLOY=1 なら wrangler deploy（ゲートの内側に配信）
 
   朝 07:30   https://hitotsu-company.com/control/
              └ 承認待ち一覧が出る。中身を見て 承認 / 差し戻し / 見送り
@@ -23,6 +23,19 @@
 
 誤配信を1回やると、取り返しがつかないからです。
 夜間工場は「作るところまで」。公開の判断は、必ず人間が朝に1回だけ行います。
+
+## 下書きを git に入れてはいけない
+
+**このリポジトリは public です。** コミットした時点で、承認前の原稿も顧問先のレポートも
+GitHub から誰でも読めます。合言葉ゲート（`src/gate.js`）が守るのは Web からの入口だけで、
+git は別の出口です。
+
+なので `control/drafts/` `control/queue.json` `control/clients/*`（README と雛形を除く）は
+`.gitignore` に入れてあります。下書きは手元のディスクに置き、`wrangler deploy` で
+ゲートの内側にだけ配信します。朝スマホから見られるのはこの配信のおかげです。
+
+顧問先の情報を扱うなら、この線は動かさないでください。動かすときは、
+このリポジトリを private にするか、統制室だけ別リポジトリに分けてからにします。
 
 ## ジョブ一覧
 
@@ -39,15 +52,21 @@
 ## 設定
 
 ```sh
-# 1. 夜間工場を回す（cron から）
-0 2 * * *  cd /path/to/hitotsu-company-hp && ./scripts/nightly.sh >> /tmp/nightly.log 2>&1
-
-# 2. 統制室の合言葉（Cloudflare側。1回だけ）
+# 1. 統制室の合言葉（Cloudflare側。1回だけ）
 npx wrangler secret put CONTROL_KEY
+npx wrangler deploy
 
-# 3. 任意：朝のブリーフを送る先（LINE Messaging APIのpush等）
+# 2. 夜間工場を回す（cron から）
+#    NIGHTLY_DEPLOY=1 を付けると、下書きを作ったあと deploy まで行います。
+#    作業中の変更（control/ の外）が残っているときは deploy を見送ります。
+0 2 * * *  cd /path/to/hitotsu-company-hp && NIGHTLY_DEPLOY=1 ./scripts/nightly.sh >> /tmp/nightly.log 2>&1
+
+# 3. 任意：朝のブリーフを送る先
 export CONTROL_WEBHOOK="https://..."
 ```
+
+初回は `DRY_RUN=1 ./scripts/nightly.sh` で段取りだけ見て、
+次に `./scripts/nightly.sh apps` で1ジョブだけ試してください。
 
 ## ジョブの足し方
 
@@ -57,6 +76,11 @@ export CONTROL_WEBHOOK="https://..."
 ## ジョブが守る約束
 
 1. 成果物は `control/drafts/<日付>/<ジョブID>/` の中にだけ書く。既存ファイルを直接書き換えない。
+   `nightly.sh` はジョブごとに `control/` の外が変わっていないか確かめ、変わっていたらそこで止まります。
 2. 最後に `queue-item.json` を書く。書かないジョブは「今日はやることなし」とみなされる。
 3. 公開先を書き換える必要があるもの（道具箱のindexなど）は、書き換え後のファイルも下書きとして出す。
    公開は `publish.py` がファイルを移すだけで済むようにする。
+
+`queue-item.json` の `from` は `control/drafts/<日付>/` の中、`to` はリポジトリの中しか書けません。
+`preview` は `drafts/...` の相対パスだけです。外を指すものは承認待ちに並ぶ前に落とされます
+（`build_queue.py` と `publish.py` の両方で確かめています）。

@@ -16,12 +16,29 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 QUEUE = ROOT / "control" / "queue.json"
+DRAFTS = ROOT / "control" / "drafts"
 OK, NG, SKIP = "ok", "ng", "skip"
 
 
 def die(msg):
     print(msg, file=sys.stderr)
     sys.exit(1)
+
+
+def inside(base: Path, rel, what: str) -> Path:
+    """base の中に収まるパスだけを返す。外を指していればその場で止める。
+
+    queue.json は夜間工場（AI）が書いたものなので、素直に信じない。
+    絶対パス（/etc/passwd）や .. （../../.ssh/authorized_keys）が混じっていても、
+    Path の結合はそれをそのまま通してしまうため、ここで必ず確かめる。
+    """
+    if not isinstance(rel, str) or not rel.strip():
+        die(f"{what} が空です。")
+    p = (base / rel).resolve()
+    base = base.resolve()
+    if p == base or base not in p.parents:
+        die(f"{what} が {base} の外を指しています: {rel}")
+    return p
 
 
 def git(*args):
@@ -59,11 +76,28 @@ def main():
     if not decisions:
         die("どれを公開するか指定してください。例: python3 scripts/publish.py apps:ok")
 
-    # 動かす前に、全部のファイルがそろっているか確かめる
-    missing = [f["from"] for jid, d in decisions.items() if d == OK
-               for f in items[jid].get("files", []) if not (ROOT / f["from"]).exists()]
-    if missing:
-        die("下書きが見つかりません:\n  " + "\n  ".join(missing))
+    # 1ファイルも動かす前に、全部のパスを確かめる（途中で止まらないように）
+    plan = {}
+    for jid, d in decisions.items():
+        if d != OK:
+            continue
+        pairs = []
+        for f in items[jid].get("files", []):
+            frm, to = f.get("from"), f.get("to")
+            # 取り出し元は control/drafts/ の中だけ
+            if not isinstance(frm, str) or not frm.startswith("control/drafts/"):
+                die(f"下書きの場所が違います（control/drafts/ の中だけです）: {frm!r}")
+            src = inside(DRAFTS, frm[len("control/drafts/"):], "下書き")
+            # 置き先はリポジトリの中だけ。control/ には戻さない
+            dst = inside(ROOT, to, "公開先")
+            if DRAFTS.resolve() in dst.parents or dst == QUEUE.resolve():
+                die(f"公開先に統制室のファイルは指定できません: {to}")
+            if to.startswith("-"):
+                die(f"公開先の名前が使えません（- で始まっています）: {to}")
+            if not src.exists():
+                die(f"下書きが見つかりません: {frm}")
+            pairs.append((src, dst, frm, to))
+        plan[jid] = pairs
 
     published, held, manual, touched = [], [], [], []
     for jid, d in decisions.items():
@@ -71,10 +105,9 @@ def main():
         if d != OK:
             held.append(f"{item['title']}（{'差し戻し' if d == NG else '見送り'}）")
             continue
-        for f in item.get("files", []):
-            src, dst = ROOT / f["from"], ROOT / f["to"]
-            print(f"  {f['from']}  →  {f['to']}")
-            touched.append(f["to"])
+        for src, dst, sname, dname in plan[jid]:
+            print(f"  {sname}  →  {dname}")
+            touched.append(str(dst.relative_to(ROOT)))
             if not dry:
                 dst.parent.mkdir(parents=True, exist_ok=True)
                 shutil.copy2(src, dst)
@@ -90,14 +123,17 @@ def main():
     queue["items"] = [i for i in queue["items"] if decisions.get(i["id"]) != OK]
     QUEUE.write_text(json.dumps(queue, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
-    if published:
-        # 公開したファイルと承認待ち一覧だけをコミットする。
-        # 作業中の別の変更を巻き込まないため、-A は使わない。
-        git("add", "control/queue.json", *touched)
+    if published and touched:
+        # 公開したファイルだけをコミットする。作業中の別の変更を巻き込まないため -A は使わない。
+        # queue.json と下書きは git に入れない（このリポジトリは public）。
+        # "--" を挟んで、ファイル名がオプションとして解釈されるのを防ぐ。
+        git("add", "--", *touched)
         msg = "公開: " + " / ".join(published)
         body = "\n".join(f"- {t}" for t in published)
         git("commit", "-q", "-m", f"{msg}\n\n{body}\n\n承認: {queue['date']} 朝の統制室")
         print(f"\n公開しました（{len(published)} 件）。git push で反映されます。")
+    elif published:
+        print(f"\n承認しました（{len(published)} 件）。動かすファイルはありません。")
     if held:
         print("\n公開しなかったもの:\n  " + "\n  ".join(held))
     if manual:

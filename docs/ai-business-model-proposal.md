@@ -230,7 +230,7 @@
           └ jobs/01〜07 を claude -p で実行
           └ 成果物は control/drafts/<日付>/ に下書きとして置く（公開しない）
           └ control/queue.json に承認待ち一覧を作る
-          └ git commit（統制室ゲートの内側なので外から見えない）
+          └ wrangler deploy でゲートの内側にだけ配信（gitには入れない）
           └ CONTROL_WEBHOOK があれば朝のブリーフを送信
 
 朝 07:30  https://hitotsu-company.com/control/
@@ -243,7 +243,7 @@
 ```
 
 誤配信を防ぐため、夜間工場は必ず下書きで止まります。公開の判断は朝の1回だけです。
-くわしくは `jobs/README.md`。
+下書きは git に入れません（このリポジトリは public のため）。くわしくは `jobs/README.md`。
 
 ### 動かす前に必要な設定（3つ）
 
@@ -254,7 +254,7 @@ npx wrangler deploy
 
 # 2. 夜間工場を毎晩回す
 crontab -e
-0 2 * * * cd /path/to/hitotsu-company-hp && ./scripts/nightly.sh >> /tmp/nightly.log 2>&1
+0 2 * * * cd /path/to/hitotsu-company-hp && NIGHTLY_DEPLOY=1 ./scripts/nightly.sh >> /tmp/nightly.log 2>&1
 
 # 3. 任意：朝のブリーフの送り先
 export CONTROL_WEBHOOK="https://..."

@@ -13,6 +13,27 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 JOBS = ROOT / "jobs"
 FRONT = re.compile(r"^---\n(.*?)\n---", re.S)
+PREVIEW_OK = re.compile(r"^drafts/[A-Za-z0-9._/-]+$")
+
+
+def safe_under(base: Path, rel: str) -> bool:
+    """rel が base の中に収まるか。絶対パスや .. を弾く。"""
+    try:
+        p = (base / rel).resolve()
+    except (OSError, ValueError):
+        return False
+    base = base.resolve()
+    return p != base and base in p.parents
+
+
+def safe_preview(value):
+    """統制室の画面がリンクにする値。drafts/ 配下の相対パス以外は捨てる。
+
+    javascript: のようなURLをそのまま href に入れないため、形を決め打ちで確かめる。
+    """
+    if isinstance(value, str) and ".." not in value and PREVIEW_OK.match(value):
+        return value
+    return None
 
 
 def job_meta():
@@ -55,10 +76,29 @@ def main():
         item.setdefault("summary", "")
         item.setdefault("files", [])
         item.setdefault("manual", None)
-        # 公開先のファイルが本当にあるか確かめる（承認したのに動かせない、を防ぐ）
+
+        # ジョブが書いたパスは信じない。おかしなものが1つでもあれば、その件ごと落とす。
+        # （publish.py でも同じ確認をするが、承認待ちに並べる前に落としておく）
+        bad = None
         for f in item["files"]:
-            if not (ROOT / f["from"]).exists():
-                print(f"  {item['id']}: 下書き {f['from']} が見つかりません", file=sys.stderr)
+            frm, to = f.get("from"), f.get("to")
+            if not (isinstance(frm, str) and isinstance(to, str)):
+                bad = f"from / to が文字列ではありません: {f!r}"
+            elif not frm.startswith(f"control/drafts/{date}/"):
+                bad = f"下書きの場所が違います: {frm}"
+            elif not safe_under(ROOT / "control" / "drafts", frm[len("control/drafts/"):]):
+                bad = f"下書きがフォルダの外を指しています: {frm}"
+            elif not safe_under(ROOT, to) or to.startswith("-"):
+                bad = f"公開先が使えません: {to}"
+            elif not (ROOT / frm).exists():
+                bad = f"下書き {frm} が見つかりません"
+            if bad:
+                break
+        if bad:
+            print(f"  {item['id']}: {bad} → この件は承認待ちに出しません", file=sys.stderr)
+            continue
+
+        item["preview"] = safe_preview(item.get("preview"))
         items.append(item)
 
     queue = {

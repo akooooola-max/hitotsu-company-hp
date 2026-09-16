@@ -2,6 +2,10 @@
 # 夜間工場。jobs/*.md を順に実行し、成果物を下書きとして control/drafts/<日付>/ に残す。
 # 公開はしない。公開は朝の承認のあと scripts/publish.py が行う。
 #
+# 下書きは git に入れない。このリポジトリは public なので、コミットすれば
+# 承認前の原稿も顧問先のレポートも外から読めてしまう。下書きは手元のディスクに置き、
+# wrangler deploy で合言葉ゲート（src/gate.js）の内側にだけ配信する。
+#
 #   cron 例: 0 2 * * * cd /path/to/hitotsu-company-hp && ./scripts/nightly.sh >> /tmp/nightly.log 2>&1
 set -uo pipefail
 
@@ -49,10 +53,21 @@ EOF
     continue
   fi
 
+  before="$(git status --porcelain -- . ':(exclude)control' | sha1sum)"
+
   if ! "$CLAUDE_BIN" -p "$prompt" --permission-mode acceptEdits >"$DRAFTS/$id/run.log" 2>&1; then
     log "  失敗しました（$DRAFTS/$id/run.log を見てください）"
     failed=$((failed+1))
     continue
+  fi
+
+  # ジョブは下書きの中だけを書く約束。約束の外に手が出ていたら、その場で止める。
+  after="$(git status --porcelain -- . ':(exclude)control' | sha1sum)"
+  if [ "$before" != "$after" ]; then
+    log "  !! $id が control/ の外を書き換えました。中身を確かめてください:"
+    git status --porcelain -- . ':(exclude)control' | sed 's/^/     /'
+    log "  !! 続きを止めます。git diff で確認し、不要なら git checkout -- <file> で戻してください。"
+    exit 1
   fi
 
   if [ -f "$DRAFTS/$id/queue-item.json" ]; then
@@ -68,12 +83,17 @@ python3 scripts/build_queue.py "$DATE" || { log "queue.json の作成に失敗�
 count="$(python3 -c "import json,sys;print(len(json.load(open('control/queue.json'))['items']))" 2>/dev/null || echo 0)"
 log "承認待ち $count 件"
 
-# 下書きをコミット（統制室ゲートの内側なので、これで公開されることはない）
-if [ -n "$(git status --porcelain control/ 2>/dev/null)" ]; then
-  git add control/
-  git commit -q -m "control: 夜間工場の下書き（$DATE・$count件）" && log "コミットしました"
-  if [ "${NIGHTLY_PUSH:-}" = "1" ]; then
-    git push -q origin HEAD && log "push しました"
+# 下書きは git に入れない（.gitignore 済み）。
+# 朝、スマホから統制室を開くには配信が要るので、必要なら deploy する。
+if [ "${NIGHTLY_DEPLOY:-}" = "1" ]; then
+  dirty="$(git status --porcelain -- . ':(exclude)control')"
+  if [ -n "$dirty" ]; then
+    log "作業中の変更があるので deploy しません（先にコミットするか戻してください）:"
+    printf '%s\n' "$dirty" | sed 's/^/   /'
+  elif npx wrangler deploy >"$DRAFTS/deploy.log" 2>&1; then
+    log "deploy しました（統制室に承認待ちが出ます）"
+  else
+    log "deploy に失敗しました（$DRAFTS/deploy.log を見てください）"
   fi
 fi
 

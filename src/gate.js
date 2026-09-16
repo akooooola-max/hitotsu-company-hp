@@ -73,10 +73,26 @@ export default {
     const t = await token(key);
     if ((request.headers.get("Cookie") || "").includes(`control=${t}`)) {
       const res = await env.ASSETS.fetch(request);
-      // 承認待ちの中身をキャッシュや検索に残さない
       const headers = new Headers(res.headers);
+      // 承認待ちの中身をキャッシュや検索に残さない
       headers.set("cache-control", "no-store");
       headers.set("x-robots-tag", "noindex, nofollow");
+      // 統制室の中から外へは持ち出させない。
+      // 承認待ちの中身（下書き・顧問先レポート）を読めるのはこのページだけなので、
+      // 万一おかしなものが画面に混じっても、よそへ送る先を塞いでおく。
+      headers.set(
+        "content-security-policy",
+        "default-src 'self'; " +
+          "script-src 'self' 'unsafe-inline'; " +
+          "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
+          "font-src https://fonts.gstatic.com; " +
+          "img-src 'self' data:; " +
+          "connect-src 'self'; " +
+          "form-action 'self'; " +
+          "frame-ancestors 'none'; " +
+          "base-uri 'none'"
+      );
+      headers.set("referrer-policy", "no-referrer");
       return new Response(res.body, { status: res.status, headers });
     }
 

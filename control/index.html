@@ -193,8 +193,17 @@ textarea:focus{outline:none;border-color:var(--acc)}
       memo=document.getElementById('memo'), cmdbox=document.getElementById('cmdbox');
   var JOBS=[], live=false, date='', key='', state={}, tid;
 
-  function esc(t){ return String(t==null?'':t).replace(/[&<>"]/g,function(c){
-    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c] }) }
+  function esc(t){ return String(t==null?'':t).replace(/[&<>"']/g,function(c){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c] }) }
+  // queue.json は夜間工場（AI）が書いたもの。リンクにする前に必ず形を確かめる。
+  // javascript: のようなURLがそのまま href に入ると、統制室の中身を読んで
+  // 外へ送るコードを、オーナー自身のクリックで動かせてしまう。
+  function safeUrl(u){
+    if(typeof u!=='string' || !/^drafts\/[A-Za-z0-9._\/-]+$/.test(u) || u.indexOf('..')>=0) return null;
+    try{ var x=new URL(u, location.href);
+         return (x.protocol==='https:'||x.protocol==='http:') && x.origin===location.origin ? u : null; }
+    catch(e){ return null }
+  }
   function ymd(d){ return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2) }
 
   function save(){
@@ -216,7 +225,8 @@ textarea:focus{outline:none;border-color:var(--acc)}
       var html='<div class="jhead"><span class="jn">'+esc(j.n)+'</span><span class="jt">'+esc(j.title)+'</span>'
         +'<span class="jteam">'+esc(j.team)+'</span></div>'
         +'<p class="jd">'+esc(j.summary)+'</p>';
-      if(j.preview) html+='<a class="jlink" href="'+esc(j.preview)+'" target="_blank" rel="noopener">中身を見る →</a>';
+      var pv=safeUrl(j.preview);
+      if(pv) html+='<a class="jlink" href="'+esc(pv)+'" target="_blank" rel="noopener">中身を見る →</a>';
       if(j.manual) html+='<p class="jman"><b>公開後にやること：</b>'+esc(j.manual)+'</p>';
       html+='<div class="acts">'
         +'<button data-v="ok" class="ok">承認</button>'
