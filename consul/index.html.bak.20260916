@@ -118,8 +118,6 @@
   .mi .price small{font-size:17px;font-weight:700;margin-left:6px}
   .mi p{margin:20px 0 0;font-size:17px;line-height:2}
   .mi .availability{font-size:16px;margin-top:20px}
-  .mi .deliv{margin:8px 0 0;padding-left:22px;font-size:16px;line-height:1.9}
-  .pay-note.tiny{font-size:14px;opacity:.8}
   .morelink{display:block;width:fit-content;max-width:100%;margin-top:20px;padding:8px 0;
     min-height:44px;font-size:16px;font-weight:700;line-height:1.8}
   .paybtn{display:none;width:100%;margin-top:24px;border:1px solid var(--maroon);
@@ -193,48 +191,87 @@
 <div class="hero"><div class="wrap">
   <div class="badges"><span class="bd">鹿児島</span><span class="bd">事業者の方むけ</span><span class="bd">まずは相談から</span></div>
   <h1><span class="nb">面倒な仕事は、</span><br><span class="y">AIにやらせましょう。</span></h1>
-  <p class="lead"><span class="nb">AIコンサルタントの「ひとつ」です。</span><span class="nb">あなたの仕事のやり方を覚えた</span><span class="nb">AI社員のチームを作って、お渡しします。</span><span class="nb">相談は無料。売るのは、動くチームだけです。</span></p>
+  <p class="lead"><span class="nb">AIコンサルタントの「ひとつ」です。</span><span class="nb">日々の事務作業の自動化から、</span><span class="nb">アプリ・ホームページの制作まで。</span><span class="nb">あなたの仕事に合わせて、</span><span class="nb">AIが働く仕組みをつくります。</span></p>
   <p class="hero-cta"><a class="btn btn-entry" href="https://timerex.net/s/a.koooool.a_1933/c8e21ca2" target="_blank" rel="noopener">空き日程を見て予約する →</a></p>
   <div class="term" aria-label="AI受付のごあいさつ">
     <div class="body" id="termBody"><span class="cur"></span></div>
   </div>
 </div></div>
 
+<section class="diagnosis"><div class="wrap">
+  <p class="eyebrow">10秒診断</p>
+  <h2>2回タップすると、<br>おすすめが出ます。</h2>
+  <div class="quiz" aria-live="polite">
+    <div id="q1">
+      <p class="q">Q1. AIは、いまどれくらい使っていますか？</p>
+      <div class="chips">
+        <button class="chip" data-q1="0">まだ触っていない</button>
+        <button class="chip" data-q1="1">ChatGPTくらいは</button>
+        <button class="chip" data-q1="2">毎日つかっている</button>
+      </div>
+    </div>
+    <div id="q2" style="display:none">
+      <p class="q">Q2. いちばん欲しいのは？</p>
+      <div class="chips">
+        <button class="chip" data-q2="soudan">相談できる相手</button>
+        <button class="chip" data-q2="app">仕事がラクになる道具</button>
+        <button class="chip" data-q2="hito">代わりに働く人手</button>
+        <button class="chip" data-q2="web">お店の紹介ページ</button>
+      </div>
+    </div>
+    <div class="res" id="qres"></div>
+  </div>
+</div></section>
+
 <section><div class="wrap">
   <p class="eyebrow">メニューと料金</p>
-  <h2>無料診断から、<br>AI社員チーム納品へ。</h2>
+  <h2>やることと、値段。<br>これだけです。</h2>
   <div class="menu">
 
-    <div class="mi" id="m-shindan">
-      <span class="tag">まずここから</span>
-      <h3>無料AI業務診断（30分）</h3>
-      <div class="price">0<small>円</small></div>
-      <p><span class="nb">いまの仕事のやり方を聞かせてください。</span><span class="nb">「AIに任せられるのはここ」を、</span><span class="nb">その場で3つに絞ってお返しします。</span><span class="nb">対面でもZoomでも。売り込みはしません。</span></p>
+    <div class="mi" id="m-soudan">
+      <h3>単発相談（60分）</h3>
+      <div class="price">5,000<small>円</small></div>
+      <p><span class="nb">「うちの仕事、AIで何ができる？」に</span><span class="nb">その場でお答えします。</span><span class="nb">対面でもZoomでも。</span><span class="nb">1回きりでもOKです。</span></p>
       <a class="morelink" href="https://timerex.net/s/a.koooool.a_1933/c8e21ca2" target="_blank" rel="noopener">空き日程を見て予約する →</a>
+<p class="availability">受付枠：月・水・木・金の21:00〜23:00（60分）／2026年9月16日（水）から。日中はお仕事の方もご相談いただけます。</p>
+      <a class="paybtn" data-pay="soudan" href="#">ご相談済みの方：カード決済へ</a>
     </div>
 
-    <div class="mi hot" id="m-team">
-      <span class="tag">商品はこれ1つ</span>
-      <h3>AI社員チーム納品</h3>
-      <div class="price">個人 300,000<small>円</small></div>
-      <div class="price" style="margin-top:0">法人 500,000<small>円〜</small></div>
-      <p><span class="nb">あなたの仕事のやり方を覚えたAI社員を、</span><span class="nb">役割ごとにチームで作って、お渡しします。</span><span class="nb">作るのはこちら。使うのはあなた。</span><span class="nb">時間ではなく、動く「チーム」を納品します。</span></p>
-      <p style="margin-top:16px"><b>納品物（6点）</b></p>
-      <ol class="deliv">
-        <li>受付係（会社のルールブック・CLAUDE.md）</li>
-        <li>役割ごとのAI社員 一式（3〜15名・各自の指示書）</li>
-        <li>組織図（誰が何をするかの1枚）</li>
-        <li>朝礼（毎朝、今日の提案が3つ出る仕組み）</li>
-        <li>導入プロンプトと手順書（貼るだけ・15分）</li>
-        <li>30日間の不具合対応（直すのはこちら）</li>
-      </ol>
-      <p><span class="nb">実物：当社は6つの事業を55名のAI社員で回しています。</span></p>
+    <div class="mi" id="m-app">
+      <h3>アプリ作成</h3>
+      <div class="price">10,000<small>円</small></div>
+      <p><span class="nb">予約受付・記録づけ・スタンプカードなど、</span><span class="nb">あなたの仕事専用の道具を1本作ります。</span><span class="nb">（1つの機能・修正2回まで。追加は別途）</span></p>
+      <a class="morelink" href="/apps/box-9f4a7c2e/">制作例の道具箱を見る →</a>
+      <a class="paybtn" data-pay="app" href="#">ご相談済みの方：カード決済へ</a>
+    </div>
+
+    <div class="mi" id="m-shain">
+      <h3>AI社員作り</h3>
+      <div class="price">30,000<small>円</small></div>
+      <p><span class="nb">あなたの仕事のやり方を覚えたAI社員を</span><span class="nb">1人作ります。</span><span class="nb">毎回おなじ説明をしなくても、</span><span class="nb">最後まで仕事をやってくれます。</span></p>
+      <a class="morelink" href="/card">Hitotsu Companyの名刺を見る →</a>
+      <a class="paybtn" data-pay="shain" href="#">ご相談済みの方：カード決済へ</a>
+    </div>
+
+    <div class="mi" id="m-web">
+      <h3>ホームページ制作</h3>
+      <div class="price">50,000<small>円</small></div>
+      <p><span class="nb">お店・サービスの紹介ページを1枚から。</span><span class="nb">スマホ対応・QRコード付きで納品します。</span></p>
+      <a class="morelink" href="/hp/">プランのくわしい説明を見る →</a>
+      <a class="paybtn" data-pay="web" href="#">ご相談済みの方：カード決済へ</a>
+    </div>
+
+    <div class="mi hot" id="m-soshiki">
+      <span class="tag">いちばん人気</span>
+      <h3>AI組織作り</h3>
+      <div class="price">100,000<small>円</small></div>
+      <p><span class="nb">AI社員を役割ごとにチームで揃えて、</span><span class="nb">あなたの会社の中に「AIの部署」を作ります。</span><span class="nb">事務・発信・書類づくりを</span><span class="nb">まとめて任せられる状態で納品します。</span></p>
       <a class="morelink" href="/#org">当社のAI社員の組織図を見る →</a>
+      <a class="paybtn" data-pay="soshiki" href="#">ご相談済みの方：カード決済へ</a>
     </div>
 
   </div>
-  <p class="pay-note"><span class="nb">はじめての方は、無料診断からどうぞ。</span><span class="nb">診断のあと、やること・金額・期日を先に決めてから作ります。</span><span class="nb">お支払いは納品時（カード・銀行振込・PayPay）。</span></p>
-  <p class="pay-note tiny"><span class="nb">自分で入れたい方へ：貼るだけの「AI社員キット」（29,800円・買い切り）と、</span><span class="nb">毎週作ったものが届く「AI社員室」（note）もあります。</span><span class="nb">ホームページ制作のみのご依頼は <a href="/hp/">こちら</a>。</span></p>
+  <p class="pay-note"><span class="nb">はじめての方は、まず下の</span><span class="nb">公式LINEか対面でご相談ください。</span><span class="nb">内容が決まった方は、</span><span class="nb">各カードのボタンからそのままカード決済できます</span><span class="nb">（銀行振込・PayPay・現金も対応）。</span></p>
 </div></section>
 
 <section class="ex"><div class="wrap">
@@ -314,6 +351,52 @@
   }
   setTimeout(function(){typeLine(0)},800);
 
+  // 10秒診断
+  var q1v=0;
+  var MAP={
+    soudan:['m-soudan','単発相談（60分）','5,000円','まずは1時間、話すのが近道です。'],
+    app:['m-app','アプリ作成','10,000円','毎日の面倒は、道具にして片付けましょう。'],
+    web:['m-web','ホームページ制作','50,000円','このページのようなサイトを、あなたのお店にも。'],
+    shain:['m-shain','AI社員作り','30,000円','あなたの仕事を覚えたAIを、まず1人。'],
+    soshiki:['m-soshiki','AI組織作り','100,000円','毎日使っているなら、次はチームで任せる番です。']
+  };
+  var q1=document.getElementById('q1'),q2=document.getElementById('q2'),res=document.getElementById('qres');
+  q1.querySelectorAll('.chip').forEach(function(b){b.onclick=function(){
+    q1v=+b.dataset.q1;q1.style.display='none';q2.style.display='block';
+  }});
+  q2.querySelectorAll('.chip').forEach(function(b){b.onclick=function(){
+    var k=b.dataset.q2;if(k==='hito')k=(q1v===2)?'soshiki':'shain';
+    var m=MAP[k];
+    q2.style.display='none';res.style.display='block';
+    res.innerHTML='<p class="q" style="margin:0">あなたへのおすすめは…</p>'
+      +'<p class="big"><b>'+m[1]+'</b>　'+m[2]+'</p>'
+      +'<p class="tiny muted" style="margin:6px 0 0">'+m[3]+'</p>'
+      +'<button class="again" id="qagain">もう一度診断する</button>';
+    document.getElementById('qagain').onclick=function(){
+      res.style.display='none';q1.style.display='block';
+    };
+    var card=document.getElementById(m[0]);
+    setTimeout(function(){
+      card.scrollIntoView({behavior:reduce?'auto':'smooth',block:'center'});
+      card.classList.remove('flash');void card.offsetWidth;card.classList.add('flash');
+    },600);
+  }});
+})();
+</script>
+<script>
+// Stripe決済リンク。URLを入れたメニューだけ決済ボタンが表示される
+(function(){
+  var PAY={
+    soudan:'https://buy.stripe.com/00wcN4as94SnaQIga66EU00',
+    app:'https://buy.stripe.com/eVq3cu8k12Kf4sk3nk6EU01',
+    shain:'https://buy.stripe.com/00w9AScAhbgL3og3nk6EU02',
+    web:'https://buy.stripe.com/dRm4gy6bT1Gb9MEbTQ6EU03',
+    soshiki:'https://buy.stripe.com/9B6bJ0dEl70vgb27DA6EU04'
+  };
+  document.querySelectorAll('.paybtn').forEach(function(b){
+    var url=PAY[b.dataset.pay];
+    if(url){b.href=url;b.classList.add('on')}
+  });
 })();
 </script>
 </body></html>

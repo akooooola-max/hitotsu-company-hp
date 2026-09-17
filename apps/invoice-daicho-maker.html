@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="経理担当者。請求書PDFの山を、取引先別に整理して台帳化まで一直線">
+<title>請求書 台帳メーカー</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, "Hiragino Sans", "Yu Gothic", sans-serif;
+  background: #f4f6f8;
+  color: #333;
+  line-height: 1.6;
+  padding: 16px;
+}
+.container { max-width: 900px; margin: 0 auto; }
+h1 { font-size: 1.4rem; color: #2c3e50; margin-bottom: 8px; }
+.subtitle { color: #666; font-size: 0.9rem; margin-bottom: 20px; }
+.card {
+  background: #fff;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 16px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+.card h2 {
+  font-size: 1.05rem;
+  color: #2c3e50;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #e8ecef;
+}
+.step-num {
+  display: inline-block;
+  background: #4a90e2;
+  color: #fff;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  text-align: center;
+  line-height: 24px;
+  font-size: 0.85rem;
+  margin-right: 8px;
+}
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+.form-row-full { margin-bottom: 10px; }
+label { display: block; font-size: 0.85rem; color: #555; margin-bottom: 4px; }
+input, textarea, select {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid #ccd3d9;
+  border-radius: 4px;
+  font-size: 0.95rem;
+  font-family: inherit;
+}
+textarea { resize: vertical; min-height: 60px; }
+button {
+  background: #4a90e2;
+  color: #fff;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 4px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  font-weight: bold;
+}
+button:hover { background: #357abd; }
+button.sub { background: #6c757d; }
+button.sub:hover { background: #5a6268; }
+button.danger { background: #dc3545; padding: 6px 12px; font-size: 0.85rem; }
+button.danger:hover { background: #c82333; }
+.btn-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+th, td { padding: 8px 6px; text-align: left; border-bottom: 1px solid #e8ecef; }
+th { background: #f8f9fa; font-weight: bold; color: #555; }
+.empty { text-align: center; color: #999; padding: 20px; font-size: 0.9rem; }
+.total-row { font-weight: bold; background: #eaf3fc; }
+.prompt-box {
+  background: #f0f4f8;
+  border-left: 3px solid #4a90e2;
+  padding: 12px;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  white-space: pre-wrap;
+  font-family: "SFMono-Regular", Consolas, monospace;
+  margin-bottom: 10px;
+  max-height: 250px;
+  overflow-y: auto;
+}
+.tip { background: #fff8e1; padding: 10px; border-radius: 4px; font-size: 0.85rem; color: #6d4c00; margin-bottom: 12px; }
+.table-wrap { overflow-x: auto; }
+.group-header { background: #eaf3fc; font-weight: bold; color: #2c3e50; }
+@media (max-width: 600px) {
+  .form-row { grid-template-columns: 1fr; }
+  th, td { padding: 6px 4px; font-size: 0.8rem; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>📋 請求書 台帳メーカー</h1>
+  <p class="subtitle">請求書PDFの中身を1件ずつ入力（またはAIで抜き出して貼付け）→ 取引先ごとに整理された台帳が出来上がります。</p>
+
+  <div class="card">
+    <h2><span class="step-num">1</span>AIに依頼する文（コピーして使用）</h2>
+    <p class="tip">💡 手元のPDFをAIチャットに読ませ、下の依頼文を貼るとCSV形式で結果が返ってきます。それを次のステップの「まとめて追加」に貼り付けてください。</p>
+    <div class="prompt-box" id="promptText">添付した請求書PDF（複数枚）から、以下の項目を抜き出し、CSV形式で出力してください。
+ヘッダー行は不要です。カンマ区切りで、1請求書につき1行にしてください。
+金額は数字のみ（円マーク・カンマなし）でお願いします。
+
+【出力する列の順番】
+発行日(YYYY-MM-DD),取引先名,金額,請求書番号,備考
+
+例:
+2024-03-15,株式会社ABC,55000,INV-001,3月分保守料
+2024-03-20,山田商事,128000,2024-A15,消耗品</div>
+    <button class="sub" onclick="copyPrompt()">📋 依頼文をコピー</button>
+  </div>
+
+  <div class="card">
+    <h2><span class="step-num">2</span>台帳に追加する</h2>
+    <div class="form-row">
+      <div>
+        <label>発行日</label>
+        <input type="date" id="date">
+      </div>
+      <div>
+        <label>取引先名</label>
+        <input type="text" id="vendor" placeholder="例：株式会社ABC">
+      </div>
+    </div>
+    <div class="form-row">
+      <div>
+        <label>金額（円）</label>
+        <input type="number" id="amount" placeholder="55000">
+      </div>
+      <div>
+        <label>請求書番号</label>
+        <input type="text" id="invoiceNo" placeholder="INV-001">
+      </div>
+    </div>
+    <div class="form-row-full">
+      <label>備考（任意）</label>
+      <input type="text" id="memo" placeholder="例：3月分保守料">
+    </div>
+    <div class="btn-row">
+      <button onclick="addOne()">＋ 1件追加</button>
+    </div>
+
+    <details style="margin-top:16px;">
+      <summary style="cursor:pointer; color:#4a90e2; font-size:0.9rem;">📥 CSVをまとめて貼り付けて追加</summary>
+      <div style="margin-top:10px;">
+        <label>CSV貼り付け欄（発行日,取引先,金額,請求書番号,備考）</label>
+        <textarea id="csvInput" rows="6" placeholder="2024-03-15,株式会社ABC,55000,INV-001,3月分&#10;2024-03-20,山田商事,128000,2024-A15,消耗品"></textarea>
+        <div class="btn-row">
+          <button onclick="addBulk()">CSVから追加</button>
+        </div>
+      </div>
+    </details>
+  </div>
+
+  <div class="card">
+    <h2><span class="step-num">3</span>台帳（取引先ごとに自動グループ化）</h2>
+    <div class="table-wrap">
+      <table id="ledger">
+        <thead>
+          <tr>
+            <th>発行日</th>
+            <th>請求書番号</th>
+            <th>金額</th>
+            <th>備考</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="ledgerBody"></tbody>
+      </table>
+    </div>
+    <div class="btn-row">
+      <button onclick="downloadCSV()">📊 台帳をCSVでダウンロード</button>
+      <button class="sub" onclick="clearAll()">🗑 全て削除</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const STORAGE_KEY = 'invoice_ledger_v1';
+let data = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+
+function save() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  render();
+}
+
+function addOne() {
+  const date = document.getElementById('date').value;
+  const vendor = document.getElementById('vendor').value.trim();
+  const amount = parseInt(document.getElementById('amount').value) || 0;
+  const invoiceNo = document.getElementById('invoiceNo').value.trim();
+  const memo = document.getElementById('memo').value.trim();
+  if (!vendor) { alert('取引先名を入力してください'); return; }
+  data.push({ date, vendor, amount, invoiceNo, memo });
+  document.getElementById('date').value = '';
+  document.getElementById('vendor').value = '';
+  document.getElementById('amount').value = '';
+  document.getElementById('invoiceNo').value = '';
+  document.getElementById('memo').value = '';
+  save();
+}
+
+function addBulk() {
+  const text = document.getElementById('csvInput').value.trim();
+  if (!text) return;
+  const lines = text.split(/\r?\n/);
+  let added = 0;
+  for (const line of lines) {
+    if (!line.trim()) continue;
+    const parts = line.split(',').map(s => s.trim());
+    if (parts.length < 3) continue;
+    data.push({
+      date: parts[0] || '',
+      vendor: parts[1] || '',
+      amount: parseInt(parts[2].replace(/[^\d-]/g, '')) || 0,
+      invoiceNo: parts[3] || '',
+      memo: parts[4] || ''
+    });
+    added++;
+  }
+  document.getElementById('csvInput').value = '';
+  save();
+  alert(added + '件を追加しました');
+}
+
+function del(idx) {
+  if (!confirm('削除しますか？')) return;
+  data.splice(idx, 1);
+  save();
+}
+
+function clearAll() {
+  if (!confirm('本当に全て削除しますか？')) return;
+  data = [];
+  save();
+}
+
+function render() {
+  const body = document.getElementById('ledgerBody');
+  body.innerHTML = '';
+  if (data.length === 0) {
+    body.innerHTML = '<tr><td colspan="5" class="empty">まだ登録がありません。上のフォームから追加してください。</td></tr>';
+    return;
+  }
+  // 取引先でグループ化
+  const groups = {};
+  data.forEach((item, idx) => {
+    const key = item.vendor || '(未入力)';
+    if (!groups[key]) groups[key] = [];
+    groups[key].push({ ...item, _idx: idx });
+  });
+  const vendors = Object.keys(groups).sort();
+  let grandTotal = 0;
+  for (const v of vendors) {
+    const items = groups[v].sort((a,b) => (a.date||'').localeCompare(b.date||''));
+    let subtotal = 0;
+    const header = document.createElement('tr');
+    header.className = 'group-header';
+    header.innerHTML = `<td colspan="5">📁 ${escapeHtml(v)}（${items.length}件）</td>`;
+    body.appendChild(header);
+    for (const it of items) {
+      subtotal += it.amount;
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${escapeHtml(it.date)}</td>
+        <td>${escapeHtml(it.invoiceNo)}</td>
+        <td>¥${it.amount.toLocaleString()}</td>
+        <td>${escapeHtml(it.memo)}</td>
+        <td><button class="danger" onclick="del(${it._idx})">削除</button></td>
+      `;
+      body.appendChild(tr);
+    }
+    const sub = document.createElement('tr');
+    sub.className = 'total-row';
+    sub.innerHTML = `<td colspan="2">小計</td><td>¥${subtotal.toLocaleString()}</td><td colspan="2"></td>`;
+    body.appendChild(sub);
+    grandTotal += subtotal;
+  }
+  const gt = document.createElement('tr');
+  gt.className = 'total-row';
+  gt.style.background = '#4a90e2';
+  gt.style.color = '#fff';
+  gt.innerHTML = `<td colspan="2">合計（全${data.length}件）</td><td>¥${grandTotal.toLocaleString()}</td><td colspan="2"></td>`;
+  body.appendChild(gt);
+}
+
+function escapeHtml(s) {
+  return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function downloadCSV() {
+  if (data.length === 0) { alert('データがありません'); return; }
+  const sorted = [...data].sort((a,b) => (a.vendor||'').localeCompare(b.vendor||'') || (a.date||'').localeCompare(b.date||''));
+  let csv = '\ufeff取引先,発行日,請求書番号,金額,備考\n';
+  for (const it of sorted) {
+    csv += [it.vendor, it.date, it.invoiceNo, it.amount, it.memo]
+      .map(v => `"${String(v||'').replace(/"/g,'""')}"`).join(',') + '\n';
+  }
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `請求書台帳_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function copyPrompt() {
+  const text = document.getElementById('promptText').textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    alert('依頼文をコピーしました。AIチャットの入力欄に貼り付けてください。');
+  }).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    alert('依頼文をコピーしました。');
+  });
+}
+
+render();
+</script>
+</body>
+</html>
