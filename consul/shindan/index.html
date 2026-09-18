@@ -1,0 +1,221 @@
+<!doctype html><html lang="ja"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#F7F0DE">
+<title>無料AI業務診断シート｜AIコンサルタント ひとつ</title>
+<meta name="description" content="10問に答えて送るだけ。3営業日以内に「AIに任せられる仕事」を3つに絞った所見1枚をお返しします。面談は不要。実データはお預かりしません。">
+<meta property="og:type" content="website">
+<meta property="og:title" content="無料AI業務診断シート（5分）｜AIコンサルタント ひとつ">
+<meta property="og:description" content="10問に答えて送るだけ。所見1枚が返ります。面談は不要。">
+<meta property="og:site_name" content="Hitotsu Company">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&family=Noto+Sans+JP:wght@400;500;700;900&display=swap">
+<style>
+  /* /consul/ と同じ配色・角丸。追加の色は使わない。 */
+  :root{--cream:#F7F0DE;--cream-deep:#EFE5CC;--ink:#4A3B2E;--maroon:#A8324A;--maroon-deep:#8C2740;
+    --matcha:#6B7A2E;--white:#FFFDF7;--radius:18px;
+    --sans:"Noto Sans JP",-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN","Hiragino Sans","Yu Gothic",Meiryo,sans-serif;
+    --display:"Zen Maru Gothic",var(--sans)}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--cream);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.9;
+    -webkit-text-size-adjust:100%;-webkit-font-smoothing:antialiased;overflow-wrap:anywhere}
+  a{color:var(--maroon);text-underline-offset:5px}
+  button,input,select,textarea{font:inherit;color:inherit}
+  .wrap,.header-in{width:100%;max-width:740px;margin:0 auto;padding:0 24px}
+  h1,h2,h3{font-family:var(--display);font-weight:900;line-height:1.55;margin:0;letter-spacing:.03em}
+  h1{font-size:clamp(27px,6vw,38px)}
+  h1 .y{color:var(--maroon)}
+  .site-header{background:var(--cream)}
+  .header-in{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:16px;padding-top:20px;padding-bottom:20px}
+  .logo{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink)}
+  .logo-mark{width:44px;height:44px;border-radius:50%;background:var(--maroon);color:var(--white);display:grid;place-items:center;font-family:var(--display);font-weight:900;font-size:19px;flex:none}
+  .logo-text{line-height:1.3}
+  .logo-text small{display:block;font-size:10px;letter-spacing:.14em;color:var(--maroon)}
+  .logo-text strong{font-family:var(--display);font-size:17px;font-weight:900}
+  .site-nav a{display:inline-flex;align-items:center;min-height:44px;font-size:14px;font-weight:700}
+  .hero{padding:44px 0 28px}
+  .eyebrow{font-family:var(--display);font-size:15px;font-weight:900;letter-spacing:.1em;color:var(--maroon);margin:0 0 14px}
+  .lead{margin:20px 0 0;font-size:17px;line-height:2}
+  .flow{display:grid;gap:10px;margin:24px 0 0;padding:0;list-style:none;counter-reset:s}
+  .flow li{position:relative;padding:12px 16px 12px 58px;background:var(--white);border:1px solid var(--cream-deep);border-radius:var(--radius);font-size:16px;line-height:1.8}
+  .flow li:before{counter-increment:s;content:counter(s);position:absolute;left:14px;top:12px;width:32px;height:32px;border-radius:50%;
+    border:2px solid var(--maroon);color:var(--maroon);background:var(--cream);display:grid;place-items:center;font-family:var(--display);font-weight:900;font-size:15px}
+  .flow b{color:var(--maroon)}
+  form{padding:8px 0 60px}
+  .q{background:var(--white);border:1px solid var(--cream-deep);border-radius:var(--radius);padding:24px 22px;margin-top:18px}
+  .q label.t,.q .t{display:block;font-family:var(--display);font-size:18px;font-weight:900;line-height:1.6;margin:0 0 6px}
+  .q .t small{display:inline-block;margin-left:8px;font-family:var(--sans);font-size:13px;font-weight:700;color:var(--maroon)}
+  .hint{margin:0 0 12px;font-size:14px;line-height:1.8;opacity:.8}
+  input[type=text],textarea,select{width:100%;padding:12px 14px;border:1px solid var(--cream-deep);border-radius:12px;background:#fff;font-size:16px}
+  textarea{min-height:88px;resize:vertical}
+  .chips{display:flex;flex-wrap:wrap;gap:8px}
+  .chips label{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:8px 16px;border:1px solid var(--maroon);border-radius:999px;
+    background:var(--white);color:var(--maroon);font-size:15px;font-weight:700;cursor:pointer}
+  .chips input{accent-color:var(--maroon);width:18px;height:18px;margin:0}
+  .chips label:has(input:checked){background:var(--maroon);color:var(--white)}
+  .row{display:grid;gap:12px}
+  @media(min-width:520px){.row{grid-template-columns:1fr 1fr}}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:56px;border:0;border-radius:999px;padding:16px 24px;
+    font-family:var(--display);font-size:17px;font-weight:900;text-decoration:none;cursor:pointer;margin-top:28px;
+    background:var(--maroon);color:var(--white);box-shadow:0 4px 0 var(--maroon-deep)}
+  .btn:hover{background:var(--maroon-deep)}
+  .btn.sub{background:var(--white);color:var(--maroon);border:1px solid var(--maroon);box-shadow:none;margin-top:12px}
+  .btn.sub:hover{background:var(--cream)}
+  .out{display:none;margin-top:28px;background:var(--cream-deep);border-radius:var(--radius);padding:24px 22px}
+  .out.show{display:block}
+  .out h2{font-size:22px}
+  .out p{margin:12px 0 0;font-size:16px;line-height:1.9}
+  .out textarea{min-height:260px;margin-top:14px;font-size:14px;line-height:1.7;background:var(--white)}
+  .done{display:none;margin-top:12px;padding:12px 14px;border-radius:12px;background:var(--white);color:var(--matcha);font-weight:700;font-size:15px}
+  .safe{display:flex;gap:12px;margin-top:28px;font-size:15px;line-height:1.9}
+  .safe>span{color:var(--maroon);font-weight:900;flex:none}
+  footer{padding:36px 0;background:var(--cream-deep);font-size:14px}
+  footer a{display:inline-block;padding:6px 0}
+</style>
+</head><body>
+<header class="site-header"><div class="header-in">
+  <a class="logo" href="/consul/" aria-label="メニューと料金へ"><span class="logo-mark" aria-hidden="true">ひ</span><span class="logo-text"><small>HITOTSU COMPANY</small><strong>AIコンサルタント ひとつ</strong></span></a>
+  <nav class="site-nav" aria-label="関連ページ"><a href="/consul/">メニューと料金</a></nav>
+</div></header>
+<main><div class="wrap">
+  <div class="hero">
+    <p class="eyebrow">無料・面談なし・5分</p>
+    <h1>AI業務診断シート<br><span class="y">10問に答えて、送るだけ。</span></h1>
+    <p class="lead">いまの仕事のやり方を、この1枚に書いてください。<b>3営業日以内に「AIに任せられる仕事」を3つに絞った所見1枚</b>をお返しします。売り込みはしません。作ってほしくなったときだけ、30分お話しします。</p>
+    <ol class="flow">
+      <li><b>書く</b>　下の10問。分からない欄は空欄で大丈夫です</li>
+      <li><b>送る</b>　「送信文を作る」→ LINEかメールに貼って送る</li>
+      <li><b>届く</b>　所見1枚（現状の図・二重入力の箇所・AIに任せる3つ）</li>
+    </ol>
+  </div>
+
+  <form id="f" autocomplete="on">
+    <div class="q">
+      <label class="t" for="org">1. 法人名・お名前<small>必須</small></label>
+      <p class="hint">例：社会福祉法人〇〇会　理事長 〇〇</p>
+      <input type="text" id="org" name="法人名・お名前" required>
+    </div>
+
+    <div class="q">
+      <p class="t">2. 事業の種類<small>あてはまる全部</small></p>
+      <div class="chips">
+        <label><input type="checkbox" name="事業" value="介護（特養・老健・通所など）">介護</label>
+        <label><input type="checkbox" name="事業" value="障がい（入所・GH・就労・訪問など）">障がい</label>
+        <label><input type="checkbox" name="事業" value="児童（放デイ・児発・保育など）">児童</label>
+        <label><input type="checkbox" name="事業" value="医療・その他">医療・その他</label>
+      </div>
+    </div>
+
+    <div class="q">
+      <p class="t">3. 規模</p>
+      <div class="row">
+        <div><p class="hint">事業所数（概数）</p><input type="text" name="事業所数" placeholder="例：7か所"></div>
+        <div><p class="hint">職員数（概数）</p><input type="text" name="職員数" placeholder="例：120人"></div>
+      </div>
+    </div>
+
+    <div class="q">
+      <label class="t" for="kiroku">4. 記録・請求に使っているソフト</label>
+      <p class="hint">例：ほのぼの、カイポケ、ワイズマン、HUG、紙　など。複数あれば全部</p>
+      <input type="text" id="kiroku" name="記録・請求のソフト">
+    </div>
+
+    <div class="q">
+      <label class="t" for="keiri">5. 会計・給与・勤怠・人事に使っているソフト</label>
+      <p class="hint">例：会計はMJS、給与は弥生、勤怠はクロノス、人事はsmartHR、Excel　など</p>
+      <input type="text" id="keiri" name="会計・給与・勤怠・人事のソフト">
+    </div>
+
+    <div class="q">
+      <label class="t" for="nijuu">6. 同じ数字を「手で入力し直している」ところ</label>
+      <p class="hint">例：記録ソフトの売上を会計に手入力／勤怠を見て給与に打ち直し／利用者情報を2か所に登録</p>
+      <textarea id="nijuu" name="二重入力しているところ"></textarea>
+    </div>
+
+    <div class="q">
+      <p class="t">7. まだ紙のままの業務<small>あてはまる全部</small></p>
+      <div class="chips">
+        <label><input type="checkbox" name="紙のまま" value="日誌・記録">日誌・記録</label>
+        <label><input type="checkbox" name="紙のまま" value="シフト表">シフト表</label>
+        <label><input type="checkbox" name="紙のまま" value="稟議・決裁">稟議・決裁</label>
+        <label><input type="checkbox" name="紙のまま" value="申し送り・連絡表">申し送り</label>
+        <label><input type="checkbox" name="紙のまま" value="家族への連絡帳">連絡帳</label>
+        <label><input type="checkbox" name="紙のまま" value="経費精算">経費精算</label>
+        <label><input type="checkbox" name="紙のまま" value="会議の議事録">議事録</label>
+      </div>
+    </div>
+
+    <div class="q">
+      <p class="t">8. 職員同士の連絡手段<small>あてはまる全部</small></p>
+      <div class="chips">
+        <label><input type="checkbox" name="連絡手段" value="LINE（個人）">LINE（個人）</label>
+        <label><input type="checkbox" name="連絡手段" value="LINE WORKS">LINE WORKS</label>
+        <label><input type="checkbox" name="連絡手段" value="メール">メール</label>
+        <label><input type="checkbox" name="連絡手段" value="Teams・Slack・チャット">チャット</label>
+        <label><input type="checkbox" name="連絡手段" value="電話・紙">電話・紙</label>
+      </div>
+    </div>
+
+    <div class="q">
+      <label class="t" for="keiyaku">9. 1年以内に契約が切れる・更新が来るソフトや機器</label>
+      <p class="hint">例：記録ソフトが12月末で満了、パソコン30台が来春リース切れ。なければ空欄</p>
+      <input type="text" id="keiyaku" name="1年以内の契約満了">
+    </div>
+
+    <div class="q">
+      <label class="t" for="komari">10. いちばん困っていること<small>必須・3つまで</small></label>
+      <p class="hint">例：日誌が夜まで終わらない／請求月の残業／稟議が回るのに2週間／退職者のID消し忘れ</p>
+      <textarea id="komari" name="困っていること" required></textarea>
+    </div>
+
+    <div class="q">
+      <p class="t">11. AIを使ったことは</p>
+      <div class="chips">
+        <label><input type="radio" name="AI利用" value="法人として導入している">法人で導入</label>
+        <label><input type="radio" name="AI利用" value="職員が個人で使っている">個人で使う人がいる</label>
+        <label><input type="radio" name="AI利用" value="ほぼ使っていない">ほぼない</label>
+      </div>
+    </div>
+
+    <div class="q">
+      <label class="t" for="okuri">12. 所見の送り先<small>必須</small></label>
+      <p class="hint">メールアドレス、またはLINEで送る旨（LINEで送る場合は「LINEで」と書けば大丈夫です）</p>
+      <input type="text" id="okuri" name="所見の送り先" required>
+    </div>
+
+    <button class="btn" type="submit">送信文を作る →</button>
+
+    <div class="out" id="out">
+      <h2>あと1回。貼って送ってください。</h2>
+      <p>下の文をコピーして、<b>公式LINE</b>かメールに貼って送信。3営業日以内に所見1枚をお返しします。</p>
+      <textarea id="txt" readonly></textarea>
+      <button class="btn" type="button" id="copy">文をコピーする</button>
+      <div class="done" id="done">コピーしました。次は下のボタンでLINEを開いて、貼り付けて送ってください。</div>
+      <a class="btn sub" href="https://line.me/R/ti/p/@188jocyd" target="_blank" rel="noopener">公式LINEを開く（貼って送る）</a>
+      <a class="btn sub" id="mail" href="#">メールで送る</a>
+    </div>
+
+    <div class="safe"><span>✓</span><div>利用者名・職員名など実データは書かないでください。所見にはソフト名と流れだけを使います。この画面は何も保存しません。</div></div>
+  </form>
+</div></main>
+<footer><div class="wrap"><a href="/consul/">← メニューと料金</a>　<a href="/tokusho.html">特定商取引法に基づく表記</a><br>Hitotsu Company　AIコンサルタント ひとつ</div></footer>
+<script>
+  const form=document.getElementById('f'),out=document.getElementById('out'),txt=document.getElementById('txt');
+  const KEYS=['法人名・お名前','事業','事業所数','職員数','記録・請求のソフト','会計・給与・勤怠・人事のソフト','二重入力しているところ','紙のまま','連絡手段','1年以内の契約満了','困っていること','AI利用','所見の送り先'];
+  function build(){
+    const fd=new FormData(form);const lines=['【無料AI業務診断シート】'];
+    for(const k of KEYS){const v=fd.getAll(k).map(s=>s.trim()).filter(Boolean);lines.push(k+'：'+(v.length?v.join('、'):'（未記入）'));}
+    lines.push('送信日：'+new Date().toLocaleDateString('ja-JP'));
+    return lines.join('\n');
+  }
+  form.addEventListener('submit',e=>{e.preventDefault();txt.value=build();out.classList.add('show');out.scrollIntoView({behavior:'smooth'});});
+  document.getElementById('copy').addEventListener('click',async()=>{
+    try{await navigator.clipboard.writeText(txt.value);}catch(_){txt.select();document.execCommand('copy');}
+    document.getElementById('done').style.display='block';
+  });
+  document.getElementById('mail').addEventListener('click',e=>{
+    e.preventDefault();
+    location.href='mailto:a.koooool.a@gmail.com?subject='+encodeURIComponent('無料AI業務診断シート')+'&body='+encodeURIComponent(txt.value||build());
+  });
+</script>
+</body></html>
