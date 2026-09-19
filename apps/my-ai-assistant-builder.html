@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="自分専用AI設定。毎回の前提説明をやめて、指示文を作り置き">
+<title>マイAIアシスタント設計書</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic", sans-serif;
+    background: #f4f6f9;
+    margin: 0;
+    padding: 16px;
+    color: #222;
+    line-height: 1.6;
+  }
+  .container { max-width: 900px; margin: 0 auto; }
+  h1 { font-size: 1.4em; margin: 0 0 8px; }
+  .lead { color: #555; font-size: 0.9em; margin-bottom: 20px; }
+  .card {
+    background: #fff;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 16px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  }
+  .card h2 { font-size: 1.1em; margin: 0 0 12px; color: #1a5490; border-left: 4px solid #1a5490; padding-left: 10px; }
+  label { display: block; font-weight: bold; font-size: 0.9em; margin: 12px 0 4px; }
+  .hint { font-weight: normal; color: #888; font-size: 0.85em; margin-left: 6px; }
+  input[type=text], textarea, select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 1em;
+    font-family: inherit;
+  }
+  textarea { resize: vertical; min-height: 70px; }
+  .row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
+  button {
+    padding: 10px 18px;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.95em;
+    cursor: pointer;
+    font-weight: bold;
+  }
+  .btn-primary { background: #1a5490; color: #fff; }
+  .btn-secondary { background: #e0e0e0; color: #333; }
+  .btn-danger { background: #d64545; color: #fff; }
+  button:hover { opacity: 0.85; }
+  .preset-btns { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+  .preset-btns button {
+    background: #f0f4fa;
+    color: #1a5490;
+    border: 1px solid #c0d4e8;
+    font-size: 0.85em;
+    padding: 6px 12px;
+  }
+  #output {
+    background: #f8f8f8;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 14px;
+    white-space: pre-wrap;
+    font-family: "Menlo", "Consolas", monospace;
+    font-size: 0.9em;
+    min-height: 200px;
+    margin-top: 12px;
+  }
+  .saved-list { list-style: none; padding: 0; margin: 0; }
+  .saved-list li {
+    padding: 10px;
+    background: #f8f8f8;
+    border-radius: 6px;
+    margin-bottom: 6px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+  }
+  .saved-list li span { flex: 1; font-weight: bold; }
+  .saved-list button { padding: 6px 12px; font-size: 0.85em; }
+  .toast {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #333;
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 6px;
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
+    z-index: 100;
+  }
+  .toast.show { opacity: 1; }
+  .step { font-size: 0.85em; color: #888; margin-bottom: 4px; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>🤖 マイAIアシスタント設計書</h1>
+  <p class="lead">毎回同じ前提を説明するのをやめませんか。役割・口調・ルールを一度書いておけば、次からは「今日のメール書いて」の一言で済みます。この画面で作った指示文を、いつものAIチャットの「カスタム設定」欄や、依頼の一番最初に貼り付けて使ってください。</p>
+
+  <div class="card">
+    <h2>1. まずは用途を選ぶ（クリックで下に例が入ります）</h2>
+    <div class="preset-btns">
+      <button onclick="loadPreset('mail')">📧 メール返信係</button>
+      <button onclick="loadPreset('minutes')">📝 議事録要約係</button>
+      <button onclick="loadPreset('sns')">📱 SNS投稿案の作成</button>
+      <button onclick="loadPreset('idea')">💡 企画・アイデア出し</button>
+      <button onclick="loadPreset('teacher')">🎓 やさしい解説係</button>
+      <button onclick="clearForm()">🗑️ 空にする</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>2. 項目を埋める（分かる範囲でOK）</h2>
+
+    <label>アシスタントの名前 <span class="hint">例：メール返信サポーター</span></label>
+    <input type="text" id="name" placeholder="このアシスタントの呼び名">
+
+    <label>役割 <span class="hint">「あなたは〇〇です」</span></label>
+    <textarea id="role" placeholder="例：あなたは私の会社の営業アシスタントです。お客様への問い合わせ返信を手伝います。"></textarea>
+
+    <label>前提となる背景情報 <span class="hint">会社名・商品・お客様の特徴など</span></label>
+    <textarea id="context" placeholder="例：弊社は中小企業向けの経理ソフトを販売しています。お客様は40〜60代の経営者が中心です。"></textarea>
+
+    <label>口調・トーン <span class="hint">丁寧、フランク、専門用語を避ける、など</span></label>
+    <textarea id="tone" placeholder="例：丁寧すぎず、親しみのある敬語。専門用語は使わず中学生でもわかる言葉で。"></textarea>
+
+    <label>やってほしい作業の手順 <span class="hint">「①〜する ②〜する」の形が分かりやすい</span></label>
+    <textarea id="steps" placeholder="例：①お客様の質問内容を要約する ②返信の冒頭で共感を示す ③具体的な回答を3行以内で書く ④次のアクションを提案する"></textarea>
+
+    <label>使ってはいけない言葉・避けたい表現 <span class="hint">NGワード</span></label>
+    <textarea id="ng" placeholder="例：「頑張ります」「善処します」は使わない。絵文字は使わない。"></textarea>
+
+    <label>出力の形式 <span class="hint">箇条書き・表・見出し付きなど</span></label>
+    <textarea id="format" placeholder="例：件名／本文の順で出力。本文は300字以内。"></textarea>
+
+    <div class="row">
+      <button class="btn-primary" onclick="generate()">✨ 指示文を作成する</button>
+      <button class="btn-secondary" onclick="saveGem()">💾 この設計を保存</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>3. できあがった指示文（コピーして使う）</h2>
+    <p class="step">↓この文章をまるごとコピーして、いつものAIチャットの最初に貼り付けてください。以降は簡単な指示だけで動きます。</p>
+    <div id="output">まだ作成されていません。上の「指示文を作成する」ボタンを押してください。</div>
+    <div class="row">
+      <button class="btn-primary" onclick="copyOutput()">📋 コピー</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>4. 保存した設計書一覧</h2>
+    <ul class="saved-list" id="savedList"></ul>
+    <p id="emptyMsg" style="color:#888;font-size:0.9em;">まだ保存された設計はありません。</p>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const fields = ['name','role','context','tone','steps','ng','format'];
+
+const presets = {
+  mail: {
+    name: 'メール返信サポーター',
+    role: 'あなたは私の会社のメール返信アシスタントです。お客様や取引先からのメールに対する返信案を作ります。',
+    context: '弊社は【会社名・業種を書く】です。主なお客様は【客層を書く】です。',
+    tone: '丁寧で親しみのある敬語。堅すぎず、上から目線にならない。',
+    steps: '①相手のメールの要点を頭の中で整理する ②冒頭でお礼または共感を一文入れる ③本題の回答を簡潔に書く ④必要なら次のアクション（返答期限や連絡先）を添える',
+    ng: '「頑張ります」「善処します」「取り急ぎ」は使わない。',
+    format: '件名の案／本文の順で出力。本文は400字以内。'
+  },
+  minutes: {
+    name: '議事録要約係',
+    role: 'あなたは会議の議事録を整理する専門アシスタントです。私が貼り付けた文字起こしを、決まった形式にまとめ直します。',
+    context: '対象は社内会議です。参加者は数名〜10名程度。',
+    tone: '事実だけを淡々と。感想や推測は入れない。',
+    steps: '①全体を読んで話題ごとに区切る ②以下の4項目を抽出する：決定事項／宿題（TODO）／担当者／期限 ③重要度の高い順に並べる',
+    ng: '推測での補完はしない。不明な点は「不明」と書く。',
+    format: '見出し【決定事項】【宿題】【担当】【期限】の順で箇条書き。最後に3行以内の全体サマリー。'
+  },
+  sns: {
+    name: 'SNS投稿アシスタント',
+    role: 'あなたは私のSNS投稿の下書きを作るアシスタントです。',
+    context: '投稿する媒体は【媒体名】。フォロワーは【属性】。発信テーマは【テーマ】。',
+    tone: 'カジュアルで読みやすい。難しい言葉を使わない。',
+    steps: '①伝えたいメッセージを1つに絞る ②冒頭1行で興味を引く ③本文で具体例を入れる ④最後に問いかけや行動喚起を入れる',
+    ng: '大げさな煽り表現、断定的な健康・金融アドバイスはしない。',
+    format: '本文（改行入り）／ハッシュタグ候補5つ、の順で出力。'
+  },
+  idea: {
+    name: '企画アイデア出し係',
+    role: 'あなたは私の企画・アイデア出しの相棒です。ブレスト相手として、多角的な視点から案を出します。',
+    context: '私は【職種】で、【どんな課題】について案を考えています。',
+    tone: '前向きで、否定より発想を広げる方向で。',
+    steps: '①テーマを確認する ②違う切り口で5案出す ③各案に「良い点／注意点」を一行ずつ添える ④最後に「もう一段深めるならこの質問」を1つ返す',
+    ng: '一般論・当たり障りのない案は避ける。',
+    format: '案1〜5を箇条書き、その下にまとめコメント。'
+  },
+  teacher: {
+    name: 'やさしい解説係',
+    role: 'あなたは初心者向けの解説アシスタントです。難しい話を、身近な例えで分かりやすく説明します。',
+    context: '私はITや専門知識に自信がありません。基礎から知りたいです。',
+    tone: '丁寧でやさしい。専門用語は必ず言い換える。',
+    steps: '①用語を一言で言い換える ②身近な例えで説明する ③実際にどう役立つかを1つ示す ④「もっと知りたい場合の次のステップ」を提案する',
+    ng: '専門用語を説明なしで使わない。「〜ですよね？」など前提決めつけをしない。',
+    format: '4つの見出し（一言／たとえ／使いどころ／次の一歩）で構成。'
+  }
+};
+
+function loadPreset(key) {
+  const p = presets[key];
+  if (!p) return;
+  fields.forEach(f => { document.getElementById(f).value = p[f] || ''; });
+  showToast('例文を読み込みました。自分向けに書き換えてください。');
+}
+
+function clearForm() {
+  if (!confirm('入力内容をすべて消しますか？')) return;
+  fields.forEach(f => { document.getElementById(f).value = ''; });
+}
+
+function generate() {
+  const v = {};
+  fields.forEach(f => { v[f] = document.getElementById(f).value.trim(); });
+
+  if (!v.role && !v.context) {
+    alert('少なくとも「役割」か「背景情報」を入れてください。');
+    return;
+  }
+
+  let out = '';
+  out += '# あなたの設定\n\n';
+  if (v.name) out += `【アシスタント名】${v.name}\n\n`;
+  if (v.role) out += `## 役割\n${v.role}\n\n`;
+  if (v.context) out += `## 前提となる背景\n${v.context}\n\n`;
+  if (v.tone) out += `## 口調・トーン\n${v.tone}\n\n`;
+  if (v.steps) out += `## 作業の手順\n${v.steps}\n\n`;
+  if (v.ng) out += `## 使ってはいけない言葉・注意点\n${v.ng}\n\n`;
+  if (v.format) out += `## 出力の形式\n${v.format}\n\n`;
+  out += '---\n以上を踏まえ、これから私が依頼する内容に対応してください。分からない点があれば質問してください。';
+
+  document.getElementById('output').textContent = out;
+  showToast('指示文を作成しました');
+}
+
+function copyOutput() {
+  const txt = document.getElementById('output').textContent;
+  if (!txt || txt.startsWith('まだ')) {
+    alert('先に指示文を作成してください。');
+    return;
+  }
+  const ta = document.createElement('textarea');
+  ta.value = txt;
+  document.body.appendChild(ta);
+  ta.select();
+  try { document.execCommand('copy'); showToast('コピーしました！AIチャットに貼り付けてください'); }
+  catch(e) { alert('コピーに失敗しました。手動で選択してください。'); }
+  document.body.removeChild(ta);
+}
+
+function saveGem() {
+  const name = document.getElementById('name').value.trim();
+  if (!name) { alert('保存には「アシスタントの名前」を入れてください。'); return; }
+  const data = {};
+  fields.forEach(f => { data[f] = document.getElementById(f).value; });
+  const all = JSON.parse(localStorage.getItem('myGems') || '{}');
+  all[name] = data;
+  localStorage.setItem('myGems', JSON.stringify(all));
+  showToast('保存しました');
+  renderSaved();
+}
+
+function renderSaved() {
+  const all = JSON.parse(localStorage.getItem('myGems') || '{}');
+  const list = document.getElementById('savedList');
+  const empty = document.getElementById('emptyMsg');
+  list.innerHTML = '';
+  const keys = Object.keys(all);
+  if (keys.length === 0) { empty.style.display = 'block'; return; }
+  empty.style.display = 'none';
+  keys.forEach(k => {
+    const li = document.createElement('li');
+    li.innerHTML = `<span>${escapeHtml(k)}</span>`;
+    const btnLoad = document.createElement('button');
+    btnLoad.className = 'btn-secondary';
+    btnLoad.textContent = '読込';
+    btnLoad.onclick = () => {
+      const d = all[k];
+      fields.forEach(f => { document.getElementById(f).value = d[f] || ''; });
+      window.scrollTo({top:0, behavior:'smooth'});
+      showToast('読み込みました');
+    };
+    const btnDel = document.createElement('button');
+    btnDel.className = 'btn-danger';
+    btnDel.textContent = '削除';
+    btnDel.onclick = () => {
+      if (!confirm(`「${k}」を削除しますか？`)) return;
+      delete all[k];
+      localStorage.setItem('myGems', JSON.stringify(all));
+      renderSaved();
+    };
+    li.appendChild(btnLoad);
+    li.appendChild(btnDel);
+    list.appendChild(li);
+  });
+}
+
+function escapeHtml(s) {
+  return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+renderSaved();
+</script>
+</body>
+</html>
