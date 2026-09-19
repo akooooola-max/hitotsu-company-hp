@@ -854,3 +854,14 @@ a { color: inherit; }
   *, *::before, *::after { animation: none !important; transition: none !important; }
   .reveal { opacity: 1; transform: none; }
 }
+
+/* いま買えるもの（2026-09-19） */
+.prod-grid { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+.prod { display: block; background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 1.3rem 1.4rem 1.2rem; color: var(--text); text-decoration: none; position: relative; overflow: hidden; transition: transform .2s, border-color .2s; }
+.prod::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--accent); }
+.prod:hover { transform: translateY(-3px); border-color: var(--accent); }
+.prod .p-tag { display: inline-block; font-size: .72rem; font-weight: 700; letter-spacing: .08em; color: var(--accent); border: 1px solid var(--accent); border-radius: 999px; padding: .15rem .6rem; margin-bottom: .7rem; }
+.prod .p-name { font-size: 1.25rem; font-weight: 800; letter-spacing: -.01em; }
+.prod .p-price { font-weight: 700; margin: .25rem 0 .6rem; color: var(--accent); }
+.prod p { font-size: .92rem; line-height: 1.8; opacity: .85; margin: 0 0 .9rem; }
+.prod .p-go { font-weight: 700; font-size: .9rem; }
